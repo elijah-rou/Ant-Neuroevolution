@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "neuro_ants"
+version = "0.1.0"
+description = "Neuroevolution of ant-like agents"
+authors = [
+    "Eli Roussos <ekr43@cornell.edu>", 
+    "Russell Bingham <rcb366@cornell.edu>",
+    "Darren Midkiff <dm883@cornell.edu>",
+    "Everett Key <ek724@cornell.edu>"
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pytorch = "^1.0.2"
+numpy = "^1.20.2"
+
+[tool.poetry.dev-dependencies]
+black = "^20.8b1"
+flake8 = "^3.9.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
