@@ -11,7 +11,6 @@ authors = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pytorch = "^1.0.2"
 numpy = "^1.20.2"
 
 [tool.poetry.dev-dependencies]
