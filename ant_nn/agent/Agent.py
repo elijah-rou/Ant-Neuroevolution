@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 import numpy as np
-#from ant_nn.environ import GridCell
-class Agent(abc.ABC):
+
+# from ant_nn.environ import GridCell
+class Agent(ABC):
     """Class representing the ant agent"""
+
     has_food = False
     last_food_location = np.array((0, 0))
     position = np.array((0, 0))
@@ -15,14 +17,14 @@ class Agent(abc.ABC):
     def update(self):
         """ Update the Agent's state """
         raise NotImplementedError
-    
+
     @abstractmethod
-    def depositPheromone(self)
+    def depositPheromone(self):
         """ Decide whether to drop pheromone """
         raise NotImplementedError
 
     @abstractmethod
-    def move(self)
+    def move(self):
         """ Decide a direction to move """
         raise NotImplementedError
 
@@ -32,10 +34,9 @@ class Agent(abc.ABC):
             self.has_food = True
             cell.food -= 1
             self.last_food_location = current_cell.position
-    
+
     def dropFood(self):
         """ Drop Food if the current cell is a nest cell """
         if self.has_food and self.current_cell.is_nest:
             food_gathered += 1
             self.has_food = False
-
