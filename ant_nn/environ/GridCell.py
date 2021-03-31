@@ -5,9 +5,9 @@ class GridCell:
         init_params: dict
     ):
         self.pheromone = 0
-        self.active = not init_params["is-wall?"]
+        self.active = not init_params["is-wall"]
         if self.active:
             self.food = init_params["food"]
-        else
+        else:
             self.food = 0
             
