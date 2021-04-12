@@ -14,7 +14,7 @@ class Agent(ABC):
     distance_traveled = 0
 
     @abstractmethod
-    def update(self):
+    def update(self, en_grid):
         """ Update the Agent's state """
         raise NotImplementedError
 
