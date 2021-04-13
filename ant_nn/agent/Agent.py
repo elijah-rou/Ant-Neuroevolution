@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 import numpy as np
 
-# from ant_nn.environ import GridCell
-class Agent(ABC):
+# class Agent(ABC): <- What is ABC?
+class Agent:
     """Class representing the ant agent"""
 
     has_food = False
@@ -13,10 +13,24 @@ class Agent(ABC):
     food_gathered = 0
     distance_traveled = 0
 
+    def __init__(self):
+        self.pos = np.array((7, 0))
+        self.velocity = np.array((0, 1))
+
     @abstractmethod
-    def update(self, en_grid):
+    def update(self, env):
         """ Update the Agent's state """
-        raise NotImplementedError
+
+        # Begin Ev's code for GUI test
+        next_pos = self.pos + self.velocity
+        if min(next_pos) < 0 or max(next_pos) > env.height-1:
+            self.velocity = self.velocity * -1
+            next_pos = self.pos + self.velocity
+        env.grid[self.pos[0]][self.pos[1]].pheromone = 1 # maybe move to depositePheromone
+        self.pos = next_pos # maybe move to move()
+        # End Ev's code for GUI test
+
+        # raise NotImplementedError
 
     @abstractmethod
     def depositPheromone(self):
