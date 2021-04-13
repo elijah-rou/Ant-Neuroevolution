@@ -38,8 +38,8 @@ class Communicate(QtCore.QObject):
 
 class Board(QtWidgets.QFrame):
     
-    BoardWidth = 10
-    BoardHeight = 10
+    BoardWidth = 50
+    BoardHeight = 50
     Timer = 200
 
     def __init__(self, parent):
@@ -80,7 +80,7 @@ class Board(QtWidgets.QFrame):
                 boardTop + (Board.BoardHeight - row - 1) * self.squareHeight(),
                 cell)
         for agent in self.environ.agents:
-            row, col = agent.pos
+            row, col = agent.get_coord()
             self.drawSquare(painter, rect.left() + col * self.squareWidth(),
             boardTop + (Board.BoardHeight - row - 1) * self.squareHeight())
         painter.end()
