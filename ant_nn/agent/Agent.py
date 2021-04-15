@@ -7,14 +7,15 @@ import numpy as np
 class Agent:
     """Class representing the ant agent"""
 
-    has_food = False
-    last_food_location = np.array((0, 0))
-    position = np.array((0, 0))
-    velocity = np.array((0, 0))
-    random_v = np.array((0.1, 0.1))
 
-    food_gathered = 0
-    distance_traveled = 0
+    def __init__(self, position=np.array((0,0)), velocity=np.array((0,0))):
+        self.has_food = False
+        self.last_food_location = np.array((0, 0))
+        self.position = position
+        self.velocity = velocity
+
+        self.food_gathered = 0
+        self.distance_traveled = 0
 
     def __init__(self):
         self.pos = np.array((7, 0))
