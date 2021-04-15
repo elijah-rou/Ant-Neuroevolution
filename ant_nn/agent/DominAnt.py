@@ -21,7 +21,7 @@ class Brain(nn.Module):
         x = self.fc2(x)
         return x
 
-class NNAnt(Agent):
+class DominAnt(Agent):
     def __init__(self):
         self.brain = Brain()
 
