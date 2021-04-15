@@ -5,13 +5,14 @@ import numpy as np
 class Agent(ABC):
     """Class representing the ant agent"""
 
-    has_food = False
-    last_food_location = np.array((0, 0))
-    position = np.array((0, 0))
-    velocity = np.array((0, 0))
+    def __init__(self):
+        self.has_food = False
+        self.last_food_location = np.array((0, 0))
+        self.position = np.array((0, 0))
+        self.velocity = np.array((0, 0))
 
-    food_gathered = 0
-    distance_traveled = 0
+        self.food_gathered = 0
+        self.distance_traveled = 0
 
     @abstractmethod
     def update(self):
