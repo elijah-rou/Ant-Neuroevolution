@@ -38,7 +38,7 @@ class Agent(ABC):
 
     def pickupFood(self):
         """ Pickup Food if the current cell has food """
-        if self.current_cell.food > 0:
+        if (not self.has_food) and self.current_cell.food > 0:
             self.has_food = True
             cell.food -= 1
             self.last_food_location = current_cell.position
