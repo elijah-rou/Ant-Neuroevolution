@@ -28,13 +28,13 @@ class Agent(ABC):
         self.distance_traveled = 0
 
     @abstractmethod
-    def sense(self, env):
-
-
-
-    @abstractmethod
     def update(self, env, current_cell=None, sensed_cells=None):
         """ Update the Agent's state """
+        raise NotImplementedError
+
+    @abstractmethod
+    def sense(self, env):
+        """ Sense local environment (update current and sensed cells) """
         raise NotImplementedError
     
     @abstractmethod

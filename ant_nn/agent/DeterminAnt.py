@@ -18,7 +18,7 @@ class DeterminAnt(Agent):
     }
 
     def __init__(self):
-        super.__init__()
+        super().__init__()
 
     def update(self, env):
         self.sense(env)
@@ -28,9 +28,9 @@ class DeterminAnt(Agent):
         self.depositPheromone()
         self.move()
 
-    def self.sense(env):
-        """Updates current and sensed cells """
-        
+    def sense(self,env):
+        """ Updates current and sensed cells """
+
         cell_pos = self.get_coord()  # integer coordinates of current cell
         angle_case = np.round(8 * self.orientation / (2*np.pi)).astype(np.uint8)  # split angles 0-2pi into 8 possible cases
                                                                                   # really case 0 and 8 are equivalent
@@ -46,12 +46,14 @@ class DeterminAnt(Agent):
 
     def move(self):
         if self.has_food:  # head straight to colony w/ food
+            # polar angle from nest
             theta = np.arctan(
                 self.position[1] / self.position[0]
-            )  # polar angle from nest
+            ) 
             self.orientation = (theta + np.pi) % (2 * np.pi)
             self.speed = MAX_SPEED
         else:
+            # random walk
             self.orientation = (self.orientation + np.random.normal(0, 0.5)) % (2 * np.pi)
             self.speed = MAX_SPEED
         self.position[0] = self.speed * cos(self.orientation)
