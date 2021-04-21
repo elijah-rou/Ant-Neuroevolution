@@ -9,7 +9,7 @@ class Agent:
 
     MAX_SPEED = 1  # maximum velocity; accessible to all agents
 
-    def __init__(self, position=np.array((0,0)), orientation = np.array((0,0)), velocity=np.array((0,0)),
+    def __init__(self, position=np.array((0,0)), orientation=0, velocity=np.array((0,0)),
                     current_cell, sensed_cells):
         self.has_food = False
         self.last_food_location = np.array((0, 0))
@@ -23,10 +23,6 @@ class Agent:
         self.food_gathered = 0
         self.distance_traveled = 0
 
-    def __init__(self):
-        self.pos = np.array((7, 0))
-        self.dir = 0 
-        self.v = 1
 
     @abstractmethod
     def update(self, current_cell, sensed_cells):
@@ -43,18 +39,18 @@ class Agent:
     @abstractmethod
     def move(self, env):
         """ Decide a direction to move, and move"""
-        abs_v = self.v * np.array([np.sin(self.dir), np.cos(self.dir)])
-        next_pos = self.pos + abs_v
+        abs_v = MAX_SPEED * np.array([np.sin(self.orientation), np.cos(self.orientation)])
+        next_pos = self.position + abs_v
         if min(next_pos) < 0 or max(next_pos) > env.height-1:
-            self.dir = self.dir + np.pi
-            abs_v = self.v * np.array((np.sin(self.dir), np.cos(self.dir)))
-            next_pos = self.pos + abs_v
-        self.pos = next_pos
+            self.orientation = self.orientation + np.pi
+            abs_v = MAX_SPEED * np.array((np.sin(self.orientation), np.cos(self.orientation)))
+            next_pos = self.position + abs_v
+        self.position = next_pos
         dir_change = random.random()
         if dir_change < 0.1:
-            self.dir += np.pi / 6
+            self.orientation += np.pi / 6
         elif dir_change < 0.2:
-            self.dir -= np.pi / 6
+            self.orientation -= np.pi / 6
 
     def pickupFood(self):
         """ Pickup Food if the current cell has food """
@@ -70,4 +66,4 @@ class Agent:
             self.has_food = False
     
     def get_coord(self):
-        return self.pos.astype(int)
+        return self.position.astype(int)
