@@ -11,4 +11,7 @@ class DeterminAnt(Agent):
         pass
 
     def move(self):
-        pass
+        if(self.has_food):
+            self.orientation = self.position[1] + np.pi
+            self.velocity = MAX_VEL
+        else:

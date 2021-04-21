@@ -5,18 +5,24 @@ import numpy as np
 class Agent(ABC):
     """Class representing the ant agent"""
 
-    def __init__(self, position=np.array((0,0)), orientation = np.array((0,0)), velocity=np.array((0,0))):
+    MAX_VEL = 1  # maximum velocity; accessible to all agents
+
+    def __init__(self, position=np.array((0,0)), orientation = np.array((0,0)), velocity=np.array((0,0)),
+                    current_cell, sensed_cells):
         self.has_food = False
         self.last_food_location = np.array((0, 0))
         self.position = position  # position in polar coordinates (radians)
         self.orientation = orientation  # angle of orientation in radians
         self.velocity = velocity
 
+        self.current_cell = current_cell
+        self.sensed_cells = sensed_cells
+
         self.food_gathered = 0
         self.distance_traveled = 0
 
     @abstractmethod
-    def update(self):
+    def update(self, current_cell, sensed_cells):
         """ Update the Agent's state """
         raise NotImplementedError
 
