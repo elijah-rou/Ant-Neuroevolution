@@ -10,12 +10,12 @@ class Agent:
     MAX_SPEED = 1  # maximum velocity; accessible to all agents
 
     def __init__(
-        self, 
-        current_cell=None, 
-        sensed_cells=None, 
-        position=np.array((0,0)), 
-        orientation=0, 
-        velocity=np.array((0,0)),
+        self,
+        current_cell=None,
+        sensed_cells=None,
+        position=np.array((0, 0)),
+        orientation=0,
+        velocity=np.array((0, 0)),
     ):
         self.has_food = False
         self.last_food_location = np.array((0, 0))
@@ -28,13 +28,12 @@ class Agent:
         self.food_gathered = 0
         self.distance_traveled = 0
 
-
     @abstractmethod
     def update(self, env, current_cell=None, sensed_cells=None):
         """ Update the Agent's state """
         self.depositPheromone(env)
         self.move(env)
-    
+
     @abstractmethod
     def depositPheromone(self, env):
         """ Decide whether to drop pheromone, drop it if yes"""
@@ -44,11 +43,15 @@ class Agent:
     @abstractmethod
     def move(self, env):
         """ Decide a direction to move, and move"""
-        abs_v = self.MAX_SPEED * np.array([np.sin(self.orientation), np.cos(self.orientation)])
+        abs_v = self.MAX_SPEED * np.array(
+            [np.sin(self.orientation), np.cos(self.orientation)]
+        )
         next_pos = self.position + abs_v
-        if min(next_pos) < 0 or max(next_pos) > env.height-1:
+        if min(next_pos) < 0 or max(next_pos) > env.height - 1:
             self.orientation = self.orientation + np.pi
-            abs_v = self.MAX_SPEED * np.array((np.sin(self.orientation), np.cos(self.orientation)))
+            abs_v = self.MAX_SPEED * np.array(
+                (np.sin(self.orientation), np.cos(self.orientation))
+            )
             next_pos = self.position + abs_v
         self.position = next_pos
         dir_change = random.random()
@@ -69,6 +72,6 @@ class Agent:
         if self.has_food and self.current_cell.is_nest:
             food_gathered += 1
             self.has_food = False
-    
+
     def get_coord(self):
         return self.position.astype(int)

@@ -106,27 +106,28 @@ class Board(QtWidgets.QFrame):
         colorTable = [
             0x000000,
             0xCC6666,
-            0x66CC66, # Green
-            0x6666CC, 
-            0xCCCC66, # 
-            0xCC66CC, # purple
-            0x66CCCC, # Cyan
-            0xDAAA00, # Yellow
+            0x66CC66,  # Green
+            0x6666CC,
+            0xCCCC66,  #
+            0xCC66CC,  # purple
+            0x66CCCC,  # Cyan
+            0xDAAA00,  # Yellow
         ]
-        if not cell: # Pass in None if it is an Ant
+        if not cell:  # Pass in None if it is an Ant
             color = QtGui.QColor(0xCC0000)
         elif not cell.active:
             color = QtGui.QColor(0xDAAA00)  # Draw Wall
-        elif cell.pheromone > 0:            # draw pheromone
+        elif cell.pheromone > 0:  # draw pheromone
             color = QtGui.QColor.fromHsv(233, 255 * cell.pheromone, 255)
-        elif cell.food > 0:                 # Draw Food
+        elif cell.food > 0:  # Draw Food
             color = QtGui.QColor(0x66CC66)
-        elif cell.pheromone == 0:           # Draw blank space
-            color = QtGui.QColor(0xFFFFFF)  
+        elif cell.pheromone == 0:  # Draw blank space
+            color = QtGui.QColor(0xFFFFFF)
 
         painter.fillRect(
             x + 1, y + 1, self.squareWidth() - 1, self.squareHeight() - 1, color
         )
+
 
 class Things(object):
 

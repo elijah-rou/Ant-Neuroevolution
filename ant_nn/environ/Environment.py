@@ -34,7 +34,7 @@ class Environment:
                 grid_cell.update()
         for agent in self.agents:
             agent.update(self)
-    
+
     def drop_food(self):
         if self.time % 10 == 0:
             row = np.random.randint(self.height)
@@ -46,7 +46,6 @@ class Environment:
             for j in range(col - r, col + r):
                 if 0 <= i < self.width and 0 <= j < self.height:
                     self.grid[i][j].food += amount
-
 
     def __str__(self):
         string = ""
