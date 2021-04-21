@@ -50,7 +50,7 @@ class Board(QtWidgets.QFrame):
 
         self.timer = QtCore.QBasicTimer()
 
-        self.agents = [Agent()]
+        self.agents = [Agent(), Agent()]
         self.environ = Environment(
             h=Board.BoardHeight, w=Board.BoardWidth, agents=self.agents
         )
