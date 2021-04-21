@@ -21,7 +21,6 @@ class Agent:
         self.last_food_location = np.array((0, 0))
         self.position = position  # position [x,y]
         self.orientation = orientation  # angle of orientation in radians
-        self.speed = speed
 
         self.current_cell = current_cell
         self.sensed_cells = sensed_cells
@@ -31,7 +30,7 @@ class Agent:
 
 
     @abstractmethod
-    def update(self, current_cell, sensed_cells):
+    def update(self, env, current_cell=None, sensed_cells=None):
         """ Update the Agent's state """
         self.depositPheromone(env)
         self.move(env)
@@ -45,11 +44,11 @@ class Agent:
     @abstractmethod
     def move(self, env):
         """ Decide a direction to move, and move"""
-        abs_v = MAX_SPEED * np.array([np.sin(self.orientation), np.cos(self.orientation)])
+        abs_v = self.MAX_SPEED * np.array([np.sin(self.orientation), np.cos(self.orientation)])
         next_pos = self.position + abs_v
         if min(next_pos) < 0 or max(next_pos) > env.height-1:
             self.orientation = self.orientation + np.pi
-            abs_v = MAX_SPEED * np.array((np.sin(self.orientation), np.cos(self.orientation)))
+            abs_v = self.MAX_SPEED * np.array((np.sin(self.orientation), np.cos(self.orientation)))
             next_pos = self.position + abs_v
         self.position = next_pos
         dir_change = random.random()
