@@ -1,4 +1,5 @@
 from ant_nn.environ.GridCell import GridCell
+import numpy as np
 
 # from GridCell import GridCell
 class Environment:
@@ -23,18 +24,29 @@ class Environment:
         pass
 
     def default_setup(self):
-        self.grid[2][1].food += 2
-        for i in range(2, 5):
-            self.grid[3][i].active = False
-        for i in range(1, 9):
-            self.grid[6][i].pheromone = 1 * 0.9 ** i
+        pass
 
     def update(self):
+        self.time += 1
+        self.drop_food()
         for grid_row in self.grid:
             for grid_cell in grid_row:
                 grid_cell.update()
         for agent in self.agents:
             agent.update(self)
+    
+    def drop_food(self):
+        if self.time % 10 == 0:
+            row = np.random.randint(self.height)
+            col = np.random.randint(self.width)
+            self.spawn_food(row, col)
+
+    def spawn_food(self, row, col, r=3, amount=1):
+        for i in range(row - r, row + r):
+            for j in range(col - r, col + r):
+                if 0 <= i < self.width and 0 <= j < self.height:
+                    self.grid[i][j].food += amount
+
 
     def __str__(self):
         string = ""
