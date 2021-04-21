@@ -7,12 +7,18 @@ import numpy as np
 class Agent:
     """Class representing the ant agent"""
 
+    MAX_SPEED = 1  # maximum velocity; accessible to all agents
 
-    def __init__(self, position=np.array((0,0)), velocity=np.array((0,0))):
+    def __init__(self, position=np.array((0,0)), orientation = np.array((0,0)), velocity=np.array((0,0)),
+                    current_cell, sensed_cells):
         self.has_food = False
         self.last_food_location = np.array((0, 0))
-        self.position = position
-        self.velocity = velocity
+        self.position = position  # position [x,y]
+        self.orientation = orientation  # angle of orientation in radians
+        self.speed = speed
+
+        self.current_cell = current_cell
+        self.sensed_cells = sensed_cells
 
         self.food_gathered = 0
         self.distance_traveled = 0
@@ -23,7 +29,7 @@ class Agent:
         self.v = 1
 
     @abstractmethod
-    def update(self, env):
+    def update(self, current_cell, sensed_cells):
         """ Update the Agent's state """
         self.depositPheromone(env)
         self.move(env)
@@ -52,9 +58,9 @@ class Agent:
 
     def pickupFood(self):
         """ Pickup Food if the current cell has food """
-        if self.current_cell.food > 0:
+        if (not self.has_food) and self.current_cell.food > 0:
             self.has_food = True
-            cell.food -= 1
+            current_cell.food -= 1
             self.last_food_location = current_cell.position
 
     def dropFood(self):
