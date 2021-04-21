@@ -11,8 +11,8 @@ class Agent:
 
     def __init__(
         self, 
-        current_cell, 
-        sensed_cells, 
+        current_cell=None, 
+        sensed_cells=None, 
         position=np.array((0,0)), 
         orientation=0, 
         velocity=np.array((0,0)),
