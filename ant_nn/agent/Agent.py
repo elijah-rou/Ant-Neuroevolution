@@ -1,38 +1,67 @@
+import random
+
 from abc import ABC, abstractmethod
 import numpy as np
 
-# from ant_nn.environ import GridCell
-class Agent(ABC):
+# class Agent(ABC): <- What is ABC?
+class Agent:
     """Class representing the ant agent"""
 
-    has_food = False
-    last_food_location = np.array((0, 0))
-    position = np.array((0, 0))
-    velocity = np.array((0, 0))
+    MAX_SPEED = 1  # maximum velocity; accessible to all agents
 
-    food_gathered = 0
-    distance_traveled = 0
+    def __init__(
+        self, 
+        current_cell=None, 
+        sensed_cells=None, 
+        position=np.array((0,0)), 
+        orientation=0, 
+        velocity=np.array((0,0)),
+    ):
+        self.has_food = False
+        self.last_food_location = np.array((0, 0))
+        self.position = position  # position [x,y]
+        self.orientation = orientation  # angle of orientation in radians
+
+        self.current_cell = current_cell
+        self.sensed_cells = sensed_cells
+
+        self.food_gathered = 0
+        self.distance_traveled = 0
+
 
     @abstractmethod
-    def update(self):
+    def update(self, env, current_cell=None, sensed_cells=None):
         """ Update the Agent's state """
-        raise NotImplementedError
+        self.depositPheromone(env)
+        self.move(env)
+    
+    @abstractmethod
+    def depositPheromone(self, env):
+        """ Decide whether to drop pheromone, drop it if yes"""
+        i, j = self.get_coord()
+        env.grid[i][j].pheromone = 1
 
     @abstractmethod
-    def depositPheromone(self):
-        """ Decide whether to drop pheromone """
-        raise NotImplementedError
-
-    @abstractmethod
-    def move(self):
-        """ Decide a direction to move """
-        raise NotImplementedError
+    def move(self, env):
+        """ Decide a direction to move, and move"""
+        abs_v = self.MAX_SPEED * np.array([np.sin(self.orientation), np.cos(self.orientation)])
+        next_pos = self.position + abs_v
+        if min(next_pos) < 0 or max(next_pos) > env.height-1:
+            self.orientation = self.orientation + np.pi
+            abs_v = self.MAX_SPEED * np.array((np.sin(self.orientation), np.cos(self.orientation)))
+            next_pos = self.position + abs_v
+        self.position = next_pos
+        dir_change = random.random()
+        if dir_change < 0.1:
+            self.orientation += np.pi / 6
+        elif dir_change < 0.2:
+            self.orientation -= np.pi / 6
 
     def pickupFood(self):
         """ Pickup Food if the current cell has food """
-        if self.current_cell.food > 0:
+        if (not self.has_food) and self.current_cell.food > 0:
             self.has_food = True
-            cell.food -= 1
+            current_cell.food -= 1
             self.last_food_location = current_cell.position
 
     def dropFood(self):
@@ -40,3 +69,6 @@ class Agent(ABC):
         if self.has_food and self.current_cell.is_nest:
             food_gathered += 1
             self.has_food = False
+    
+    def get_coord(self):
+        return self.position.astype(int)
