@@ -3,11 +3,10 @@ import random
 from abc import ABC, abstractmethod
 import numpy as np
 
-# class Agent(ABC): <- What is ABC?
-class Agent:
-    """Class representing the ant agent"""
+MAX_SPEED = 1  # maximum velocity; accessible to all agents
 
-    MAX_SPEED = 1  # maximum velocity; accessible to all agents
+class Agent(ABC):
+    """Class representing the ant agent"""
 
     def __init__(
         self, 
@@ -27,6 +26,9 @@ class Agent:
 
         self.food_gathered = 0
         self.distance_traveled = 0
+
+    @abstractmethod
+    def sense(self, env)
 
 
     @abstractmethod
