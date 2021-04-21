@@ -5,15 +5,15 @@ import numpy as np
 class Agent(ABC):
     """Class representing the ant agent"""
 
-    MAX_VEL = 1  # maximum velocity; accessible to all agents
+    MAX_SPEED = 1  # maximum velocity; accessible to all agents
 
     def __init__(self, position=np.array((0,0)), orientation = np.array((0,0)), velocity=np.array((0,0)),
                     current_cell, sensed_cells):
         self.has_food = False
         self.last_food_location = np.array((0, 0))
-        self.position = position  # position in polar coordinates (radians)
+        self.position = position  # position [x,y]
         self.orientation = orientation  # angle of orientation in radians
-        self.velocity = velocity
+        self.speed = speed
 
         self.current_cell = current_cell
         self.sensed_cells = sensed_cells
@@ -40,7 +40,7 @@ class Agent(ABC):
         """ Pickup Food if the current cell has food """
         if (not self.has_food) and self.current_cell.food > 0:
             self.has_food = True
-            cell.food -= 1
+            current_cell.food -= 1
             self.last_food_location = current_cell.position
 
     def dropFood(self):
