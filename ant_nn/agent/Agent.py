@@ -61,7 +61,7 @@ class Agent(ABC):
 
     def pickupFood(self):
         """ Pickup Food if the current cell has food """
-        if (not self.has_food) and self.current_cell.food > 0:
+        if (not self.has_food) and (self.current_cell.food > 0) and (not self.current_cell.is_nest):
             self.has_food = True
             current_cell.food -= 1
             self.last_food_location = current_cell.position
@@ -69,7 +69,7 @@ class Agent(ABC):
     def dropFood(self):
         """ Drop Food if the current cell is a nest cell """
         if self.has_food and self.current_cell.is_nest:
-            self.current_cell.food_gathered += 1
+            self.current_cell.food += 1
             self.has_food = False
     
     def get_coord(self):
