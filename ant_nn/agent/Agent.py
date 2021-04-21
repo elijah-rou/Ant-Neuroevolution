@@ -3,8 +3,7 @@ import random
 from abc import ABC, abstractmethod
 import numpy as np
 
-# class Agent(ABC): <- What is ABC?
-class Agent:
+class Agent(ABC):
     """Class representing the ant agent"""
 
     MAX_SPEED = 1  # maximum velocity; accessible to all agents
