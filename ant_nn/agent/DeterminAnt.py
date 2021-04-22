@@ -62,9 +62,7 @@ class DeterminAnt(Agent):
     def move(self, grid):
         if self.has_food:  # head straight to colony w/ food
             nest_diff = self.position - self.nest_loc
-            theta = np.arctan(
-                nest_diff[1] / nest_diff[0]
-            ) 
+            theta = np.arctan2(nest_diff[1], nest_diff[0])
             self.orientation = theta % (2 * np.pi)
             self.speed = self.MAX_SPEED
         else:
