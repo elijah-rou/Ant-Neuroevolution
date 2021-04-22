@@ -35,8 +35,6 @@ class DeterminAnt(Agent):
     def update(self, grid):
         grid
         self.sense(grid)
-        if(self.current_cell.is_nest):
-
         self.pickupFood()
         self.dropFood()
         self.depositPheromone()
