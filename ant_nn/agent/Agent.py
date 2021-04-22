@@ -10,12 +10,14 @@ class Agent(ABC):
 
     def __init__(
         self, 
+        nest_loc = np.array((0,0)),
         current_cell=None, 
         sensed_cells=[None for i in range(5)], 
         position=np.array((0,0),dtype=float), 
         orientation=0, 
         velocity=np.array((0,0)),
     ):
+        self.nest_loc = nest_loc
         self.has_food = False
         self.last_food_location = np.array((0, 0))
         self.position = position  # position [x,y]
@@ -63,7 +65,7 @@ class Agent(ABC):
         """ Pickup Food if the current cell has food """
         if (not self.has_food) and (self.current_cell.food > 0) and (not self.current_cell.is_nest):
             self.has_food = True
-            current_cell.food -= 1
+            self.current_cell.food -= 1
             self.last_food_location = current_cell.position
 
     def dropFood(self):
