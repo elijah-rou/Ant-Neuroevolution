@@ -28,7 +28,7 @@ class DeterminAnt(Agent):
         self.depositPheromone()
         self.move()
 
-    def self.sense(env):
+    def sense(self, env):
         """Updates current and sensed cells """
         
         cell_pos = self.get_coord()  # integer coordinates of current cell

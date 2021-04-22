@@ -3,6 +3,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 
 from ant_nn.environ.Environment import Environment
 from ant_nn.agent.Agent import Agent
+from ant_nn.agent.RandAnt import RandAnt
 
 # TODO
 # * Set the grid to fixed size, don't allow reshape
@@ -49,12 +50,10 @@ class Board(QtWidgets.QFrame):
         super(Board, self).__init__()
 
         self.timer = QtCore.QBasicTimer()
-
-        self.agents = [Agent(), Agent()]
         self.environ = Environment(
-            h=Board.BoardHeight, w=Board.BoardWidth, agents=self.agents
-        )
-        self.environ.default_setup()
+                                    h=Board.BoardHeight,
+                                    w=Board.BoardWidth
+                                )
 
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
