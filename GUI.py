@@ -2,7 +2,7 @@ import sys, random
 from PySide2 import QtCore, QtGui, QtWidgets
 
 from ant_nn.environ.Environment import Environment
-from ant_nn.agent.Agent import Agent
+from ant_nn.agent.DeterminAnt import DeterminAnt
 
 # TODO
 # * Set the grid to fixed size, don't allow reshape
@@ -50,7 +50,7 @@ class Board(QtWidgets.QFrame):
 
         self.timer = QtCore.QBasicTimer()
 
-        self.agents = [Agent()]
+        self.agents = [DeterminAnt()]
         self.environ = Environment(
             h=Board.BoardHeight, w=Board.BoardWidth, agents=self.agents
         )

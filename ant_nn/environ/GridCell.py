@@ -6,7 +6,7 @@ class GridCell:
 
     def __init__(self, row, col, kind=None, food=0):
         self.active = not kind == "wall"
-        self.nest = kind == "nest"
+        self.is_nest = kind == "nest"
         self.position = np.array([row, col])
 
         self.pheromone = 0
@@ -26,7 +26,7 @@ class GridCell:
     def __str__(self):
         if not self.active:
             return "W"  # W for wall
-        if self.nest:
+        if self.is_nest:
             return "N"  # N for nest
         if self.food > 0:
             return "F"

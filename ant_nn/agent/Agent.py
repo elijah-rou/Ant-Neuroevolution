@@ -11,8 +11,8 @@ class Agent(ABC):
     def __init__(
         self, 
         current_cell=None, 
-        sensed_cells=None, 
-        position=np.array((0,0)), 
+        sensed_cells=[None for i in range(5)], 
+        position=np.array((0,0),dtype=float), 
         orientation=0, 
         velocity=np.array((0,0)),
     ):
@@ -28,7 +28,7 @@ class Agent(ABC):
         self.distance_traveled = 0
 
     @abstractmethod
-    def update(self, env, current_cell=None, sensed_cells=None):
+    def update(self, env):
         """ Update the Agent's state """
         raise NotImplementedError
 
@@ -38,7 +38,7 @@ class Agent(ABC):
         raise NotImplementedError
     
     @abstractmethod
-    def depositPheromone(self, env):
+    def depositPheromone(self):
         """ Decide whether to drop pheromone, drop it if yes"""
         raise NotImplementedError
 
@@ -74,3 +74,9 @@ class Agent(ABC):
     
     def get_coord(self):
         return self.position.astype(int)
+
+    def coord_valid(self, grid, coord):
+        """ Check if coordinate is on grid """
+        x_valid = (coord[0] > 0) and (coord[0] < len(grid))
+        y_valid = (coord[1] > 1) and (coord[1] < len(grid[0]))
+        return x_valid and y_valid 

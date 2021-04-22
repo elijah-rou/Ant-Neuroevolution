@@ -33,7 +33,7 @@ class Environment:
             for grid_cell in grid_row:
                 grid_cell.update()
         for agent in self.agents:
-            agent.update(self)
+            agent.update(self.grid)
     
     def drop_food(self):
         if self.time % 10 == 0:
