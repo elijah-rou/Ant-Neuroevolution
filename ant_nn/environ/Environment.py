@@ -36,6 +36,8 @@ class Environment:
         nest_loc = [self.height // 2, self.width // 2]
         for i in range(10):
             self.agents.append(DeterminAnt(nest_loc=nest_loc, position=nest_loc))
+        self.spawn_food(10, 15)
+        self.spawn_food(30, 40)
         # self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[10,20], has_food=True))
         # self.agents.append(RandAnt())
         # Set up nest location
@@ -43,7 +45,7 @@ class Environment:
 
     def update(self):
         self.time += 1
-        self.drop_food()
+        # self.drop_food()
         for grid_row in self.grid:
             for grid_cell in grid_row:
                 grid_cell.update()
