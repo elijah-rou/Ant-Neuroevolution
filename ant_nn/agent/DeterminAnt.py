@@ -26,10 +26,10 @@ class DeterminAnt(Agent):
         sensed_cells=[None for i in range(5)], 
         position= [0,0], 
         orientation=0, 
-        velocity=np.array((0,0)),
+        speed=np.array((0,0)),
         has_food = False
     ):
-        super().__init__(nest_loc, current_cell, sensed_cells, position, orientation, velocity, has_food)
+        super().__init__(nest_loc, current_cell, sensed_cells, position, orientation, speed, has_food)
         self.adjacent_food = -1
         self.adjacent_pheromone = -1
 
