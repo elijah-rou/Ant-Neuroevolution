@@ -14,8 +14,7 @@ class Agent(ABC):
         current_cell=None, 
         sensed_cells=[None for i in range(5)], 
         position= [0,0], 
-        orientation=0, 
-        speed=np.array((0,0)),
+        orientation=0,
         has_food = False
     ):
         self.nest_loc = np.asarray(nest_loc).astype(int)
@@ -23,6 +22,7 @@ class Agent(ABC):
         self.last_food_location = np.array((0, 0))
         self.position = np.asarray(position).astype(float)  # position [x,y]
         self.orientation = orientation  # angle of orientation in radians
+        self.speed = 0
 
         self.current_cell = current_cell
         self.sensed_cells = sensed_cells
