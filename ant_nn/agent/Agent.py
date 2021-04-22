@@ -3,9 +3,9 @@ import random
 from abc import ABC, abstractmethod
 import numpy as np
 
-
 class Agent(ABC):
     """Class representing the ant agent"""
+
     MAX_SPEED = 1  # maximum velocity; accessible to all agents
 
     def __init__(
@@ -42,24 +42,12 @@ class Agent(ABC):
     @abstractmethod
     def depositPheromone(self):
         """ Decide whether to drop pheromone, drop it if yes"""
-        raise NotImplementedError
+        pass
 
     @abstractmethod
     def move(self, env):
         """ Decide a direction to move, and move"""
-        raise NotImplementedError
-        # abs_v = self.MAX_SPEED * np.array([np.sin(self.orientation), np.cos(self.orientation)])
-        # next_pos = self.position + abs_v
-        # if min(next_pos) < 0 or max(next_pos) > env.height-1:
-        #     self.orientation = self.orientation + np.pi
-        #     abs_v = self.MAX_SPEED * np.array((np.sin(self.orientation), np.cos(self.orientation)))
-        #     next_pos = self.position + abs_v
-        # self.position = next_pos
-        # dir_change = random.random()
-        # if dir_change < 0.1:
-        #     self.orientation += np.pi / 6
-        # elif dir_change < 0.2:
-        #     self.orientation -= np.pi / 6
+        pass
 
     def pickupFood(self):
         """ Pickup Food if the current cell has food """
