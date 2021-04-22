@@ -23,10 +23,16 @@ class AntGUI(QtWidgets.QMainWindow):
         self.setCentralWidget(self.board)
 
         self.statusbar = self.statusBar()
+
+        self.statusbar = self.statusBar()
         self.board.c.msgToSB[str].connect(self.statusbar.showMessage)
 
         self.board.start()
         self.center()
+    
+    def update(self):
+        super.update()
+        self.statusbar.showMessage(self.board.environ.nest.food)
 
     def center(self):
 
@@ -99,6 +105,8 @@ class Board(QtWidgets.QFrame):
         if event.timerId() == self.timer.timerId():
             self.environ.update()
             self.update()
+            score = self.environ.nest.food
+            self.c.msgToSB.emit("Food Collected: " + str(score))
         QtWidgets.QFrame.timerEvent(self, event)
 
     def drawSquare(self, painter, x, y, cell=None):
@@ -120,7 +128,7 @@ class Board(QtWidgets.QFrame):
         elif not cell.active:
             color = QtGui.QColor(0xDAAA00)  # Draw Wall
         elif cell.pheromone > 0:            # draw pheromone
-            color = QtGui.QColor.fromHsv(233, 255 * cell.pheromone, 255)
+            color = QtGui.QColor.fromHsv(233, 255 * min(cell.pheromone, 1), 255)
         elif cell.food > 0:                 # Draw Food
             color = QtGui.QColor(0x66CC66)
         elif cell.pheromone == 0:           # Draw blank space
