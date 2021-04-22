@@ -25,7 +25,7 @@ class Environment:
             self.nest = self.grid[nest[0]][nest[1]]
         else:
             self.nest = self.grid[h//2][w//2]
-        self.nest.nest = True
+        self.nest.is_nest = True
 
         self.default_setup()
 

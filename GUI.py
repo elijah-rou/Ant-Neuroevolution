@@ -115,7 +115,7 @@ class Board(QtWidgets.QFrame):
         ]
         if not cell: # Pass in None if it is an Ant
             color = QtGui.QColor(0xCC0000)
-        elif cell.nest:
+        elif cell.is_nest:
             color = QtGui.QColor(0x000000)
         elif not cell.active:
             color = QtGui.QColor(0xDAAA00)  # Draw Wall

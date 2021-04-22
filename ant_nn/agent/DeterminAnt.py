@@ -31,6 +31,8 @@ class DeterminAnt(Agent):
     def update(self, grid):
         grid
         self.sense(grid)
+        if(self.current_cell.is_nest):
+            print('IN NEST')
 
         self.pickupFood()
         self.dropFood()
@@ -61,9 +63,9 @@ class DeterminAnt(Agent):
 
     def move(self, grid):
         if self.has_food:  # head straight to colony w/ food
-            nest_diff = self.position - self.nest_loc
+            nest_diff = self.position - (self.nest_loc + 0.5)
             theta = np.arctan2(nest_diff[1], nest_diff[0])
-            self.orientation = theta % (2 * np.pi)
+            self.orientation = (theta + np.pi) % (2 * np.pi)
             self.speed = self.MAX_SPEED
         else:
             # random walk
@@ -80,5 +82,3 @@ class DeterminAnt(Agent):
             next_pos[1] = self.position[1] + self.speed * np.sin(self.orientation)
 
         self.position[:] = next_pos[:]
-        print(self.speed * np.cos(self.orientation))
-        print(self.position[0])

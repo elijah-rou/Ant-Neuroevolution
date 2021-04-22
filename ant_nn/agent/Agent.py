@@ -59,6 +59,7 @@ class Agent(ABC):
     def dropFood(self):
         """ Drop Food if the current cell is a nest cell """
         if self.has_food and self.current_cell.is_nest:
+            print('DROP')
             self.current_cell.food += 1
             self.has_food = False
     
