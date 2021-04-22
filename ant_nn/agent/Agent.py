@@ -66,7 +66,7 @@ class Agent(ABC):
         if (not self.has_food) and (self.current_cell.food > 0) and (not self.current_cell.is_nest):
             self.has_food = True
             self.current_cell.food -= 1
-            self.last_food_location = current_cell.position
+            self.last_food_location = self.current_cell.position
 
     def dropFood(self):
         """ Drop Food if the current cell is a nest cell """
