@@ -114,6 +114,8 @@ class Board(QtWidgets.QFrame):
         ]
         if not cell: # Pass in None if it is an Ant
             color = QtGui.QColor(0xCC0000)
+        elif cell.nest:
+            color = QtGui.QColor(0x000000)
         elif not cell.active:
             color = QtGui.QColor(0xDAAA00)  # Draw Wall
         elif cell.pheromone > 0:            # draw pheromone
@@ -121,7 +123,7 @@ class Board(QtWidgets.QFrame):
         elif cell.food > 0:                 # Draw Food
             color = QtGui.QColor(0x66CC66)
         elif cell.pheromone == 0:           # Draw blank space
-            color = QtGui.QColor(0xFFFFFF)  
+            color = QtGui.QColor(0xFFFFFF) 
 
         painter.fillRect(
             x + 1, y + 1, self.squareWidth() - 1, self.squareHeight() - 1, color

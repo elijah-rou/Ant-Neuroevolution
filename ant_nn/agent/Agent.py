@@ -49,6 +49,3 @@ class Agent(ABC):
     def dropFood(self):
         """ Drop Food if the current cell is a nest cell """
         pass
-    
-    def get_coord(self):
-        return self.position.astype(int)
