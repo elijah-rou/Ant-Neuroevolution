@@ -122,7 +122,7 @@ class Board(QtWidgets.QFrame):
             0xDAAA00, # Yellow
         ]
         if not cell: # Pass in None if it is an Ant
-            color = QtGui.QColor(0xCC0000)
+            color = QtGui.QColor(0xDAAA00)
         elif cell.is_nest:
             color = QtGui.QColor(0x000000)
         elif not cell.active:
