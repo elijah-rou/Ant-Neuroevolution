@@ -2,9 +2,6 @@ import sys, random
 from PySide2 import QtCore, QtGui, QtWidgets
 
 from ant_nn.environ.Environment import Environment
-from ant_nn.agent.DeterminAnt import DeterminAnt
-from ant_nn.agent.Agent import Agent
-from ant_nn.agent.RandAnt import RandAnt
 
 # TODO
 # * Set the grid to fixed size, don't allow reshape
