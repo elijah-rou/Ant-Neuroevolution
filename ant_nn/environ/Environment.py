@@ -34,7 +34,7 @@ class Environment:
 
     def default_setup(self):
         nest_loc = [self.height // 2, self.width // 2]
-        for i in range(1):
+        for i in range(10):
             self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[10,20]))
         # self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[10,20], has_food=True))
         # self.agents.append(RandAnt())
@@ -54,6 +54,8 @@ class Environment:
         if self.time % 10 == 0:
             row = np.random.randint(self.height)
             col = np.random.randint(self.width)
+            row = 10
+            col = 10
             self.spawn_food(row, col)
 
     def spawn_food(self, row, col, r=3, amount=1):
