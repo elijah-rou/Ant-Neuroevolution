@@ -34,7 +34,9 @@ class Environment:
 
     def default_setup(self):
         nest_loc = [self.height // 2, self.width // 2]
-        self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[20,20]))
+        for i in range(20):
+            self.agents.append(DeterminAnt(nest_loc=nest_loc))
+        # self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[10,20], has_food=True))
         # self.agents.append(RandAnt())
         # Set up nest location
         
