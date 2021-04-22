@@ -58,6 +58,7 @@ class Agent(ABC):
 
     def dropFood(self):
         """ Drop Food if the current cell is a nest cell """
+<<<<<<< HEAD
         if self.has_food and self.current_cell.is_nest:
             self.current_cell.food += 1
             self.has_food = False
@@ -70,3 +71,6 @@ class Agent(ABC):
         x_valid = (coord[0] > 0) and (coord[0] < len(grid))
         y_valid = (coord[1] > 1) and (coord[1] < len(grid[0]))
         return x_valid and y_valid 
+=======
+        pass
+>>>>>>> dev/ev
