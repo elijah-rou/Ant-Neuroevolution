@@ -51,12 +51,12 @@ class Environment:
             agent.update(self.grid)
     
     def drop_food(self):
-        if self.time % 50 == 0:
+        if self.time % 10 == 0:
             row = np.random.randint(self.height)
             col = np.random.randint(self.width)
             self.spawn_food(row, col)
 
-    def spawn_food(self, row, col, r=2, amount=1):
+    def spawn_food(self, row, col, r=3, amount=1):
         for i in range(row - r, row + r):
             for j in range(col - r, col + r):
                 if 0 <= i < self.width and 0 <= j < self.height:
