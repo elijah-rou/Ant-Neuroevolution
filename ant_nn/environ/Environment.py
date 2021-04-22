@@ -19,7 +19,7 @@ class Environment:
         for i in range(self.height):
             self.grid.append([])
             for j in range(self.width):
-                self.grid[i].append(GridCell(i, j))
+                self.grid[i].append(GridCell(i, j, dissapate_coef=0.98))
         
         if nest:
             self.nest = self.grid[nest[0]][nest[1]]
@@ -34,7 +34,9 @@ class Environment:
 
     def default_setup(self):
         nest_loc = [self.height // 2, self.width // 2]
-        self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[20,20]))
+        for i in range(1):
+            self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[10,20]))
+        # self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[10,20], has_food=True))
         # self.agents.append(RandAnt())
         # Set up nest location
         

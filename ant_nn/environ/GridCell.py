@@ -4,13 +4,13 @@ import numpy as np
 class GridCell:
     """ Class representing a cell in the environment"""
 
-    def __init__(self, row, col, kind=None, food=0):
+    def __init__(self, row, col, kind=None, food=0, dissapate_coef=0.95):
         self.active = not kind == "wall"
         self.is_nest = kind == "nest"
         self.position = np.array([row, col])
 
         self.pheromone = 0
-        self.dissapate_coef = 0.95
+        self.dissapate_coef = dissapate_coef
 
         if self.active:
             self.food = food
