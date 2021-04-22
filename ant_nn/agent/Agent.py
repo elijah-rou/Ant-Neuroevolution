@@ -6,21 +6,21 @@ import numpy as np
 class Agent(ABC):
     """Class representing the ant agent"""
 
-    MAX_SPEED = 1  # maximum velocity; accessible to all agents
+    MAX_SPEED = 1  # maximum speed; accessible to all agents
 
     def __init__(
         self, 
-        nest_loc = np.array((0,0)),
+        nest_loc = [0,0],
         current_cell=None, 
         sensed_cells=[None for i in range(5)], 
-        position=np.array((0,0),dtype=float), 
+        position= [0,0], 
         orientation=0, 
-        velocity=np.array((0,0)),
+        speed=np.array((0,0)),
     ):
-        self.nest_loc = nest_loc
+        self.nest_loc = np.asarray(nest_loc).astype(int)
         self.has_food = False
         self.last_food_location = np.array((0, 0))
-        self.position = position  # position [x,y]
+        self.position = np.asarray(position).astype(float)  # position [x,y]
         self.orientation = orientation  # angle of orientation in radians
 
         self.current_cell = current_cell

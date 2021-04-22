@@ -1,6 +1,7 @@
 import numpy as np
 from ant_nn.environ.GridCell import GridCell
 from ant_nn.agent.RandAnt import RandAnt
+from ant_nn.agent.DeterminAnt import DeterminAnt
 
 
 # from GridCell import GridCell
@@ -32,8 +33,9 @@ class Environment:
         pass
 
     def default_setup(self):
-        self.agents.append(RandAnt())
-        self.agents.append(RandAnt())
+        nest_loc = [self.height // 2, self.width // 2]
+        self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[20,20]))
+        # self.agents.append(RandAnt())
         # Set up nest location
         
 

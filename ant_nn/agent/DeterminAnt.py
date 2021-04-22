@@ -17,8 +17,16 @@ class DeterminAnt(Agent):
         7 :  np.array([[ 1, 1], [ 1, 0], [ 1,-1], [ 0,-1], [-1,-1]]),  # 7pi/4
     }
 
-    def __init__(self):
-        super().__init__()
+    def __init__(
+        self, 
+        nest_loc = [0,0],
+        current_cell=None, 
+        sensed_cells=[None for i in range(5)], 
+        position= [0,0], 
+        orientation=0, 
+        velocity=np.array((0,0)),
+    ):
+        super().__init__(nest_loc, current_cell, sensed_cells, position, orientation, velocity)
 
     def update(self, grid):
         grid
@@ -57,7 +65,7 @@ class DeterminAnt(Agent):
             theta = np.arctan(
                 nest_diff[1] / nest_diff[0]
             ) 
-            self.orientation = (theta + np.pi) % (2 * np.pi)
+            self.orientation = theta % (2 * np.pi)
             self.speed = self.MAX_SPEED
         else:
             # random walk
