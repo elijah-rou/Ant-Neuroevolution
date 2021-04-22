@@ -92,7 +92,8 @@ class DeterminAnt(Agent):
 
         # if food adjacent, head to it
         elif self.adjacent_food > -1 :
-            turn = -1*np.pi/2 + self.adjacent_food * (np.pi / 4)
+            print('Turning to Food')
+            turn = np.pi/2 - self.adjacent_food * (np.pi / 4)
             self.orientation = (self.orientation + turn) % (2 * np.pi)
             self.speed = self.MAX_SPEED
 
@@ -100,18 +101,21 @@ class DeterminAnt(Agent):
         elif self.current_cell.pheromone > 0.1:
             facing_nest = np.abs(self.orientation - self.get_angle_to_nest()) < np.pi/2
             if facing_nest:
+                print('FACING NEST')
                 self.orientation = (self.orientation + np.pi) % (2 * np.pi)  # turn away from nest
                 self.speed = 0
             elif self.adjacent_pheromone > -1 :
-                turn = -1*np.pi/2 + self.adjacent_pheromone * (np.pi / 4)
+                print('FOLLOWING PH')
+                turn = np.pi/2 - self.adjacent_pheromone * (np.pi / 4)
                 self.orientation = (self.orientation + turn) % (2 * np.pi)
                 self.speed = self.MAX_SPEED
             else:
+                print('sad')
                 self.orientation = (self.orientation + np.random.normal(0, 0.5)) % (2 * np.pi)
 
         # if pheromone adjacent, head to it
         elif self.adjacent_pheromone > -1 :
-            turn = -1*np.pi/2 + self.adjacent_pheromone * (np.pi / 4)
+            turn = np.pi/2 - self.adjacent_pheromone * (np.pi / 4)
             self.orientation = (self.orientation + turn) % (2 * np.pi)
             self.speed = self.MAX_SPEED
 
