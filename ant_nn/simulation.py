@@ -9,7 +9,7 @@ class Simulation:
     def __init__(self):
         self.hi = 'hi'
 
-    def run(self, agent_class, max_t=5000):
+    def run(self, agent_class, max_t=1000):
         '''
         INPUT:
           max_t:
@@ -18,16 +18,23 @@ class Simulation:
           return number of food retrived in each time step
         '''
         env = Environment()
-        agents = [agent_class()] * 10 
+        env.default_setup()
+        #agents = self.make_agents(agent_class, 10) 
         food_retrived = np.zeros(max_t)
         for t in range(max_t):
-            self.env.update()
-            food_retrived[t] = self.env.nest.food
+            env.update()
+            food_retrived[t] = env.nest.food
         return food_retrived
     
+    def make_agents(self, agent_class, number):
+        agents = []
+        for i in range(number):
+            agents.append(agent_class())
+        return agents
+
     def sample_experiment(self):
         max_t = 3000
-        agent_classes = [DeterminAnt, RandAnt]
+        agent_classes = [DeterminAnt]
         food_gathered = []
         t = np.arange(max_t)
         for agent_class in agent_classes:
@@ -38,11 +45,7 @@ class Simulation:
         fig, ax = plt.subplots()
         for food in foods:
             ax.plot(food)
-        fig.show()
-
-# if __name__ == 'main':
-#     sim = Simulation()
-#     sim.sample_experiment()
-#     print('Done')
-
-    
+        ax.set_title('Food v Time')
+        ax.set_xlabel('time')
+        ax.set_ylabel('Food Collected')
+        plt.show()
