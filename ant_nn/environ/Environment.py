@@ -1,30 +1,45 @@
-from ant_nn.environ.GridCell import GridCell
 import numpy as np
+from ant_nn.environ.GridCell import GridCell
+from ant_nn.agent.RandAnt import RandAnt
+from ant_nn.agent.DeterminAnt import DeterminAnt
+
 
 # from GridCell import GridCell
 class Environment:
     """ Class representing a cell in the environment"""
 
-    def __init__(self, h=1, w=1, agents=[]):
+    def __init__(self, h=1, w=1, agents=[], nest=None):
         self.grid = []
         self.agents = agents
         self.time = 0
         self.height = h
         self.width = w
+        self.nest = None
 
         for i in range(self.height):
             self.grid.append([])
             for j in range(self.width):
-                self.grid[i].append(GridCell(i, j))
+                self.grid[i].append(GridCell(i, j, dissapate_coef=0.9))
+        
+        if nest:
+            self.nest = self.grid[nest[0]][nest[1]]
+        else:
+            self.nest = self.grid[h//2][w//2]
+        self.nest.is_nest = True
 
-        # print(self.__str__())
+        self.default_setup()
 
     def run(self):
-
         pass
 
     def default_setup(self):
-        pass
+        nest_loc = [self.height // 2, self.width // 2]
+        for i in range(10):
+            self.agents.append(DeterminAnt(nest_loc=nest_loc, position=nest_loc))
+        # self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[10,20], has_food=True))
+        # self.agents.append(RandAnt())
+        # Set up nest location
+        
 
     def update(self):
         self.time += 1
@@ -33,12 +48,14 @@ class Environment:
             for grid_cell in grid_row:
                 grid_cell.update()
         for agent in self.agents:
-            agent.update(self)
-
+            agent.update(self.grid)
+    
     def drop_food(self):
         if self.time % 10 == 0:
             row = np.random.randint(self.height)
             col = np.random.randint(self.width)
+            row = 10
+            col = 10
             self.spawn_food(row, col)
 
     def spawn_food(self, row, col, r=3, amount=1):
