@@ -40,9 +40,9 @@ class Simulation:
             ax.plot(food)
         fig.show()
 
-if __name__ == 'main':
-    sim = Simulation()
-    sim.sample_experiment()
-    print('Done')
+# if __name__ == 'main':
+#     sim = Simulation()
+#     sim.sample_experiment()
+#     print('Done')
 
     
