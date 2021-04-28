@@ -30,6 +30,26 @@ class DominAnt(Agent):
     PHEROMONE_MAX = 5
     MAX_TURN = np.pi / 2
 
+    sense_dict = {
+        #                || LEFTER |  LEFT  | AHEAD |  RIGHT  | RIGHTER || RADIANS
+        0: np.array([[0, 1], [1, 1], [1, 0], [1, -1], [0, -1]]),
+        1: np.array([[-1, 1], [0, 1], [1, 1], [1, 0], [1, -1]]),  # pi/4
+        2: np.array([[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0]]),  # pi/2
+        3: np.array([[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1]]),  # 3pi/4
+        4: np.array([[0, -1], [-1, -1], [-1, 0], [-1, 1], [0, 1]]),  # pi
+        5: np.array([[1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]]),  # 5pi/4
+        6: np.array([[1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0]]),  # 3pi/2
+        7: np.array([[1, 1], [1, 0], [1, -1], [0, -1], [-1, -1]]),  # 7pi/4
+        8: np.array([[0, 1], [1, 1], [1, 0], [1, -1], [0, -1]]),  # 2pi
+    }
+    sense_idxs = [
+        2,
+        1,
+        3,
+        0,
+        4,
+    ]  # indices for use searching sensed cells in reasonable order
+
     def __init__(
         self,
         hidden_size,
@@ -38,8 +58,8 @@ class DominAnt(Agent):
         current_cell=None,
         sensed_cells=[None for _ in range(5)],
         position=[0, 0],
-        orientation=0,
-        has_food=False,
+        orientation=np.random.uniform(0, 2*np.pi),
+        has_food=False
     ):
         # Init
         super().__init__(

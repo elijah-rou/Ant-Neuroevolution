@@ -2,13 +2,15 @@ import numpy as np
 from ant_nn.environ.GridCell import GridCell
 from ant_nn.agent.RandAnt import RandAnt
 from ant_nn.agent.DeterminAnt import DeterminAnt
+from ant_nn.agent.DominAnt import DominAnt
+from ant_nn.agent.population import Population
 
 
 # from GridCell import GridCell
 class Environment:
     """ Class representing a cell in the environment"""
 
-    def __init__(self, h=1, w=1, agents=[], nest=None):
+    def __init__(self, h=1, w=1, agents=[], nest=None, agentType="default"):
         self.grid = []
         self.agents = agents
         self.time = 0
@@ -27,7 +29,10 @@ class Environment:
             self.nest = self.grid[h // 2][w // 2]
         self.nest.is_nest = True
 
-        self.default_setup()
+        if agentType == "DominAnt":
+            self.dominant_setup()
+        else:
+            self.default_setup()
 
     def run(self):
         pass
@@ -39,6 +44,19 @@ class Environment:
         # self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[10,20], has_food=True))
         # self.agents.append(RandAnt())
         # Set up nest location
+
+    def dominant_setup(self):
+        numInputs = 11
+        numOutputs = 2
+        hidden_size = 10
+        nest_loc = [self.height // 2, self.width // 2]
+
+        pop = Population(10, .1, 1, .1, numInputs, numOutputs, [hidden_size, hidden_size]) # TODO: pass in real values here instead of hardcode
+        chromosome = pop.getChromosome(0)
+
+        for i in range(10):
+            self.agents.append(DominAnt(hidden_size, chromosome, nest_loc=nest_loc, position=nest_loc))
+
 
     def update(self):
         self.time += 1
