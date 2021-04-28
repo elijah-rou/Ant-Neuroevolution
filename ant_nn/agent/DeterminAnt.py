@@ -2,7 +2,7 @@ from .Agent import Agent
 import numpy as np
 
 
-class DeterminAnt(Agent):
+class DeterminAnt(Agent):  # IgnorAnt
 
     # dictionary for looking up indices of sensed cells
     sense_dict = {

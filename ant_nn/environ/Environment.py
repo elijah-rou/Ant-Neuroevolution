@@ -53,9 +53,9 @@ class Environment:
         self.spawn_food(30, 40)
 
     def dominant_setup(self):
-        numInputs = 11
+        numInputs = 13
         numOutputs = 2
-        hidden_size = 10
+        hidden_size = 15
         nest_loc = [self.height // 2, self.width // 2]
 
         pop = Population(
@@ -67,6 +67,9 @@ class Environment:
             self.agents.append(
                 DominAnt(hidden_size, chromosome, nest_loc=nest_loc, position=nest_loc)
             )
+
+        self.spawn_food(10, 15)
+        self.spawn_food(30, 40)
 
     def update(self):
         self.time += 1

@@ -7,9 +7,9 @@ from ant_nn.agent.RandAnt import RandAnt
 # Import error, can only be called from top level (Ant-Neuroevolution)
 # if called in ant_nn, won't be able to find
 class Simulation:
-    def __init__(self):
+    def __init__(self, setup="default"):
         # Add Chromosome to init
-        self.hi = "hi"
+        self.setup = setup
 
     def run(self, agent_class, max_t=1000):
         """
@@ -20,25 +20,20 @@ class Simulation:
           return number of food retrived in each time step
         """
         env = Environment()
-        env.default_setup()
-        # agents = self.make_agents(agent_class, 10)
+        if self.setup == "default":
+            env.default_setup()
+        else:
+            env.dominant_setup()
+
         food_retrived = np.zeros(max_t)
         for t in range(max_t):
             env.update()
             food_retrived[t] = env.nest.food
         return food_retrived
 
-    def make_agents(self, agent_class, number):
-        agents = []
-        for i in range(number):
-            agents.append(agent_class())
-        return agents
-
     def sample_experiment(self):
-        max_t = 3000
         agent_classes = [DeterminAnt]
         food_gathered = []
-        t = np.arange(max_t)
         for agent_class in agent_classes:
             food_gathered.append(self.run(agent_class))
         self.plot_food(food_gathered)

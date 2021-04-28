@@ -2,7 +2,7 @@ from ant_nn.simulation import Simulation
 
 
 def main():
-    sim = Simulation()
+    sim = Simulation(setup="domi")
     sim.sample_experiment()
     print("done")
 
