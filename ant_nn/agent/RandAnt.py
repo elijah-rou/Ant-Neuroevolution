@@ -50,6 +50,7 @@ class RandAnt(Agent):
             self.orientation += np.pi / 6
         elif dir_change < 0.2:
             self.orientation -= np.pi / 6
+        self.pickupFood()
 
     def pickupFood(self):
         """ Pickup Food if the current cell has food """
