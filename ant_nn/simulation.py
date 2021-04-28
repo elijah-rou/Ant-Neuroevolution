@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from ant_nn.environ.Environment import Environment
 from ant_nn.agent.population import Population
 import yaml
+import time
 
 # Import error, can only be called from top level (Ant-Neuroevolution)
 # if called in ant_nn, won't be able to find
@@ -33,10 +34,12 @@ class Simulation:
         best_scores = np.zeros(self.epochs)
         best_chromosome = []
         for e in range(self.epochs):
-            print(f"Generation: {e+1}")
+            t = time.strftime('%X %x %Z')
+            print(f"Generation: {e+1} - {t}")
             scores = np.zeros(self.population.size())
             for i in range(self.runs):
-                print(f"Run {i+1}")
+                t = time.strftime('%X')
+                print(f"Run {i+1} - {t}")
                 sims = [
                     {"env": Environment(c), "food": np.zeros(self.timesteps)}
                     for c in self.population.chromosomes
@@ -52,7 +55,9 @@ class Simulation:
 
             best_index = np.argmax(self.population.scores)
             best_scores[e] = self.population.scores[best_index]
+            print(best_scores[e])
             best_chromosome += [self.population.chromosomes[best_index]]
+            print(f"Time in thread: {time.thread_time()}\n")
         return (
             best_chromosome,
             best_scores,
