@@ -9,20 +9,10 @@ class RandAnt(Agent):
 
     def __init__(
         self,
-        current_cell=None,
-        sensed_cells=None,
         position=np.array((0, 0)),
-        orientation=0,
-        velocity=np.array((0, 0)),
     ):
-        self.has_food = False
-        self.last_food_location = np.array((0, 0))
-        self.position = position  # position [x,y]
-        self.orientation = orientation  # angle of orientation in radians
-
-        self.current_cell = current_cell
-        self.sensed_cells = sensed_cells
-
+        # Init
+        super().__init__(None, position)
         self.food_gathered = 0
         self.distance_traveled = 0
 
@@ -56,19 +46,3 @@ class RandAnt(Agent):
         elif dir_change < 0.2:
             self.orientation -= np.pi / 6
         self.pickupFood()
-
-    def pickupFood(self):
-        """ Pickup Food if the current cell has food """
-        if (not self.has_food) and self.current_cell.food > 0:
-            self.has_food = True
-            current_cell.food -= 1
-            self.last_food_location = current_cell.position
-
-    def dropFood(self):
-        """ Drop Food if the current cell is a nest cell """
-        if self.has_food and self.current_cell.is_nest:
-            food_gathered += 1
-            self.has_food = False
-
-    def get_coord(self):
-        return self.position.astype(int)

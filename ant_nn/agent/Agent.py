@@ -18,7 +18,9 @@ class Agent(ABC):
         self.has_food = False
         self.last_food_location = np.array((0, 0))
         self.position = np.asarray(position).astype(float)  # position [x,y]
-        self.orientation = np.random.uniform(0, 2 * np.pi)  # angle of orientation in radians
+        self.orientation = np.random.uniform(
+            0, 2 * np.pi
+        )  # angle of orientation in radians
         self.speed = 0
         self.current_cell = None
         self.sensed_cells = [None for _ in range(5)]

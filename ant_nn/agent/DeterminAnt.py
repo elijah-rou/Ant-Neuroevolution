@@ -29,14 +29,10 @@ class DeterminAnt(Agent):  # IgnorAnt
     def __init__(
         self,
         nest_loc=[0, 0],
-        current_cell=None,
-        sensed_cells=[None for i in range(5)],
         position=[0, 0],
-        orientation=0,
-        has_food=False,
     ):
         super().__init__(
-            nest_loc, current_cell, sensed_cells, position, orientation, has_food
+            nest_loc, position
         )
         self.adjacent_food = -1
         self.adjacent_pheromone = -1
