@@ -31,9 +31,7 @@ class DeterminAnt(Agent):  # IgnorAnt
         nest_loc=[0, 0],
         position=[0, 0],
     ):
-        super().__init__(
-            nest_loc, position
-        )
+        super().__init__(nest_loc, position)
         self.adjacent_food = -1
         self.adjacent_pheromone = -1
 

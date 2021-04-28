@@ -3,8 +3,8 @@ from ant_nn.environ.GridCell import GridCell
 from ant_nn.agent.RandAnt import RandAnt
 from ant_nn.agent.DeterminAnt import DeterminAnt
 from ant_nn.agent.DominAnt import DominAnt
-from ant_nn.agent.population import Population
 import yaml
+
 
 class Environment:
     """ Class representing the environment"""
@@ -13,10 +13,9 @@ class Environment:
         self.time = 0
 
         # Get config
-        file_stream = file("config.yaml", "r")
+        file_stream = open("config.yaml", "r")
         config = yaml.full_load(file_stream)
         agent_config = config["agent"]
-        ga_config = config["population"] 
 
         # Setup Grid
         self.height = config.get("height", 50)
@@ -37,21 +36,24 @@ class Environment:
             nest_loc = config["nest_location"]
         self.nest = self.grid[nest_loc[0]][nest_loc[1]]
         self.nest.is_nest = True
-        
+
         # Spawn Agents
         if agent_config["type"] == "DominAnt":
             params = agent_config["params"]
             layer_size = params["hidden_layer_size"]
-            self.agents = [DominAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc) for _ in range(10)]
+            self.agents = [
+                DominAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
+                for _ in range(config["num_agents"])
+            ]
         else:
-            self.agents = [DeterminAnt(nest_loc=nest_loc, position=nest_loc) for _ in range(10)]
-        
+            self.agents = [
+                DeterminAnt(nest_loc=nest_loc, position=nest_loc)
+                for _ in range(config["num_agents"])
+            ]
+
         # Spawn Food
         self.spawn_food(10, 15)
         self.spawn_food(30, 40)
-
-
-        
 
     def run(self, max_t=5000):
         """
