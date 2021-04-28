@@ -58,6 +58,7 @@ class Board(QtWidgets.QFrame):
                                     h=Board.BoardHeight,
                                     w=Board.BoardWidth
                                 )
+        self.environ.default_setup()
 
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 

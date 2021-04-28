@@ -27,10 +27,18 @@ class Environment:
             self.nest = self.grid[h//2][w//2]
         self.nest.is_nest = True
 
-        self.default_setup()
-
-    def run(self):
-        pass
+    def run(self, max_t=5000):
+        '''
+        INPUT:
+          max_t:
+        OUTPUT:
+          return number of food retrived in each time step
+        '''
+        food_retrived = np.zeros(max_t)
+        for t in range(max_t):
+            self.update()
+            food_retrived[t] = self.nest.food
+        return food_retrived
 
     def default_setup(self):
         nest_loc = [self.height // 2, self.width // 2]
@@ -61,6 +69,15 @@ class Environment:
             self.spawn_food(row, col)
 
     def spawn_food(self, row, col, r=3, amount=1):
+        '''
+        INPUT:
+          row: The row of the center of food pile
+          col: The column of center of food pile
+          r: radius of food pile, right now it spawn as square with side length 2r
+          amount: Amount of food in each square in food pile
+        OUTPUT:
+          Spawn a food pile in the environment
+        '''
         for i in range(row - r, row + r):
             for j in range(col - r, col + r):
                 if 0 <= i < self.width and 0 <= j < self.height:
