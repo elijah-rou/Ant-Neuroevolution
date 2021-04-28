@@ -6,7 +6,6 @@ class DeterminAnt(Agent):
     # dictionary for looking up indices of sensed cells
     sense_dict = {
     #                || LEFTER |  LEFT  | AHEAD |  RIGHT  | RIGHTER || RADIANS
-        8 :  np.array([[ 0, 1], [ 1, 1], [ 1, 0], [ 1,-1], [ 0,-1]]),  # 0
         0 :  np.array([[ 0, 1], [ 1, 1], [ 1, 0], [ 1,-1], [ 0,-1]]),
         1 :  np.array([[-1, 1], [ 0, 1], [ 1, 1], [ 1, 0], [ 1,-1]]),  # pi/4
         2 :  np.array([[-1, 0], [-1, 1], [ 0, 1], [ 1, 1], [ 1, 0]]),  # pi/2
@@ -15,6 +14,7 @@ class DeterminAnt(Agent):
         5 :  np.array([[ 1,-1], [ 0,-1], [-1,-1], [-1, 0], [-1, 1]]),  # 5pi/4
         6 :  np.array([[ 1, 0], [ 1,-1], [ 0,-1], [-1,-1], [-1, 0]]),  # 3pi/2
         7 :  np.array([[ 1, 1], [ 1, 0], [ 1,-1], [ 0,-1], [-1,-1]]),  # 7pi/4
+        8 :  np.array([[ 0, 1], [ 1, 1], [ 1, 0], [ 1,-1], [ 0,-1]]),  # 2pi
     }
 
     sense_idxs = [2, 1, 3, 0, 4]  # indices for use searching sensed cells in reasonable order
@@ -33,7 +33,6 @@ class DeterminAnt(Agent):
         self.adjacent_pheromone = -1
 
     def update(self, grid):
-        grid
         self.sense(grid)
         self.pickupFood()
         self.dropFood()

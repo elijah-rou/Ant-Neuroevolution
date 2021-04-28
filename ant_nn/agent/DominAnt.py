@@ -1,12 +1,12 @@
-from ant_nn.agent import Agent
+from .Agent import Agent
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 
 
-class mish(x):
+def mish(x):
     """ Mish Activation Function """
-
     return x * torch.tanh(F.softplus(x))
 
 
@@ -27,14 +27,30 @@ class Brain(nn.Module):
 
 
 class DominAnt(Agent):
-    def __init__(self):
-        self.brain = Brain()
+    def __init__(self, hidden_size):
+        self.input = {
+            "has_food": 0,
+            "adjacent_food": np.zeros(5),
+            "adjacent_pheromone": np.zeros(5)
+        }
+        input_size = 11
+        output_size = 10
+        self.brain = Brain(input_size, output_size, hidden_size)
+
+    def _tensor_input(self):
+        
 
     def update(self):
-        pass
+        actions = self.brain()
+        self.sense(grid)
+        self.pickupFood()
+        self.dropFood()
+        self.depositPheromone()
+        self.move(grid)
 
     def depositPheromone(self):
-        pass
+        if self.has_food:
+            self.current_cell.pheromone += 1
 
-    def move(self):
+    def move(self, grid):
         pass
