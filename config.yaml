@@ -1,6 +1,11 @@
-num_epochs: 1000
-num_timesteps: 2000
+num_epochs: 100
+num_timesteps: 1000
+num_agents: 20
+num_runs: 5
 nest_location: center
+# nest_location:
+#   - 0
+#   - 0
 height: 50
 width: 50
 
@@ -14,4 +19,8 @@ agent:
   number: 10
   type: DominAnt
   params:
-    hidden_layer_size: 15
+    input_size: 13
+    hidden_layer_size: 
+    - 15
+    - 15
+    output_size: 2
