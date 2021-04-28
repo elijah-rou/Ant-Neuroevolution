@@ -63,7 +63,7 @@ class Population:
                 chromosome += [
                     randomnessWidth
                     * (
-                        np.random.rand(numInputs, hiddenSizes[0])
+                        np.random.rand(hiddenSizes[0], numInputs)
                         - (0.5 - randomnessCenter)
                     )
                 ]
@@ -71,7 +71,7 @@ class Population:
                 chromosome += [
                     randomnessWidth
                     * (
-                        np.random.rand(hiddenSizes[-1], numOutputs)
+                        np.random.rand(numOutputs, hiddenSizes[-1])
                         - (0.5 - randomnessCenter)
                     )
                 ]
@@ -79,7 +79,7 @@ class Population:
                 chromosome += [
                     randomnessWidth
                     * (
-                        np.random.rand(hiddenSizes[i - 1], hiddenSizes[i])
+                        np.random.rand(hiddenSizes[i], hiddenSizes[i-1])
                         - (0.5 - randomnessCenter)
                     )
                 ]
