@@ -1,0 +1,17 @@
+num_epochs: 1000
+num_timesteps: 2000
+nest_location: center
+height: 50
+width: 50
+
+population:
+  size: 10
+  mutation_rate: 0.1
+  mutation_strength: 0.1
+  keep_threshold: 1
+
+agent:
+  number: 10
+  type: DominAnt
+  params:
+    hidden_layer_size: 15
