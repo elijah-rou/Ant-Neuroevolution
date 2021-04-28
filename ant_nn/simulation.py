@@ -7,6 +7,7 @@ from ant_nn.agent.RandAnt import RandAnt
 # if called in ant_nn, won't be able to find
 class Simulation:
     def __init__(self):
+        # Add Chromosome to init
         self.hi = 'hi'
 
     def run(self, agent_class, max_t=1000):
