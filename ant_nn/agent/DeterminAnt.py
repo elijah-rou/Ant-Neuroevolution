@@ -2,7 +2,7 @@ from .Agent import Agent
 import numpy as np
 
 
-class DeterminAnt(Agent):
+class DeterminAnt(Agent):  # IgnorAnt
 
     # dictionary for looking up indices of sensed cells
     sense_dict = {
@@ -115,12 +115,12 @@ class DeterminAnt(Agent):
                 self.speed = 0
             elif self.adjacent_pheromone > -1:
                 turn = np.pi / 2 - self.adjacent_pheromone * (np.pi / 4)
-                self.orientation = (self.orientation + turn) % (2 * np.pi)
+                noise = np.random.normal(0, 0.1)
+                self.orientation = (self.orientation + turn + noise) % (2 * np.pi)
                 self.speed = self.MAX_SPEED
             else:
-                self.orientation = (self.orientation + np.random.normal(0, 0.5)) % (
-                    2 * np.pi
-                )
+                noise = np.random.normal(0, 0.5)
+                self.orientation = (self.orientation + noise) % (2 * np.pi)
 
         # if pheromone adjacent, head to it
         elif self.adjacent_pheromone > -1:
@@ -130,6 +130,7 @@ class DeterminAnt(Agent):
 
         elif self.current_cell.is_nest:
             self.orientation = (self.orientation + np.pi) % (2 * np.pi)
+            self.speed = self.MAX_SPEED
 
         # otherwise, random walk
         else:

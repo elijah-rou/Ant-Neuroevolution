@@ -20,13 +20,15 @@ class Brain(nn.Module):
         self.fc3 = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
+        # Use tanh
+        x = mish(self.fc1(x))
+        x = mish(self.fc2(x))
+        x = mish(self.fc3(x))
         x = x
         return x
 
 
-class DominAnt(Agent):
+class DominAnt(Agent):  # IntelligAnt
     PHEROMONE_MAX = 5
     MAX_TURN = np.pi / 2
 
@@ -58,8 +60,8 @@ class DominAnt(Agent):
         current_cell=None,
         sensed_cells=[None for _ in range(5)],
         position=[0, 0],
-        orientation=np.random.uniform(0, 2*np.pi),
-        has_food=False
+        orientation=np.random.uniform(0, 2 * np.pi),
+        has_food=False,
     ):
         # Init
         super().__init__(
@@ -75,17 +77,17 @@ class DominAnt(Agent):
                 2
             ),  # orientation - tan(dy/dx), our pos - nest pos
         }
-        input_size = 11
+        input_size = 13
         output_size = 2
 
         # Init network and set weights
         self.brain = Brain(input_size, output_size, hidden_size)
-        self.brain.fc1.weight.data = torch.from_numpy(weights[0])
-        self.brain.fc2.weight.data = torch.from_numpy(weights[1])
-        self.brain.fc3.weight.data = torch.from_numpy(weights[2])
+        self.brain.fc1.weight.data = torch.from_numpy(weights[0].T).float()
+        self.brain.fc2.weight.data = torch.from_numpy(weights[1].T).float()
+        self.brain.fc3.weight.data = torch.from_numpy(weights[2].T).float()
 
     def _tensor_input(self):
-        return np.concatenate([x for x in self.input.values()])
+        return torch.from_numpy(np.concatenate([x for x in self.input.values()]))
 
     def sense(self, grid):
         """ Updates current and sensed cells """
@@ -112,32 +114,39 @@ class DominAnt(Agent):
 
     def sense_food(self):
         """ returns index of food in sensed cells """
+        result = np.zeros(5)
         for i in self.sense_idxs:
             if self.sensed_cells[i] is not None:
                 if self.sensed_cells[i].food > 0:
-                    return i
-        return -1
+                    result[i] = 1
+        return result
 
     def sense_pheromone(self):
         """ returns index of pheromone in sensed cells """
+        result = np.zeros(5)
         for i in self.sense_idxs:
             if self.sensed_cells[i] is not None:
                 if self.sensed_cells[i].pheromone > 0.1:
-                    return i
-        return -1
+                    result[i] = 1
+        return result
 
-    def update(self):
+    def update(self, grid):
+        from pprint import pprint
+
         self.sense(grid)
         self.input["relative_heading"] = self.position - self.nest_loc
         self.pickupFood()
         self.dropFood()
         self.input["has_food"][0] = 1 if self.has_food else 0
 
-        actions = self.brain(self._tensor_input())
+        actions = self.brain(self._tensor_input().float())
+        pprint(self.input)
         self.put_pheromone = (
-            F.silu(actions[0]) * PHEROMONE_MAX
-        )  # Decide to place pheromone
-        self.orientation_delta = F.tanh(actions[1]) * MAX_TURN  # Orientation delta
+            F.silu(actions[0]) * self.PHEROMONE_MAX
+        ).item()  # Decide to place pheromone
+        self.orientation_delta = (
+            torch.tanh(actions[1]).item() * self.MAX_TURN
+        )  # Orientation delta
 
         self.depositPheromone()
         self.move(grid)
@@ -147,13 +156,14 @@ class DominAnt(Agent):
 
     def move(self, grid):
         self.orientation += self.orientation_delta
+        self.orientation %= 2 * np.pi
 
         next_pos = [0.0, 0.0]
         next_pos[0] = self.position[0] + self.MAX_SPEED * np.cos(self.orientation)
         next_pos[1] = self.position[1] + self.MAX_SPEED * np.sin(self.orientation)
 
-        if not self.coord_valid(grid, next_pos):  # if walking off grid, turn around
-            self.orientation = (self.orientation + np.pi) % (2 * np.pi)
+        while not self.coord_valid(grid, next_pos):  # if walking off grid, turn around
+            self.orientation = (self.orientation + np.pi / 2) % (2 * np.pi)
             next_pos[0] = self.position[0] + self.MAX_SPEED * np.cos(self.orientation)
             next_pos[1] = self.position[1] + self.MAX_SPEED * np.sin(self.orientation)
 

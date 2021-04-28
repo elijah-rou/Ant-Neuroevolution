@@ -54,7 +54,8 @@ class Board(QtWidgets.QFrame):
         super(Board, self).__init__()
 
         self.timer = QtCore.QBasicTimer()
-        self.environ = Environment(h=Board.BoardHeight, w=Board.BoardWidth, agentType="DominAnt")
+        self.environ = Environment(h=Board.BoardHeight, w=Board.BoardWidth)
+        self.environ.default_setup()
 
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
