@@ -13,7 +13,7 @@ def mish(x):
 class Brain(nn.Module):
     """ Neural Net for the ants. Uses 3 hidden layers. """
 
-    def __init__(self, input_size, output_size, hidden_size, weight):
+    def __init__(self, input_size, output_size, hidden_size):
         super().__init__()
         self.fc1 = nn.Linear(input_size, hidden_size)
         self.fc2 = nn.Linear(hidden_size, hidden_size)
@@ -59,7 +59,7 @@ class DominAnt(Agent):
         output_size = 2
 
         # Init network and set weights
-        self.brain = Brain(input_size, output_size, hidden_size, weights)
+        self.brain = Brain(input_size, output_size, hidden_size)
         self.brain.fc1.weight.data = torch.from_numpy(weights[0])
         self.brain.fc2.weight.data = torch.from_numpy(weights[1])
         self.brain.fc3.weight.data = torch.from_numpy(weights[2])
