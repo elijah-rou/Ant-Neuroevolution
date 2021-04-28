@@ -10,7 +10,7 @@ height: 50
 width: 50
 
 population:
-  size: 10
+  size: 50
   mutation_rate: 0.1
   mutation_strength: 0.1
   keep_threshold: 1
