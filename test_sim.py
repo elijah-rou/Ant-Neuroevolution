@@ -1,5 +1,6 @@
 from ant_nn.simulation import Simulation
 
+
 def main():
     sim = Simulation()
     sim.sample_experiment()

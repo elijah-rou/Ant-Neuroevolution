@@ -113,8 +113,8 @@ class DeterminAnt(Agent):
                     2 * np.pi
                 )  # turn away from nest
                 self.speed = 0
-            elif self.adjacent_pheromone > -1 :
-                turn = np.pi/2 - self.adjacent_pheromone * (np.pi / 4)
+            elif self.adjacent_pheromone > -1:
+                turn = np.pi / 2 - self.adjacent_pheromone * (np.pi / 4)
                 noise = np.random.normal(0, 0.1)
                 self.orientation = (self.orientation + turn + noise) % (2 * np.pi)
                 self.speed = self.MAX_SPEED

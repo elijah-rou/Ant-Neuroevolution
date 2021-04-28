@@ -58,8 +58,8 @@ class DominAnt(Agent):
         current_cell=None,
         sensed_cells=[None for _ in range(5)],
         position=[0, 0],
-        orientation=np.random.uniform(0, 2*np.pi),
-        has_food=False
+        orientation=np.random.uniform(0, 2 * np.pi),
+        has_food=False,
     ):
         # Init
         super().__init__(
