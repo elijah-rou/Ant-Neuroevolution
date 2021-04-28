@@ -20,11 +20,11 @@ class Environment:
             self.grid.append([])
             for j in range(self.width):
                 self.grid[i].append(GridCell(i, j, dissapate_coef=0.9))
-        
+
         if nest:
             self.nest = self.grid[nest[0]][nest[1]]
         else:
-            self.nest = self.grid[h//2][w//2]
+            self.nest = self.grid[h // 2][w // 2]
         self.nest.is_nest = True
 
         self.default_setup()
@@ -39,7 +39,6 @@ class Environment:
         # self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[10,20], has_food=True))
         # self.agents.append(RandAnt())
         # Set up nest location
-        
 
     def update(self):
         self.time += 1
@@ -49,7 +48,7 @@ class Environment:
                 grid_cell.update()
         for agent in self.agents:
             agent.update(self.grid)
-    
+
     def drop_food(self):
         if self.time % 10 == 0:
             row = np.random.randint(self.height)

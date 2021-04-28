@@ -9,7 +9,6 @@ def mish(x):
     """ Mish Activation Function """
     return x * torch.tanh(F.softplus(x))
 
-
 class Brain(nn.Module):
     """ Neural Net for the ants. Uses 3 hidden layers. """
 
@@ -38,7 +37,7 @@ class DominAnt(Agent):
         self.brain = Brain(input_size, output_size, hidden_size)
 
     def _tensor_input(self):
-        
+        t_input = 
 
     def update(self):
         actions = self.brain()
