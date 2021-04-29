@@ -91,13 +91,20 @@ class Population:
     # TODO: add crossover routine at the end to cross-pollinate new individuals
     def makeBabies(self):
         newGen = []
-        keepCutoff = np.quantile(self.scores, (1.0 - self.keepThresh))
+        keepCutoff = np.quantile(self.scores, (1.0 - self.keepThresh), interpolation='lower')
         numKeeps = int(self.popSize * self.keepThresh)
-
+        
+        counter = 0
         # carry over the best individuals
         for i in range(self.popSize):
-            if self.scores[i] > keepCutoff:
+            if self.scores[i] >= keepCutoff:
                 newGen += [self.chromosomes[i]]
+                counter += 1
+                if counter >= numKeeps:
+                    break
+
+        if counter + 1 < numKeeps:
+            print("flag")
 
         # mutate new individuals
         for i in range(self.popSize - numKeeps):
@@ -137,5 +144,6 @@ class Population:
 # testPop = Population(100, .1, 1, .1, 5, 5, [6, 7])
 # for i in range(testPop.size()):
 #     testPop.setScore(i, 100*random.random())
-# testPop.makeBabies()
-# print(testPop.getChromosome(30))
+# for i in range(50):
+#     testPop.makeBabies()
+# print(testPop.getChromosome(99))
