@@ -37,6 +37,7 @@ class Simulation:
             t = time.strftime('%X %x %Z')
             print(f"Generation: {e+1} - {t}")
             scores = np.zeros(self.population.size())
+
             for i in range(self.runs):
                 t = time.strftime('%X')
                 print(f"Run {i+1} - {t}")
@@ -49,7 +50,7 @@ class Simulation:
                         s["env"].update()
                         s["food"][ts] = s["env"].nest.food
                 scores += np.asarray([s["food"][-1] for s in sims])
-            scores /= 5
+            scores /= self.runs
             self.population.scores = scores
             self.population.makeBabies()
 
@@ -57,7 +58,7 @@ class Simulation:
             best_scores[e] = self.population.scores[best_index]
             print(best_scores[e])
             best_chromosome += [self.population.chromosomes[best_index]]
-            print(f"Time in thread: {time.thread_time()}\n")
+            #print(f"Time in thread: {time.thread_time()}\n")
         return (
             best_chromosome,
             best_scores,

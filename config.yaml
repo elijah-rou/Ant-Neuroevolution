@@ -1,4 +1,4 @@
-num_epochs: 50
+num_epochs: 10
 num_timesteps: 1000
 num_agents: 20
 num_runs: 5
@@ -10,10 +10,10 @@ height: 50
 width: 50
 
 population:
-  size: 50
+  size: 100
   mutation_rate: 0.1
   mutation_strength: 0.1
-  keep_threshold: 1
+  keep_threshold: 0.1
 
 agent:
   number: 10
