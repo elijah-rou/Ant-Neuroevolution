@@ -13,23 +13,40 @@ class AntGUI(QtWidgets.QMainWindow):
     def __init__(self):
         super(AntGUI, self).__init__()
 
-        self.setGeometry(300, 300, 1000, 1000)
+        self.setGeometry(300, 300, 800, 800)
         self.setWindowTitle("AntsGUI")
-        self.board = Board(self)
 
+        self.statusbar = self.statusBar()
+
+        self.board = Board(self)
+        self.board.c.msgToSB[str].connect(self.statusbar.showMessage)
         self.setCentralWidget(self.board)
 
-        self.statusbar = self.statusBar()
+        self.chro_input = QtWidgets.QLineEdit()
+        self.chro_input.setPlaceholderText("Chromosome")
 
-        self.statusbar = self.statusBar()
-        self.board.c.msgToSB[str].connect(self.statusbar.showMessage)
+        self.start_button = QtWidgets.QPushButton('Start')
+        self.start_button.clicked.connect(self.start)
 
-        self.board.start()
+        self.control_layout = QtWidgets.QHBoxLayout()
+        self.control_layout.addWidget(self.chro_input)
+        self.control_layout.addWidget(self.start_button)
+
+        self.controls = QtWidgets.QWidget()
+        self.controls.setLayout(self.control_layout)
+
+        self.dock = QtWidgets.QDockWidget("Controls", self)
+        self.dock.setWidget(self.controls)
+
+        # self.board.start()
         self.center()
 
     def update(self):
         super.update()
         self.statusbar.showMessage(self.board.environ.nest.food)
+    
+    def start(self):
+        self.board.start(self.chro_input.text())
 
     def center(self):
 
@@ -53,15 +70,19 @@ class Board(QtWidgets.QFrame):
     def __init__(self, parent):
         super(Board, self).__init__()
 
-        self.timer = QtCore.QBasicTimer()
+        # self.timer = QtCore.QBasicTimer()
         self.environ = Environment(h=Board.BoardHeight, w=Board.BoardWidth)
-        self.environ.default_setup()
 
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
         self.c = Communicate()
 
-    def start(self):
+    def start(self, chromosome=None):
+        if not chromosome:
+            self.environ.default_setup()
+        else:
+            self.environ.dominant_setup(chromosome)
+        self.timer = QtCore.QBasicTimer()
         self.update()
         self.timer.start(Board.Timer, self)
 

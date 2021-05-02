@@ -52,7 +52,7 @@ class Environment:
         self.spawn_food(10, 15)
         self.spawn_food(30, 40)
 
-    def dominant_setup(self):
+    def dominant_setup(self, chromosome = None):
         numInputs = 13
         numOutputs = 2
         hidden_size = 15
@@ -61,7 +61,7 @@ class Environment:
         pop = Population(
             10, 0.1, 1, 0.1, numInputs, numOutputs, [hidden_size, hidden_size]
         )  # TODO: pass in real values here instead of hardcode
-        chromosome = pop.getChromosome(0)
+        if not chromosome: chromosome = pop.getChromosome(0)
 
         for i in range(10):
             self.agents.append(
