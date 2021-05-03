@@ -4,6 +4,7 @@ from ant_nn.agent.RandAnt import RandAnt
 from ant_nn.agent.DeterminAnt import DeterminAnt
 from ant_nn.agent.DominAnt import DominAnt
 import yaml
+import time
 
 
 class Environment:
@@ -20,6 +21,8 @@ class Environment:
         # Setup Grid
         self.height = config.get("height", 50)
         self.width = config.get("width", 50)
+
+        # Remove grid obj, replace with 2 numpy arrays
         self.grid = []
         for i in range(self.height):
             self.grid.append([])
@@ -95,11 +98,16 @@ class Environment:
     def update(self):
         self.time += 1
         # self.drop_food()
+        # Replace with numpy matrix ops
+        print(f"Update grid bef: {time.thread_time()}\n")
+        t = time.thread_time()
         for grid_row in self.grid:
             for grid_cell in grid_row:
                 grid_cell.update()
+        print(f"grd upd: {time.thread_time()-t}\n")
         for agent in self.agents:
             agent.update(self.grid)
+        print(f"comp upd: {time.thread_time()-t}\n")
 
     def drop_food(self):
         if self.time % 10 == 0:

@@ -18,8 +18,9 @@ class GridCell:
             self.food = 0
 
     def update(self, dt=1):
-        if self.active:
-            self.pheromone = self.pheromone * self.dissapate_coef ** dt
+        if self.active: # Remove this check and prop
+            self.pheromone = self.pheromone * self.dissapate_coef ** dt # remove dt
+            # Try removing
             if self.pheromone < 1e-10:
                 self.pheromone = 0
 

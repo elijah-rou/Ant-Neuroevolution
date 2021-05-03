@@ -1,7 +1,7 @@
-num_epochs: 10
-num_timesteps: 1000
+num_epochs: 1
+num_timesteps: 1
 num_agents: 20
-num_runs: 5
+num_runs: 1
 nest_location: center
 # nest_location:
 #   - 0
@@ -10,10 +10,10 @@ height: 50
 width: 50
 
 population:
-  size: 100
-  mutation_rate: 0.1
-  mutation_strength: 0.1
-  keep_threshold: 0.1
+  size: 1
+  mutation_rate: 0.4
+  mutation_strength: 0.5
+  keep_threshold: 0.2
 
 agent:
   number: 10
@@ -21,6 +21,6 @@ agent:
   params:
     input_size: 13
     hidden_layer_size: 
-    - 15
-    - 15
+    - 300
+    - 300
     output_size: 2

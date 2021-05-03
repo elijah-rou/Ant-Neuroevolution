@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+import time
 
 
 def mish(x):
@@ -123,14 +124,19 @@ class DominAnt(Agent):  # IntelligAnt
 
     def update(self, grid):
         # Update inputs
+        print()
+        t = time.thread_time()
         self.sense(grid)
+        print(f"sns: {time.thread_time()-t}\n")
         self.input["relative_heading"] = self.position - self.nest_loc
         self.pickupFood()
         self.dropFood()
+        print(f"food up: {time.thread_time()-t}\n")
         self.input["has_food"][0] = 1 if self.has_food else 0
 
         # Determine actions
         actions = self.brain(self._tensor_input().float())
+        print(f"brain work: {time.thread_time()-t}\n")
         self.put_pheromone = (
             F.silu(actions[0]).item() * self.PHEROMONE_MAX
         )  # Decide to place pheromone
@@ -138,6 +144,8 @@ class DominAnt(Agent):  # IntelligAnt
 
         self.depositPheromone()
         self.move(grid)
+        print(f"do stuff: {time.thread_time()-t}\n")
+        print()
 
     def depositPheromone(self):
         self.current_cell.pheromone += self.put_pheromone

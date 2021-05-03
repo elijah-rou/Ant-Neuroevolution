@@ -33,6 +33,7 @@ class Simulation:
         """
         best_scores = np.zeros(self.epochs)
         best_chromosome = []
+        print(f"Before Run: {time.thread_time()}\n")
         for e in range(self.epochs):
             t = time.strftime('%X %x %Z')
             print(f"Generation: {e+1} - {t}")
@@ -59,6 +60,7 @@ class Simulation:
             print(best_scores[e])
             best_chromosome += [self.population.chromosomes[best_index]]
             #print(f"Time in thread: {time.thread_time()}\n")
+            print(f"After e{e}: {time.thread_time()}\n")
         return (
             best_chromosome,
             best_scores,
