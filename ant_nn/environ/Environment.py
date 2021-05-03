@@ -68,28 +68,6 @@ class Environment:
             food_retrived[t] = self.nest.food
         return food_retrived
 
-<<<<<<< HEAD
-    def default_setup(self):
-        nest_loc = [self.height // 2, self.width // 2]
-        for i in range(10):
-            self.agents.append(DeterminAnt(nest_loc=nest_loc, position=nest_loc))
-        # self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[10,20], has_food=True))
-        # self.agents.append(RandAnt())
-        # Set up nest location
-        self.spawn_food(10, 15)
-        self.spawn_food(30, 40)
-
-    def dominant_setup(self, chromosome = None):
-        numInputs = 13
-        numOutputs = 2
-        hidden_size = 15
-        nest_loc = [self.height // 2, self.width // 2]
-
-        pop = Population(
-            10, 0.1, 1, 0.1, numInputs, numOutputs, [hidden_size, hidden_size]
-        )  # TODO: pass in real values here instead of hardcode
-        if not chromosome: chromosome = pop.getChromosome(0)
-=======
     # def default_setup(self):
     #     nest_loc = [self.height // 2, self.width // 2]
     #     self.agents = [DeterminAnt(nest_loc=nest_loc, position=nest_loc) for _ in range(10)]
@@ -104,7 +82,6 @@ class Environment:
     #     numOutputs = 2
     #     hidden_size = 15
     #     nest_loc = [self.height // 2, self.width // 2]
->>>>>>> dev/eli
 
     #     pop = Population(
     #         10, 0.1, 1, 0.1, numInputs, numOutputs, [hidden_size, hidden_size]

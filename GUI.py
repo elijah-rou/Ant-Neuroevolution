@@ -1,4 +1,5 @@
 import sys, random
+import pickle
 from PySide2 import QtCore, QtGui, QtWidgets
 
 from ant_nn.environ.Environment import Environment
@@ -24,6 +25,9 @@ class AntGUI(QtWidgets.QMainWindow):
 
         self.chro_input = QtWidgets.QLineEdit()
         self.chro_input.setPlaceholderText("Chromosome")
+
+        self.file_button = QtWidgets.QPushButton('Select file')
+        self.file_button.clicked.connect(self.select_file)
 
         self.start_button = QtWidgets.QPushButton('Start')
         self.start_button.clicked.connect(self.start)
@@ -56,6 +60,15 @@ class AntGUI(QtWidgets.QMainWindow):
             (screen.width() - size.width()) / 2, (screen.height() - size.height()) / 2
         )
 
+    def select_file(self):
+        dialog = QFileDialog(self)
+        dialog.setFileMode(QFileDialog.AnyFile)
+        dialog.setViewMode(QFileDialog.Detail)
+        if dialog.exec_():
+            file_path = dialog.selectedFiles()[0]
+        pickle_off = open(file_path, "rb")
+        emp = pickle.load(pickle_off)
+        self.board.environ = Environment(emp)
 
 class Communicate(QtCore.QObject):
     msgToSB = QtCore.Signal(str)
