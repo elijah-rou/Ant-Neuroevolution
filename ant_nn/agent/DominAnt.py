@@ -13,17 +13,16 @@ def mish(x):
 class Brain(nn.Module):
     """ Neural Net for the ants. Uses 3 hidden layers. """
 
-    def __init__(self, input_size, output_size, hidden_size):
+    def __init__(self, input_size, output_size, hidden_sizes):
         super().__init__()
-        self.fc1 = nn.Linear(input_size, hidden_size)
-        self.fc2 = nn.Linear(hidden_size, hidden_size)
-        self.fc3 = nn.Linear(hidden_size, output_size)
+        self.fc1 = nn.Linear(input_size, hidden_sizes[0])
+        self.fc2 = nn.Linear(hidden_sizes[0], hidden_sizes[1])
+        self.fc3 = nn.Linear(hidden_sizes[1], output_size)
 
     def forward(self, x):
-        # Use tanh
-        x = mish(self.fc1(x))
-        x = mish(self.fc2(x))
-        x = mish(self.fc3(x))
+        x = torch.tanh(self.fc1(x))
+        x = torch.tanh(self.fc2(x))
+        x = torch.tanh(self.fc3(x))
         x = x
         return x
 
@@ -54,44 +53,36 @@ class DominAnt(Agent):  # IntelligAnt
 
     def __init__(
         self,
-        hidden_size,
+        hidden_sizes,
         weights,
         nest_loc=[0, 0],
-        current_cell=None,
-        sensed_cells=[None for _ in range(5)],
         position=[0, 0],
-        orientation=np.random.uniform(0, 2 * np.pi),
-        has_food=False,
     ):
         # Init
-        super().__init__(
-            nest_loc, current_cell, sensed_cells, position, orientation, has_food
-        )
+        super().__init__(nest_loc, position)
 
-        # Def Input
+        # Define network input
         self.input = {
             "has_food": np.array([0]),
             "adjacent_food": np.zeros(5),
             "adjacent_pheromone": np.zeros(5),
-            "relative_heading": np.zeros(
-                2
-            ),  # orientation - tan(dy/dx), our pos - nest pos
+            "relative_heading": np.zeros(2),
         }
         input_size = 13
         output_size = 2
 
         # Init network and set weights
-        self.brain = Brain(input_size, output_size, hidden_size)
-        self.brain.fc1.weight.data = torch.from_numpy(weights[0].T).float()
-        self.brain.fc2.weight.data = torch.from_numpy(weights[1].T).float()
-        self.brain.fc3.weight.data = torch.from_numpy(weights[2].T).float()
+        self.brain = Brain(input_size, output_size, hidden_sizes)
+        self.brain.fc1.weight.data = torch.from_numpy(weights[0]).float()
+        self.brain.fc2.weight.data = torch.from_numpy(weights[1]).float()
+        self.brain.fc3.weight.data = torch.from_numpy(weights[2]).float()
 
     def _tensor_input(self):
+        """ Return a tensor from the input dict """
         return torch.from_numpy(np.concatenate([x for x in self.input.values()]))
 
     def sense(self, grid):
         """ Updates current and sensed cells """
-
         cell_pos = self.get_coord()  # integer coordinates of current cell
         self.current_cell = grid[cell_pos[0]][cell_pos[1]]
 
@@ -131,22 +122,19 @@ class DominAnt(Agent):  # IntelligAnt
         return result
 
     def update(self, grid):
-        from pprint import pprint
-
+        # Update inputs
         self.sense(grid)
         self.input["relative_heading"] = self.position - self.nest_loc
         self.pickupFood()
         self.dropFood()
         self.input["has_food"][0] = 1 if self.has_food else 0
 
+        # Determine actions
         actions = self.brain(self._tensor_input().float())
-        pprint(self.input)
         self.put_pheromone = (
-            F.silu(actions[0]) * self.PHEROMONE_MAX
-        ).item()  # Decide to place pheromone
-        self.orientation_delta = (
-            torch.tanh(actions[1]).item() * self.MAX_TURN
-        )  # Orientation delta
+            F.silu(actions[0]).item() * self.PHEROMONE_MAX
+        )  # Decide to place pheromone
+        self.orientation_delta = actions[1].item() * self.MAX_TURN  # Orientation delta
 
         self.depositPheromone()
         self.move(grid)
@@ -155,6 +143,7 @@ class DominAnt(Agent):  # IntelligAnt
         self.current_cell.pheromone += self.put_pheromone
 
     def move(self, grid):
+        # Move the approrpitae
         self.orientation += self.orientation_delta
         self.orientation %= 2 * np.pi
 

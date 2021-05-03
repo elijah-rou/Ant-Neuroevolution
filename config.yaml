@@ -1,0 +1,26 @@
+num_epochs: 10
+num_timesteps: 1000
+num_agents: 20
+num_runs: 5
+nest_location: center
+# nest_location:
+#   - 0
+#   - 0
+height: 50
+width: 50
+
+population:
+  size: 100
+  mutation_rate: 0.1
+  mutation_strength: 0.1
+  keep_threshold: 0.1
+
+agent:
+  number: 10
+  type: DominAnt
+  params:
+    input_size: 13
+    hidden_layer_size: 
+    - 15
+    - 15
+    output_size: 2
