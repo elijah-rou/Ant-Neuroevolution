@@ -89,11 +89,12 @@ class Simulation:
             best_index = np.argmax(self.population.scores)
             best_score = e_scores[-1][best_index]
             print(
-                f"Best {eval_function} score for epoch {ep}: {best_score} - chrom {best_index}\n"
+                f"Best {eval_function} score for epoch {ep}: {best_score} - chrom {best_index}"
             )
+            print(f"Time in thread: {time.thread_time()}\n")
 
             e_chromosomes += [self.population.chromosomes]
-        print(f"Time in thread: {time.thread_time()}\n")
+        print(f"END Total Time: {time.thread_time()}\n")
         return (
             e_chromosomes,
             e_scores,
