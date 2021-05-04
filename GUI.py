@@ -1,5 +1,6 @@
 import sys, random
 import pickle
+import numpy as np
 from PySide2 import QtCore, QtGui, QtWidgets
 
 from ant_nn.environ.Environment import Environment
@@ -23,8 +24,9 @@ class AntGUI(QtWidgets.QMainWindow):
         self.board.c.msgToSB[str].connect(self.statusbar.showMessage)
         self.setCentralWidget(self.board)
 
-        self.chro_input = QtWidgets.QLineEdit()
-        self.chro_input.setPlaceholderText("Chromosome")
+        self.chrom_input = QtWidgets.QLineEdit()
+        self.chrom_input.setText('C:/Users/evere/Documents/CornellTech/SwarmRobotics/Ant-Neuroevolution/results.pkl')
+        self.chrom_input.setPlaceholderText("Chromosome")
 
         self.file_button = QtWidgets.QPushButton('Select file')
         self.file_button.clicked.connect(self.select_file)
@@ -33,13 +35,15 @@ class AntGUI(QtWidgets.QMainWindow):
         self.start_button.clicked.connect(self.start)
 
         self.control_layout = QtWidgets.QHBoxLayout()
-        self.control_layout.addWidget(self.chro_input)
+        self.control_layout.addWidget(self.chrom_input)
+        self.control_layout.addWidget(self.file_button)
         self.control_layout.addWidget(self.start_button)
 
         self.controls = QtWidgets.QWidget()
         self.controls.setLayout(self.control_layout)
 
         self.dock = QtWidgets.QDockWidget("Controls", self)
+        self.dock.setFloating(False)
         self.dock.setWidget(self.controls)
 
         # self.board.start()
@@ -50,7 +54,14 @@ class AntGUI(QtWidgets.QMainWindow):
         self.statusbar.showMessage(self.board.environ.nest.food)
     
     def start(self):
-        self.board.start(self.chro_input.text())
+        chrom_file = self.chrom_input.text()
+        if len(chrom_file) > 0:
+            pickle_off = open(chrom_file, "rb")
+            temp = pickle.load(pickle_off)
+            chrom = np.array(temp[-1][1], dtype=object)
+            self.board.start(chrom)
+        else:
+            self.board.start()
 
     def center(self):
 
@@ -61,14 +72,14 @@ class AntGUI(QtWidgets.QMainWindow):
         )
 
     def select_file(self):
-        dialog = QFileDialog(self)
-        dialog.setFileMode(QFileDialog.AnyFile)
-        dialog.setViewMode(QFileDialog.Detail)
+        dialog = QtWidgets.QFileDialog(self)
+        dialog.setFileMode(QtWidgets.QFileDialog.AnyFile)
+        dialog.setViewMode(QtWidgets.QFileDialog.Detail)
         if dialog.exec_():
-            file_path = dialog.selectedFiles()[0]
-        pickle_off = open(file_path, "rb")
-        emp = pickle.load(pickle_off)
-        self.board.environ = Environment(emp)
+            self.chrom_input.setText(dialog.selectedFiles()[0])
+        #     print(dialog.selectedFiles())
+        #     file_path = dialog.selectedFiles()[0]
+        # self.chrom_input.setText(file_path)
 
 class Communicate(QtCore.QObject):
     msgToSB = QtCore.Signal(str)
@@ -82,19 +93,16 @@ class Board(QtWidgets.QFrame):
 
     def __init__(self, parent):
         super(Board, self).__init__()
-
-        # self.timer = QtCore.QBasicTimer()
-        self.environ = Environment(h=Board.BoardHeight, w=Board.BoardWidth)
-
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
-
+        self.environ = None
         self.c = Communicate()
 
     def start(self, chromosome=None):
-        if not chromosome:
-            self.environ.default_setup()
-        else:
-            self.environ.dominant_setup(chromosome)
+        self.environ = Environment(chromosome)
+        # if not chromosome:
+        #     self.environ.default_setup()
+        # else:
+        #     self.environ.dominant_setup(chromosome)
         self.timer = QtCore.QBasicTimer()
         self.update()
         self.timer.start(Board.Timer, self)
@@ -106,6 +114,8 @@ class Board(QtWidgets.QFrame):
         return self.contentsRect().height() / Board.BoardHeight
 
     def paintEvent(self, event):
+        if not self.environ:
+            return
 
         painter = QtGui.QPainter(self)
         rect = self.contentsRect()
@@ -149,6 +159,7 @@ class Board(QtWidgets.QFrame):
             0xCC66CC,  # purple
             0x66CCCC,  # Cyan
             0xDAAA00,  # Yellow
+            0xFFC0CB   # Pink
         ]
         if not cell:  # Pass in None if it is an Ant
             color = QtGui.QColor(0xCC0000)
@@ -158,10 +169,12 @@ class Board(QtWidgets.QFrame):
             color = QtGui.QColor(0xDAAA00)  # Draw Wall
         elif cell.pheromone > 0:  # draw pheromone
             color = QtGui.QColor.fromHsv(233, 255 * min(cell.pheromone, 1), 255)
-        elif cell.food > 0:  # Draw Food
-            color = QtGui.QColor(0x66CC66)
-        elif cell.pheromone == 0:  # Draw blank space
-            color = QtGui.QColor(0xFFFFFF)
+        elif cell.food > 0:  
+            color = QtGui.QColor(0x66CC66)# Draw Food
+        elif cell.pheromone == 0: 
+            color = QtGui.QColor(0xFFFFFF) # Draw blank space
+        elif cell.pheromone <0:
+            color = QtGui.QColor(0xFFC0CB)
 
         painter.fillRect(
             x + 1, y + 1, self.squareWidth() - 1, self.squareHeight() - 1, color
