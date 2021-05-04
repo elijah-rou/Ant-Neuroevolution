@@ -8,7 +8,6 @@ def main():
     file = open("results.pkl", "wb")
     dill.dump([chromosomes, scores], file)
     file.close()
-    print(scores)
     print("done")
 
 

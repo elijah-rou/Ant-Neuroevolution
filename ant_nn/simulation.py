@@ -12,8 +12,6 @@ file_stream = open("config.yaml", "r")
 config = yaml.full_load(file_stream)
 TIMESTEPS = config["num_timesteps"]
 
-# Import error, can only be called from top level (Ant-Neuroevolution)
-# if called in ant_nn, won't be able to find
 def sim_env(chromosome):
     sim = {"env": Environment(chromosome), "food": np.zeros(TIMESTEPS)}
     for t in range(TIMESTEPS):
@@ -40,42 +38,54 @@ class Simulation:
         )
 
         self.executor  = ProcessPoolExecutor()
-        self.scores = np.zeros(self.population.size())
+        self.scores = np.zeros((self.population.size(), self.runs))
 
-    def run(self):
+    def run(self, eval_function="median"):
         """
         Run the simulation
         """
         e_scores = []
         e_chromosomes = []
-        pop_range = range(self.population.size())
+        pop_size = self.population.size()
+        # pop_range = range(pop_size)
         for ep in range(self.epochs):
             t = time.strftime('%X %x %Z')
             print(f"Generation: {ep+1} - {t}")
 
-            future_envs = {self.executor.submit(sim_env, self.population.chromosomes[i]): (i, r) for i in range(self.population.size()) for r in range(self.runs)}
-            for future in as_completed(future_envs):
+            future_envs = {self.executor.submit(sim_env, self.population.chromosomes[i]): (i, r) for i in range(pop_size) for r in range(self.runs)}
+            for i, future in enumerate(as_completed(future_envs)):
                 chrom_index, run = future_envs[future]
+                if i % int(0.1*pop_size*self.runs) == 0 and i != 0:
+                    t = time.strftime('%X %x %Z')
+                    print(f"Completed {i} chromosomes - {t}")
                 try:
                     score = future.result()
-                    self.scores[chrom_index] += score
+                    self.scores[chrom_index][run] = score
                     #print(f"Chromosome {chrom_index}, run {run}: completed {score}")
                 except Exception as e:
                     print(e)
+
+            # Using executor.map, ignore
             # sim_args = [c for c in self.population.chromosomes for _ in range(self.runs)]
             # for chrom_index, score in zip(pop_range, self.executor.map(sim_env, sim_args, chunksize=16)):
             #     self.scores[chrom_index%self.population.size()] += score
             #     print(f"Chromosome {chrom_index%self.population.size()}: completed {score}")
             
-            self.scores = self.scores / self.runs
-            self.population.scores = self.scores
+            if eval_function == "median":
+                self.population.scores = np.median(self.scores, axis=1)
+            else:
+                self.population.scores = np.min(self.scores, axis=1)
             self.population.makeBabies()
-            self.scores = np.zeros(self.population.size())
+
             best_index = np.argmax(self.population.scores)
             e_scores += [self.population.scores]
-            #print(best_scores[ep])
+
+            best_index = np.argmax(self.population.scores)
+            best_score = e_scores[-1][best_index]
+            print(f"Best {eval_function} score for epoch {ep}: {best_score} - chrom {best_index}\n")
+
             e_chromosomes += [self.population.chromosomes]
-            #print(f"Time in thread: {time.thread_time()}\n")
+
         return (
             e_chromosomes,
             e_scores,
