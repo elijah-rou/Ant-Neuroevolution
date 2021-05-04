@@ -52,8 +52,8 @@ class Environment:
             ]
 
         # Spawn Food
-        self.spawn_food(10, 15)
-        self.spawn_food(30, 40)
+        self.spawn_food(5, 15)
+        self.spawn_food(25, 5)
 
     def run(self, max_t=5000):
         """
@@ -109,7 +109,7 @@ class Environment:
             col = 10
             self.spawn_food(row, col)
 
-    def spawn_food(self, row, col, r=3, amount=1):
+    def spawn_food(self, row, col, r=2, amount=10):
         """
         INPUT:
           row: The row of the center of food pile

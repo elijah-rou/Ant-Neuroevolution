@@ -36,7 +36,7 @@ class Simulation:
         for e in range(self.epochs):
             t = time.strftime('%X %x %Z')
             print(f"Generation: {e+1} - {t}")
-            scores = np.zeros(self.population.size())
+            scores = np.zeros((self.population.size(), self.runs))
 
             for i in range(self.runs):
                 t = time.strftime('%X')
@@ -49,8 +49,9 @@ class Simulation:
                     for s in sims:
                         s["env"].update()
                         s["food"][ts] = s["env"].nest.food
-                scores += np.asarray([s["food"][-1] for s in sims])
-            scores /= self.runs
+                scores[:, i] = np.asarray([s["food"][-1] for s in sims])
+            # scores /= self.runs
+            scores = np.median(scores, axis=1)
             self.population.scores = scores
             self.population.makeBabies()
 

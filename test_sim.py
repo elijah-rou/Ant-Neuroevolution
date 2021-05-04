@@ -6,7 +6,7 @@ def main():
     best_chromosomes, best_scores = sim.run()
 
     file = open("results.pkl", "wb")
-    dill.dump([best_chromosomes, best_chromosomes], file)
+    dill.dump([best_scores, best_chromosomes], file)
     file.close()
     print(best_scores)
     print("done")
