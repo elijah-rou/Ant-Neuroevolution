@@ -6,8 +6,8 @@ nest_location: center
 # nest_location:
 #   - 0
 #   - 0
-height: 50
-width: 50
+height: 30
+width: 30
 
 population:
   size: 500

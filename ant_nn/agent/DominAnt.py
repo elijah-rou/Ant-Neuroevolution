@@ -118,7 +118,7 @@ class DominAnt(Agent):  # IntelligAnt
         for i in self.sense_idxs:
             if self.sensed_cells[i] is not None:
                 if self.sensed_cells[i].pheromone > 0.1:
-                    result[i] = 1
+                    result[i] = self.sensed_cells[i].pheromone
         return result
 
     def update(self, grid):
@@ -144,7 +144,7 @@ class DominAnt(Agent):  # IntelligAnt
 
     def move(self, grid):
         # Move the approrpitae
-        self.orientation += self.orientation_delta
+        self.orientation += self.orientation_delta + np.random.normal(0, 0.01)
         self.orientation %= 2 * np.pi
 
         next_pos = [0.0, 0.0]
