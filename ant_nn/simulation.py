@@ -4,6 +4,7 @@ from ant_nn.environ.Environment import Environment
 from ant_nn.agent.population import Population
 import yaml
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 # Import error, can only be called from top level (Ant-Neuroevolution)
 # if called in ant_nn, won't be able to find
@@ -26,6 +27,25 @@ class Simulation:
             agent_params["output_size"],
             agent_params["hidden_layer_size"],
         )
+
+        self.executor  = ThreadPoolExecutor(max_workers=4)
+        self.scores = np.array(self.population.size())
+
+    def sim_env(chromosome_index):
+        chromosome = self.population.chromosomes[chromosome_index]
+        for i in range(self.runs):
+            sims = [
+                    {"env": Environment(c), "food": np.zeros(self.timesteps)}
+                    for c in self.population.chromosomes
+                ]
+            sim = 
+            for ts in range(self.timesteps):
+                for s in sims:
+                    s["env"].update()
+                    s["food"][ts] = s["env"].nest.food
+            score += np.asarray([s["food"][-1] for s in sims])
+            score /= self.runs
+        self.scores[chromosome_index] = score
 
     def run(self):
         """

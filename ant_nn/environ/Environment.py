@@ -3,8 +3,9 @@ from ant_nn.environ.GridCell import GridCell
 from ant_nn.agent.RandAnt import RandAnt
 from ant_nn.agent.DeterminAnt import DeterminAnt
 from ant_nn.agent.DominAnt import DominAnt
+from ant_nn.agent.FetchAnt import FetchAnt
 import yaml
-
+from pprint import pprint
 
 class Environment:
     """ Class representing the environment"""
@@ -43,6 +44,13 @@ class Environment:
             layer_size = params["hidden_layer_size"]
             self.agents = [
                 DominAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
+                for _ in range(config["num_agents"])
+            ]
+        elif agent_config["type"] == "FetchAnt":
+            params = agent_config["params"]
+            layer_size = params["hidden_layer_size"]
+            self.agents = [
+                FetchAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
                 for _ in range(config["num_agents"])
             ]
         else:
