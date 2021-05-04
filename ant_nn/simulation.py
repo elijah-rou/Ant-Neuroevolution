@@ -46,8 +46,8 @@ class Simulation:
         """
         Run the simulation
         """
-        best_scores = np.zeros(self.epochs)
-        best_chromosome = []
+        e_scores = []
+        e_chromosomes = []
         pop_range = range(self.population.size())
         for ep in range(self.epochs):
             t = time.strftime('%X %x %Z')
@@ -59,7 +59,7 @@ class Simulation:
                 try:
                     score = future.result()
                     self.scores[chrom_index] += score
-                    print(f"Chromosome {chrom_index}, run {run}: completed {score}")
+                    #print(f"Chromosome {chrom_index}, run {run}: completed {score}")
                 except Exception as e:
                     print(e)
             # sim_args = [c for c in self.population.chromosomes for _ in range(self.runs)]
@@ -72,11 +72,11 @@ class Simulation:
             self.population.makeBabies()
             self.scores = np.zeros(self.population.size())
             best_index = np.argmax(self.population.scores)
-            best_scores[ep] = self.population.scores[best_index]
+            e_scores += [self.population.scores]
             #print(best_scores[ep])
-            best_chromosome += [self.population.chromosomes[best_index]]
+            e_chromosomes += [self.population.chromosomes]
             #print(f"Time in thread: {time.thread_time()}\n")
         return (
-            best_chromosome,
-            best_scores,
+            e_chromosomes,
+            e_scores,
         )
