@@ -89,7 +89,7 @@ class Simulation:
             best_index = np.argmax(self.population.scores)
             best_score = e_scores[-1][best_index]
             print(
-                f"Best {eval_function} score for epoch {ep}: {best_score} - chrom {best_index}"
+                f"Best {eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}"
             )
             print(f"Time in thread: {time.thread_time()}\n")
 
