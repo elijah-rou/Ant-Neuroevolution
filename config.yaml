@@ -20,6 +20,7 @@ agent:
   params:
     input_size: 3
     hidden_layer_size: 
-    - 15
-    - 15
+    - 8
+    - 12
+    - 8
     output_size: 1
