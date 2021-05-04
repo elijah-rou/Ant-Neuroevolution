@@ -1,6 +1,7 @@
 from ant_nn.simulation import Simulation
 import dill
 
+
 def main():
     sim = Simulation()
     chromosomes, scores = sim.run()

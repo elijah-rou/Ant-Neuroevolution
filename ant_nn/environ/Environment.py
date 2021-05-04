@@ -7,6 +7,7 @@ from ant_nn.agent.FetchAnt import FetchAnt
 import yaml
 from pprint import pprint
 
+
 class Environment:
     """ Class representing the environment"""
 

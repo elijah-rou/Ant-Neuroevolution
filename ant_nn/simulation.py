@@ -12,6 +12,7 @@ file_stream = open("config.yaml", "r")
 config = yaml.full_load(file_stream)
 TIMESTEPS = config["num_timesteps"]
 
+
 def sim_env(chromosome):
     sim = {"env": Environment(chromosome), "food": np.zeros(TIMESTEPS)}
     for t in range(TIMESTEPS):
@@ -19,6 +20,7 @@ def sim_env(chromosome):
         sim["food"][t] = sim["env"].nest.food
     score = sim["food"][-1]
     return score
+
 
 class Simulation:
     def __init__(self):
@@ -37,7 +39,7 @@ class Simulation:
             agent_params["hidden_layer_size"],
         )
 
-        self.executor  = ProcessPoolExecutor()
+        self.executor = ProcessPoolExecutor()
         self.scores = np.zeros((self.population.size(), self.runs))
 
     def run(self, eval_function="median"):
@@ -49,19 +51,23 @@ class Simulation:
         pop_size = self.population.size()
         # pop_range = range(pop_size)
         for ep in range(self.epochs):
-            t = time.strftime('%X %x %Z')
+            t = time.strftime("%X %x %Z")
             print(f"Generation: {ep+1} - {t}")
 
-            future_envs = {self.executor.submit(sim_env, self.population.chromosomes[i]): (i, r) for i in range(pop_size) for r in range(self.runs)}
+            future_envs = {
+                self.executor.submit(sim_env, self.population.chromosomes[i]): (i, r)
+                for i in range(pop_size)
+                for r in range(self.runs)
+            }
             for i, future in enumerate(as_completed(future_envs)):
                 chrom_index, run = future_envs[future]
-                if i % int(0.1*pop_size*self.runs) == 0 and i != 0:
-                    t = time.strftime('%X %x %Z')
+                if i % int(0.1 * pop_size * self.runs) == 0 and i != 0:
+                    t = time.strftime("%X %x %Z")
                     print(f"Completed {i} chromosomes - {t}")
                 try:
                     score = future.result()
                     self.scores[chrom_index][run] = score
-                    #print(f"Chromosome {chrom_index}, run {run}: completed {score}")
+                    # print(f"Chromosome {chrom_index}, run {run}: completed {score}")
                 except Exception as e:
                     print(e)
 
@@ -70,7 +76,7 @@ class Simulation:
             # for chrom_index, score in zip(pop_range, self.executor.map(sim_env, sim_args, chunksize=16)):
             #     self.scores[chrom_index%self.population.size()] += score
             #     print(f"Chromosome {chrom_index%self.population.size()}: completed {score}")
-            
+
             if eval_function == "median":
                 self.population.scores = np.median(self.scores, axis=1)
             else:
@@ -82,10 +88,12 @@ class Simulation:
 
             best_index = np.argmax(self.population.scores)
             best_score = e_scores[-1][best_index]
-            print(f"Best {eval_function} score for epoch {ep}: {best_score} - chrom {best_index}\n")
+            print(
+                f"Best {eval_function} score for epoch {ep}: {best_score} - chrom {best_index}\n"
+            )
 
             e_chromosomes += [self.population.chromosomes]
-
+        print(f"Time in thread: {time.thread_time()}\n")
         return (
             e_chromosomes,
             e_scores,
