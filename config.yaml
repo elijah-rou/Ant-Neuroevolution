@@ -1,4 +1,4 @@
-num_epochs: 20
+num_epochs: 100
 num_timesteps: 200
 num_agents: 20
 num_runs: 10
@@ -11,7 +11,7 @@ width: 30
 eval: median_minvar_ratio
 
 population:
-  size: 1000
+  size: 100
   mutation_rate: 0.2
   mutation_strength: 0.5
   keep_threshold: 0.3
