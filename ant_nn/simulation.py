@@ -105,7 +105,7 @@ class Simulation:
 
             best_index = np.argmax(self.population.scores)
             e_scores[ep] = self.population.scores
-            best_score = e_scores[-1][best_index]
+            best_score = e_scores[ep][best_index]
             print(
                 f"Best {eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}\n"
             )
