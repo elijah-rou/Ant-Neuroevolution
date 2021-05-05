@@ -93,10 +93,10 @@ class Simulation:
             print(
                 f"Best {eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}"
             )
-            print(f"Time in thread: {time.thread_time()}\n")
+            #print(f"Time in thread: {time.thread_time()}\n")
             e_chromosomes += [self.population.chromosomes]
             
-        print(f"END Total Time: {time.thread_time()}\n")
+        #print(f"END Total Time: {time.thread_time()}\n")
         return (
             e_chromosomes,
             e_scores,
