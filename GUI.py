@@ -2,7 +2,7 @@ import sys, random
 import pickle
 import numpy as np
 from PySide2 import QtCore, QtGui, QtWidgets
-
+from unpickle_results import get_best
 from ant_nn.environ.Environment import Environment
 
 # TODO
@@ -52,13 +52,14 @@ class AntGUI(QtWidgets.QMainWindow):
     def update(self):
         super.update()
         self.statusbar.showMessage(self.board.environ.nest.food)
-    
+
     def start(self):
         chrom_file = self.chrom_input.text()
         if len(chrom_file) > 0:
             pickle_off = open(chrom_file, "rb")
             temp = pickle.load(pickle_off)
-            chrom = np.array(temp[-1][1], dtype=object)
+            # chrom = np.array(temp[-1][1], dtype=object)
+            chrom = get_best(temp)
             self.board.start(chrom)
         else:
             self.board.start()
@@ -87,8 +88,8 @@ class Communicate(QtCore.QObject):
 
 class Board(QtWidgets.QFrame):
 
-    BoardWidth = 50
-    BoardHeight = 50
+    BoardWidth = 30
+    BoardHeight = 30
     Timer = 200
 
     def __init__(self, parent):
@@ -132,11 +133,13 @@ class Board(QtWidgets.QFrame):
                     cell,
                 )
         for agent in self.environ.agents:
+            has_food = agent.has_food
             row, col = agent.get_coord()
             self.drawSquare(
                 painter,
                 rect.left() + col * self.squareWidth(),
                 boardTop + (Board.BoardHeight - row - 1) * self.squareHeight(),
+                has_food=has_food
             )
         painter.end()
 
@@ -148,7 +151,7 @@ class Board(QtWidgets.QFrame):
             self.c.msgToSB.emit("Food Collected: " + str(score))
         QtWidgets.QFrame.timerEvent(self, event)
 
-    def drawSquare(self, painter, x, y, cell=None):
+    def drawSquare(self, painter, x, y, cell=None, has_food=None):
 
         colorTable = [
             0x000000,
@@ -159,10 +162,14 @@ class Board(QtWidgets.QFrame):
             0xCC66CC,  # purple
             0x66CCCC,  # Cyan
             0xDAAA00,  # Yellow
-            0xFFC0CB   # Pink
+            0xFFC0CB,  # Pink
+            0xFFA500   # Orange
         ]
         if not cell:  # Pass in None if it is an Ant
-            color = QtGui.QColor(0xCC0000)
+            if not has_food:
+                color = QtGui.QColor(0xCC0000)
+            else:
+                color = QtGui.QColor(0xFFA500)
         elif cell.is_nest:
             color = QtGui.QColor(0xDAAA00)
         elif not cell.active:
