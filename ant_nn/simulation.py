@@ -21,7 +21,6 @@ def sim_env(chromosome):
     score = sim["food"][-1]
     return score
 
-def extract_chromosome(filename, epoch_index):
     
 def plot_food(foods):
         fig, ax = plt.subplots()
@@ -48,20 +47,12 @@ class Simulation:
             agent_params["input_size"],
             agent_params["output_size"],
             agent_params["hidden_layer_size"],
-<<<<<<< HEAD
-            chromosome=None
-=======
->>>>>>> 60fa9cbde1885fbc31ac4ad2971e8bdc41fcb5ed
         )
 
         self.executor = ProcessPoolExecutor()
         self.scores = np.zeros((self.population.size(), self.runs))
 
-<<<<<<< HEAD
-    def run(self, eval_function="median"):
-=======
     def run(self):
->>>>>>> 60fa9cbde1885fbc31ac4ad2971e8bdc41fcb5ed
         """
         Run the simulation
         """
@@ -69,11 +60,8 @@ class Simulation:
         e_chromosomes = []
         pop_size = self.population.size()
         # pop_range = range(pop_size)
-<<<<<<< HEAD
-=======
         eval_function = config["eval"]
 
->>>>>>> 60fa9cbde1885fbc31ac4ad2971e8bdc41fcb5ed
         for ep in range(self.epochs):
             t = time.strftime("%X %x %Z")
             print(f"Generation: {ep+1} - {t}")
@@ -106,13 +94,9 @@ class Simulation:
             elif eval_function == "median_minvar":
                 self.population.scores = np.median(self.scores, axis=1) - np.std(self.scores, axis=1)
             elif eval_function == "median_minvar_ratio":
-<<<<<<< HEAD
                 self.population.scores = np.median(self.scores, axis=1) / np.std(self.scores, axis=1)
-=======
-                std = np.std(self.scores, axis=1)
-                std[std == 0] = 1
-                self.population.scores = np.median(self.scores, axis=1) / std
->>>>>>> 60fa9cbde1885fbc31ac4ad2971e8bdc41fcb5ed
+            elif eval_function == "average":
+                self.population.scores = np.mean(self.scores, axis=1)
             else:
                 self.population.scores = np.min(self.scores, axis=1)
             self.population.makeBabies()
@@ -121,11 +105,7 @@ class Simulation:
             e_scores += [self.population.scores]
             best_score = e_scores[-1][best_index]
             print(
-<<<<<<< HEAD
-                f"Best {eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}"
-=======
                 f"Best {eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}\n"
->>>>>>> 60fa9cbde1885fbc31ac4ad2971e8bdc41fcb5ed
             )
             #print(f"Time in thread: {time.thread_time()}\n")
             e_chromosomes += [self.population.chromosomes]

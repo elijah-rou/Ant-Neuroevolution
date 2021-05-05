@@ -61,8 +61,10 @@ class Environment:
             ]
 
         # Spawn Food
-        self.spawn_food(5, 15)
-        self.spawn_food(25, 5)
+        # max food here is 320 - TODO code a way to put this number into population automatically
+        self.totalFood = 0
+        self.totalFood += self.spawn_food(5, 15)
+        self.totalFood += self.spawn_food(25, 5)
 
     def run(self, max_t=5000):
         """
@@ -132,6 +134,8 @@ class Environment:
             for j in range(col - r, col + r):
                 if 0 <= i < self.width and 0 <= j < self.height:
                     self.grid[i][j].food += amount
+
+        return (r+2)**2 * amount
 
     def __str__(self):
         string = ""
