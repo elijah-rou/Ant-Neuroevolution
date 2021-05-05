@@ -24,9 +24,9 @@ class Brain(nn.Module):
 
     # TODO change to silu
     def forward(self, x):
-        x = F.silu(self.input_fc(x))
+        x = torch.tanh(self.input_fc(x))
         for h in self.hidden:
-            x = F.silu(h(x))
+            x = torch.tanh(h(x))
         x = torch.tanh(self.output_fc(x))
         return x
 
