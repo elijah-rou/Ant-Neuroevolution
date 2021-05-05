@@ -13,18 +13,29 @@ def mish(x):
 class Brain(nn.Module):
     """ Neural Net for the ants. Uses 3 hidden layers. """
 
+    # TODO implement list of hidden layers from FetchAnt
     def __init__(self, input_size, output_size, hidden_sizes):
         super().__init__()
-        self.fc1 = nn.Linear(input_size, hidden_sizes[0])
-        self.fc2 = nn.Linear(hidden_sizes[0], hidden_sizes[1])
-        self.fc3 = nn.Linear(hidden_sizes[1], output_size)
+        self.input_fc = nn.Linear(input_size, hidden_sizes[0])
+        self.hidden = []
+        for i in range(len(hidden_sizes) - 1):
+            self.hidden.append(nn.Linear(hidden_sizes[i], hidden_sizes[i + 1]))
+        self.output_fc = nn.Linear(hidden_sizes[-1], output_size)
 
+    # TODO change to silu
     def forward(self, x):
-        x = torch.tanh(self.fc1(x))
-        x = torch.tanh(self.fc2(x))
-        x = torch.tanh(self.fc3(x))
-        x = x
+        x = F.silu(self.input_fc(x))
+        for h in self.hidden:
+            x = F.silu(h(x))
+        x = torch.tanh(self.output_fc(x))
         return x
+
+    # TODO Add apply_weights from FetchAnt
+    def apply_weights(self, weights):
+        self.input_fc.weight.data = torch.from_numpy(weights[0]).float()
+        for i, w in enumerate(weights[1:-1]):
+            self.hidden[i].weight.data = torch.from_numpy(w).float()
+        self.output_fc.weight.data = torch.from_numpy(weights[-1]).float()
 
 
 class DominAnt(Agent):  # IntelligAnt
@@ -62,24 +73,31 @@ class DominAnt(Agent):  # IntelligAnt
         super().__init__(nest_loc, position)
 
         # Define network input
+        # TODO Update network input, see FetchAnt for reference
         self.input = {
             "has_food": np.array([0]),
             "adjacent_food": np.zeros(5),
             "adjacent_pheromone": np.zeros(5),
-            "relative_heading": np.zeros(2),
+            "global_angle": np.zeros(1),
+            "local_angle": np.zeros(1),
         }
         input_size = 13
-        output_size = 2
+        output_size = 3
 
         # Init network and set weights
         self.brain = Brain(input_size, output_size, hidden_sizes)
-        self.brain.fc1.weight.data = torch.from_numpy(weights[0]).float()
-        self.brain.fc2.weight.data = torch.from_numpy(weights[1]).float()
-        self.brain.fc3.weight.data = torch.from_numpy(weights[2]).float()
+        self.brain.apply_weights(weights)
 
     def _tensor_input(self):
         """ Return a tensor from the input dict """
         return torch.from_numpy(np.concatenate([x for x in self.input.values()]))
+
+    def get_angle_to_nest(self):
+        """ returns angle from agent to nest """
+        nest_diff = self.position - (self.nest_loc + 0.5)
+        theta = np.arctan2(nest_diff[1], nest_diff[0])  # angle from nest to agent
+        theta = (theta + np.pi) % (2 * np.pi)  # turn around and put in 0-2pi
+        return theta
 
     def sense(self, grid):
         """ Updates current and sensed cells """
@@ -123,18 +141,22 @@ class DominAnt(Agent):  # IntelligAnt
 
     def update(self, grid):
         # Update inputs
+        # TODO Fix input updates
         self.sense(grid)
-        self.input["relative_heading"] = self.position - self.nest_loc
+        self.input["local_angle"][0] = self.orientation
+        self.input["global_angle"][0] = self.get_angle_to_nest()
         self.pickupFood()
         self.dropFood()
         self.input["has_food"][0] = 1 if self.has_food else 0
 
         # Determine actions
         actions = self.brain(self._tensor_input().float())
+        # TODO Remove silu from this, rework network output to assume 0-1 output
         self.put_pheromone = (
-            F.silu(actions[0]).item() * self.PHEROMONE_MAX
+            torch.sigmoid(3*actions[0]).item() * self.PHEROMONE_MAX # should set range to 0-1
         )  # Decide to place pheromone
         self.orientation_delta = actions[1].item() * self.MAX_TURN  # Orientation delta
+        self.randomness = torch.sigmoid(3*actions[2]).item() # should set range to 0-1
 
         self.depositPheromone()
         self.move(grid)
@@ -144,7 +166,7 @@ class DominAnt(Agent):  # IntelligAnt
 
     def move(self, grid):
         # Move the approrpitae
-        self.orientation += self.orientation_delta + np.random.normal(0, 0.01)
+        self.orientation += self.orientation_delta + np.random.normal(0, self.randomness)
         self.orientation %= 2 * np.pi
 
         next_pos = [0.0, 0.0]

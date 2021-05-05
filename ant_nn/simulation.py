@@ -79,22 +79,24 @@ class Simulation:
 
             if eval_function == "median":
                 self.population.scores = np.median(self.scores, axis=1)
+            elif eval_function == "median_minvar":
+                self.population.scores = np.median(self.scores, axis=1) - np.std(self.scores, axis=1)
+            elif eval_function == "median_minvar_ratio":
+                self.population.scores = np.median(self.scores, axis=1) / np.std(self.scores, axis=1)
             else:
                 self.population.scores = np.min(self.scores, axis=1)
             self.population.makeBabies()
 
             best_index = np.argmax(self.population.scores)
             e_scores += [self.population.scores]
-
-            best_index = np.argmax(self.population.scores)
             best_score = e_scores[-1][best_index]
             print(
-                f"Best {eval_function} score for epoch {ep}: {best_score} - chrom {best_index}"
+                f"Best {eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}"
             )
-            print(f"Time in thread: {time.thread_time()}\n")
-
+            #print(f"Time in thread: {time.thread_time()}\n")
             e_chromosomes += [self.population.chromosomes]
-        print(f"END Total Time: {time.thread_time()}\n")
+            
+        #print(f"END Total Time: {time.thread_time()}\n")
         return (
             e_chromosomes,
             e_scores,
