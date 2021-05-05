@@ -18,7 +18,7 @@ def sim_env(chromosome):
     for t in range(TIMESTEPS):
         sim["env"].update()
         sim["food"][t] = sim["env"].nest.food
-    score = sim["food"][-1]
+    score = sim["food"]
     return score
 
 def plot_food(foods):
@@ -50,14 +50,15 @@ class Simulation:
 
         self.executor = ProcessPoolExecutor()
         self.scores = np.zeros((self.population.size(), self.runs))
+        self.food_res = np.zeros((self.population.size(), self.runs, TIMESTEPS))
 
     def run(self):
         """
         Run the simulation
         """
-        e_scores = []
         e_chromosomes = []
         pop_size = self.population.size()
+        e_scores = np.zeros((self.epochs, pop_size))
         # pop_range = range(pop_size)
         eval_function = config["eval"]
 
@@ -76,8 +77,9 @@ class Simulation:
                     t = time.strftime("%X %x %Z")
                     print(f"Completed {i} chromosomes - {t}")
                 try:
-                    score = future.result()
-                    self.scores[chrom_index][run] = score
+                    food_results = future.result()
+                    self.food_res[chrom_index][run] = food_results
+                    self.scores[chrom_index][run] = food_results[-1]
                     # print(f"Chromosome {chrom_index}, run {run}: completed {score}")
                 except Exception as e:
                     print(e)
@@ -101,7 +103,7 @@ class Simulation:
             self.population.makeBabies()
 
             best_index = np.argmax(self.population.scores)
-            e_scores += [self.population.scores]
+            e_scores[ep] = self.population.scores
             best_score = e_scores[-1][best_index]
             print(
                 f"Best {eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}\n"
@@ -113,4 +115,5 @@ class Simulation:
         return (
             e_chromosomes,
             e_scores,
+            self.food_res
         )
