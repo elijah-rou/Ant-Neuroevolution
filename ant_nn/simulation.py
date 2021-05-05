@@ -21,6 +21,7 @@ def sim_env(chromosome):
     score = sim["food"]
     return score
 
+    
 def plot_food(foods):
         fig, ax = plt.subplots()
         for food in foods:
@@ -95,9 +96,9 @@ class Simulation:
             elif eval_function == "median_minvar":
                 self.population.scores = np.median(self.scores, axis=1) - np.std(self.scores, axis=1)
             elif eval_function == "median_minvar_ratio":
-                std = np.std(self.scores, axis=1)
-                std[std == 0] = 1
-                self.population.scores = np.median(self.scores, axis=1) / std
+                self.population.scores = np.median(self.scores, axis=1) / np.std(self.scores, axis=1)
+            elif eval_function == "average":
+                self.population.scores = np.mean(self.scores, axis=1)
             else:
                 self.population.scores = np.min(self.scores, axis=1)
             self.population.makeBabies()
