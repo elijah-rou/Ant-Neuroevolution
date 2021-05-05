@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
+
 class Brain(nn.Module):
     """ Neural Net for the ants. Uses 3 hidden layers. """
 
@@ -12,7 +13,7 @@ class Brain(nn.Module):
         self.input_fc = nn.Linear(input_size, hidden_sizes[0])
         self.hidden = []
         for i in range(len(hidden_sizes) - 1):
-            self.hidden.append(nn.Linear(hidden_sizes[i], hidden_sizes[i+1]))
+            self.hidden.append(nn.Linear(hidden_sizes[i], hidden_sizes[i + 1]))
         self.output_fc = nn.Linear(hidden_sizes[-1], output_size)
 
     def forward(self, x):
@@ -21,7 +22,7 @@ class Brain(nn.Module):
             x = F.silu(h(x))
         x = F.silu(self.output_fc(x))
         return x
-    
+
     def apply_weights(self, weights):
         self.input_fc.weight.data = torch.from_numpy(weights[0]).float()
         for i, w in enumerate(weights[1:-1]):
@@ -29,8 +30,9 @@ class Brain(nn.Module):
         self.output_fc.weight.data = torch.from_numpy(weights[-1]).float()
 
 
-class FetchAnt(Agent): 
+class FetchAnt(Agent):
     MAX_TURN = np.pi / 2
+
     def __init__(
         self,
         hidden_sizes,
@@ -64,7 +66,7 @@ class FetchAnt(Agent):
         theta = np.arctan2(nest_diff[1], nest_diff[0])  # angle from nest to agent
         theta = (theta + np.pi) % (2 * np.pi)  # turn around and put in 0-2pi
         return theta
-    
+
     def sense(self, grid):
         """ Updates current cell """
         cell_pos = self.get_coord()  # integer coordinates of current cell

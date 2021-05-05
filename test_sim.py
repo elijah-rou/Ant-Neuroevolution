@@ -1,6 +1,7 @@
 from ant_nn.simulation import Simulation
 import dill
 
+
 def main():
     sim = Simulation()
     chromosomes, scores = sim.run()
@@ -8,7 +9,6 @@ def main():
     file = open("results.pkl", "wb")
     dill.dump([chromosomes, scores], file)
     file.close()
-    print(scores)
     print("done")
 
 
