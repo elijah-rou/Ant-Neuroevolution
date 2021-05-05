@@ -12,21 +12,19 @@ class Agent(ABC):
     def __init__(
         self,
         nest_loc=[0, 0],
-        current_cell=None,
-        sensed_cells=[None for _ in range(5)],
         position=[0, 0],
-        orientation=0,
-        has_food=False,
     ):
         self.nest_loc = np.asarray(nest_loc).astype(int)
-        self.has_food = has_food
+        self.has_food = False
         self.last_food_location = np.array((0, 0))
         self.position = np.asarray(position).astype(float)  # position [x,y]
-        self.orientation = orientation  # angle of orientation in radians
+        self.orientation = np.random.uniform(
+            0, 2 * np.pi
+        )  # angle of orientation in radians
         self.speed = 0
-
-        self.current_cell = current_cell
-        self.sensed_cells = sensed_cells
+        self.randomness = 0
+        self.current_cell = None
+        self.sensed_cells = [None for _ in range(5)]
 
         self.food_gathered = 0
         self.distance_traveled = 0
