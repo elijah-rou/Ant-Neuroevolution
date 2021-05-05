@@ -1,20 +1,20 @@
-num_epochs: 20
-num_timesteps: 400
+num_epochs: 500
+num_timesteps: 500
 num_agents: 20
-num_runs: 10
+num_runs: 3
 nest_location: center
 # nest_location:
 #   - 0
 #   - 0
 height: 30
 width: 30
-eval: median_minvar
+eval: average
 
 population:
-  size: 400
-  mutation_rate: 0.3
-  mutation_strength: 0.2
-  keep_threshold: 0.3
+  size: 8
+  mutation_rate: 0.75 # this is now max mutation rate
+  mutation_strength: 0.5 # deprecated, now full resamples
+  keep_threshold: 0.25
 
 agent:
   type: DominAnt
@@ -22,8 +22,6 @@ agent:
     input_size: 13
     hidden_layer_size: 
     - 20
-    - 25
-    - 30
-    - 15
-    - 5
+    - 20
+    - 20
     output_size: 3
