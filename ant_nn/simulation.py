@@ -60,7 +60,7 @@ class Simulation:
         pop_size = self.population.size()
         # pop_range = range(pop_size)
         eval_function = config["eval"]
-        
+
         for ep in range(self.epochs):
             t = time.strftime("%X %x %Z")
             print(f"Generation: {ep+1} - {t}")
@@ -93,7 +93,9 @@ class Simulation:
             elif eval_function == "median_minvar":
                 self.population.scores = np.median(self.scores, axis=1) - np.std(self.scores, axis=1)
             elif eval_function == "median_minvar_ratio":
-                self.population.scores = np.median(self.scores, axis=1) / np.std(self.scores, axis=1)
+                std = np.std(self.scores, axis=1)
+                std[std == 0] = 1
+                self.population.scores = np.median(self.scores, axis=1) / std
             else:
                 self.population.scores = np.min(self.scores, axis=1)
             self.population.makeBabies()

@@ -8,7 +8,7 @@ nest_location: center
 #   - 0
 height: 30
 width: 30
-eval: median_minvar_ratio
+eval: median_minvar
 
 population:
   size: 100
