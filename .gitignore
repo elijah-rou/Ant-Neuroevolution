@@ -2,3 +2,4 @@
 .vscode/
 evTest.py
 results.pkl
+*.pkl

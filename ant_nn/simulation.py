@@ -4,18 +4,30 @@ from ant_nn.environ.Environment import Environment
 from ant_nn.agent.population import Population
 import yaml
 import time
+from concurrent.futures import ProcessPoolExecutor, as_completed, wait
+from functools import partial
 
-# Import error, can only be called from top level (Ant-Neuroevolution)
-# if called in ant_nn, won't be able to find
+
+file_stream = open("config.yaml", "r")
+config = yaml.full_load(file_stream)
+TIMESTEPS = config["num_timesteps"]
+
+
+def sim_env(chromosome):
+    sim = {"env": Environment(chromosome), "food": np.zeros(TIMESTEPS)}
+    for t in range(TIMESTEPS):
+        sim["env"].update()
+        sim["food"][t] = sim["env"].nest.food
+    score = sim["food"][-1]
+    return score
+
+
 class Simulation:
     def __init__(self):
-        file_stream = open("config.yaml", "r")
-        config = yaml.full_load(file_stream)
         ga_config = config["population"]
         agent_params = config["agent"]["params"]
 
         self.epochs = config["num_epochs"]
-        self.timesteps = config["num_timesteps"]
         self.runs = config["num_runs"]
         self.population = Population(
             ga_config["size"],
@@ -27,39 +39,65 @@ class Simulation:
             agent_params["hidden_layer_size"],
         )
 
-    def run(self):
+        self.executor = ProcessPoolExecutor()
+        self.scores = np.zeros((self.population.size(), self.runs))
+
+    def run(self, eval_function="median"):
         """
         Run the simulation
         """
-        best_scores = np.zeros(self.epochs)
-        best_chromosome = []
-        for e in range(self.epochs):
-            t = time.strftime('%X %x %Z')
-            print(f"Generation: {e+1} - {t}")
-            scores = np.zeros(self.population.size())
+        e_scores = []
+        e_chromosomes = []
+        pop_size = self.population.size()
+        # pop_range = range(pop_size)
+        for ep in range(self.epochs):
+            t = time.strftime("%X %x %Z")
+            print(f"Generation: {ep+1} - {t}")
 
-            for i in range(self.runs):
-                t = time.strftime('%X')
-                print(f"Run {i+1} - {t}")
-                sims = [
-                    {"env": Environment(c), "food": np.zeros(self.timesteps)}
-                    for c in self.population.chromosomes
-                ]
-                for ts in range(self.timesteps):
-                    for s in sims:
-                        s["env"].update()
-                        s["food"][ts] = s["env"].nest.food
-                scores += np.asarray([s["food"][-1] for s in sims])
-            scores /= self.runs
-            self.population.scores = scores
+            future_envs = {
+                self.executor.submit(sim_env, self.population.chromosomes[i]): (i, r)
+                for i in range(pop_size)
+                for r in range(self.runs)
+            }
+            for i, future in enumerate(as_completed(future_envs)):
+                chrom_index, run = future_envs[future]
+                if i % int(0.1 * pop_size * self.runs) == 0 and i != 0:
+                    t = time.strftime("%X %x %Z")
+                    print(f"Completed {i} chromosomes - {t}")
+                try:
+                    score = future.result()
+                    self.scores[chrom_index][run] = score
+                    # print(f"Chromosome {chrom_index}, run {run}: completed {score}")
+                except Exception as e:
+                    print(e)
+
+            # Using executor.map, ignore
+            # sim_args = [c for c in self.population.chromosomes for _ in range(self.runs)]
+            # for chrom_index, score in zip(pop_range, self.executor.map(sim_env, sim_args, chunksize=16)):
+            #     self.scores[chrom_index%self.population.size()] += score
+            #     print(f"Chromosome {chrom_index%self.population.size()}: completed {score}")
+
+            if eval_function == "median":
+                self.population.scores = np.median(self.scores, axis=1)
+            elif eval_function == "median_minvar":
+                self.population.scores = np.median(self.scores, axis=1) - np.std(self.scores, axis=1)
+            elif eval_function == "median_minvar_ratio":
+                self.population.scores = np.median(self.scores, axis=1) / np.std(self.scores, axis=1)
+            else:
+                self.population.scores = np.min(self.scores, axis=1)
             self.population.makeBabies()
 
             best_index = np.argmax(self.population.scores)
-            best_scores[e] = self.population.scores[best_index]
-            print(best_scores[e])
-            best_chromosome += [self.population.chromosomes[best_index]]
+            e_scores += [self.population.scores]
+            best_score = e_scores[-1][best_index]
+            print(
+                f"Best {eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}"
+            )
             #print(f"Time in thread: {time.thread_time()}\n")
+            e_chromosomes += [self.population.chromosomes]
+            
+        #print(f"END Total Time: {time.thread_time()}\n")
         return (
-            best_chromosome,
-            best_scores,
+            e_chromosomes,
+            e_scores,
         )

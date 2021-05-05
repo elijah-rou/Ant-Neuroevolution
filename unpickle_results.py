@@ -1,4 +1,3 @@
-
 import pickle
 import numpy as np
 
@@ -9,3 +8,7 @@ level = temp[1][-1]
 np.array(level)
 print(type(level))
 print(len(level))
+
+def get_best(emp):
+    best_index = np.argmax(np.max(emp[1], axis=1))
+    return emp[0][best_index][np.argmax(emp[1], axis=1)[best_index]]
