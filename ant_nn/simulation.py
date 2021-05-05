@@ -21,6 +21,15 @@ def sim_env(chromosome):
     score = sim["food"][-1]
     return score
 
+def plot_food(foods):
+        fig, ax = plt.subplots()
+        for food in foods:
+            ax.plot(food)
+        ax.set_title("Food v Time")
+        ax.set_xlabel("time")
+        ax.set_ylabel("Food Collected")
+        plt.show()
+
 
 class Simulation:
     def __init__(self):
