@@ -8,12 +8,12 @@ nest_location: center
 #   - 0
 height: 30
 width: 30
-eval: average
+eval: median
 
 population:
   size: 800
-  mutation_rate: 0.5 # this is now max mutation rate
-  mutation_strength: 0.5 # deprecated, now full resamples
+  mutation_rate: 0.3 # this is now max mutation rate
+  mutation_strength: 0.5 
   keep_threshold: 0.25
 
 agent:
@@ -21,7 +21,6 @@ agent:
   params:
     input_size: 13
     hidden_layer_size: 
-    - 20
-    - 20
-    - 20
+    - 15
+    - 8
     output_size: 3

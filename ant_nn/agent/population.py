@@ -35,7 +35,7 @@ class Population:
         self.mutationStrength = (
             mutationStrength  # variance of gaussian mutation function (needs testing)
         )
-        self.clampRange = [-1, 1] # range of allowable scores
+        self.clampRange = [-2, 2] # range of allowable scores
         self.keepThresh = keepThresh  # what percentage of best chromosomes to keep unchanged each epoch (try 0.1)
         self.crossover = False  # enable crossover, not implemented yet
         self.chromosomes = self.initializePop(
@@ -45,7 +45,7 @@ class Population:
         
         self.mutationRate = 0 # temp
 
-        self.maxScore = 100 #WARNING ----- this is hard coded and needs to be updated if food ICs change
+        self.maxScore = 50 #represents the target score - WARNING - if scores go above this training stops
 
     # makes self.chromosomes
     def initializePop(self, numInputs, numOutputs, layerSizes):
@@ -88,7 +88,7 @@ class Population:
                         - (0.5 - randomnessCenter)
                     )
                 ]
-        chromosome = self.clampChromosome(chromosome)
+
         return chromosome
 
     # bound weights to range
@@ -137,7 +137,7 @@ class Population:
     # takes in chromosome, randomly mutates it according to stored params
     def mutate(self, chromosome, score):
         # mutate more if score is low
-        self.mutationRate = self.maxMutationRate - (score/self.maxScore)
+        self.mutationRate = self.maxMutationRate * (1 - (score/self.maxScore))
         # loop over layers
         for i in range(len(chromosome)):
             # loop over weights
@@ -146,8 +146,9 @@ class Population:
                     if (
                         random.random() < self.mutationRate
                     ):  # only mutate a gene w some small prob
-                        chromosome[i][j][k] = random.uniform(self.clampRange[0], self.clampRange[1])
+                        chromosome[i][j][k] += np.random.normal(0, self.mutationStrength)
 
+        chromosome = self.clampChromosome(chromosome)
         return chromosome
 
     def setScore(self, index, score):
