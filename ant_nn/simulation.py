@@ -21,6 +21,15 @@ def sim_env(chromosome):
     score = sim["food"][-1]
     return score
 
+def plot_food(foods):
+        fig, ax = plt.subplots()
+        for food in foods:
+            ax.plot(food)
+        ax.set_title("Food v Time")
+        ax.set_xlabel("time")
+        ax.set_ylabel("Food Collected")
+        plt.show()
+
 
 class Simulation:
     def __init__(self):
@@ -42,7 +51,7 @@ class Simulation:
         self.executor = ProcessPoolExecutor()
         self.scores = np.zeros((self.population.size(), self.runs))
 
-    def run(self, eval_function="median"):
+    def run(self):
         """
         Run the simulation
         """
@@ -50,6 +59,8 @@ class Simulation:
         e_chromosomes = []
         pop_size = self.population.size()
         # pop_range = range(pop_size)
+        eval_function = config["eval"]
+
         for ep in range(self.epochs):
             t = time.strftime("%X %x %Z")
             print(f"Generation: {ep+1} - {t}")
@@ -82,7 +93,9 @@ class Simulation:
             elif eval_function == "median_minvar":
                 self.population.scores = np.median(self.scores, axis=1) - np.std(self.scores, axis=1)
             elif eval_function == "median_minvar_ratio":
-                self.population.scores = np.median(self.scores, axis=1) / np.std(self.scores, axis=1)
+                std = np.std(self.scores, axis=1)
+                std[std == 0] = 1
+                self.population.scores = np.median(self.scores, axis=1) / std
             else:
                 self.population.scores = np.min(self.scores, axis=1)
             self.population.makeBabies()
@@ -91,7 +104,7 @@ class Simulation:
             e_scores += [self.population.scores]
             best_score = e_scores[-1][best_index]
             print(
-                f"Best {eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}"
+                f"Best {eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}\n"
             )
             #print(f"Time in thread: {time.thread_time()}\n")
             e_chromosomes += [self.population.chromosomes]
