@@ -1,6 +1,6 @@
 num_epochs: 20
-num_timesteps: 500
-num_agents: 15
+num_timesteps: 200
+num_agents: 20
 num_runs: 10
 nest_location: center
 # nest_location:
@@ -8,9 +8,10 @@ nest_location: center
 #   - 0
 height: 30
 width: 30
+eval: median_minvar_ratio
 
 population:
-  size: 500
+  size: 1000
   mutation_rate: 0.2
   mutation_strength: 0.5
   keep_threshold: 0.3
@@ -21,6 +22,8 @@ agent:
     input_size: 3
     hidden_layer_size: 
     - 8
+    - 12
+    - 24
     - 12
     - 8
     output_size: 1
