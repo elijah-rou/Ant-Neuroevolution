@@ -1,6 +1,6 @@
-num_epochs: 500
-num_timesteps: 500
-num_agents: 20
+num_epochs: 200
+num_timesteps: 300
+num_agents: 10
 num_runs: 3
 nest_location: center
 # nest_location:
@@ -11,8 +11,8 @@ width: 30
 eval: average
 
 population:
-  size: 8
-  mutation_rate: 0.75 # this is now max mutation rate
+  size: 800
+  mutation_rate: 0.5 # this is now max mutation rate
   mutation_strength: 0.5 # deprecated, now full resamples
   keep_threshold: 0.25
 

@@ -45,7 +45,7 @@ class Population:
         
         self.mutationRate = 0 # temp
 
-        self.maxScore = 320 #WARNING ----- this is hard coded and needs to be updated if food ICs change
+        self.maxScore = 100 #WARNING ----- this is hard coded and needs to be updated if food ICs change
 
     # makes self.chromosomes
     def initializePop(self, numInputs, numOutputs, layerSizes):
@@ -61,7 +61,7 @@ class Population:
 
         # TODO: optimize these coefficients/make them not hard-coded
         randomnessCenter = 0  # center of initialization range
-        randomnessWidth = .1  # width of initialization range
+        randomnessWidth = 1  # width of initialization range
 
         for i in range(len(hiddenSizes) + 1):
             if i == 0:  # first layer
@@ -109,6 +109,7 @@ class Population:
             self.scores, (1.0 - self.keepThresh), interpolation="lower"
         )
         numKeeps = int(self.popSize * self.keepThresh)
+        
 
         counter = 0
         # carry over the best individuals
@@ -124,9 +125,11 @@ class Population:
 
         # mutate new individuals
         for i in range(self.popSize - numKeeps):
-            mutant = newGen[int(numKeeps * random.random())]
+            mutant = newGen[int(numKeeps * random.random())].copy()
             mutant = self.mutate(mutant, best_score)
             newGen += [mutant]
+
+        self.chromosomes = newGen
 
         # TODO: put crossover routine here
         # TODO: add more sexual innuendos to this method
@@ -145,6 +148,8 @@ class Population:
                     ):  # only mutate a gene w some small prob
                         chromosome[i][j][k] = random.uniform(self.clampRange[0], self.clampRange[1])
 
+        return chromosome
+
     def setScore(self, index, score):
         self.scores[index] = score
 
@@ -159,9 +164,9 @@ class Population:
 
 
 # testing code - uncomment to see functionality
-# testPop = Population(100, .1, 1, .1, 5, 5, [6, 7])
-# for i in range(testPop.size()):
-#     testPop.setScore(i, 100*random.random())
+# testPop = Population(10, .8, 1, .1, 4, 2, [3])
 # for i in range(50):
+#     for j in range(testPop.size()):
+#         testPop.setScore(j, 100*random.random())
 #     testPop.makeBabies()
-# print(testPop.getChromosome(99))
+# print(testPop.getChromosome(1))
