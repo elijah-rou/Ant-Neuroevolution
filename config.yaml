@@ -1,29 +1,27 @@
-num_epochs: 100
-num_timesteps: 200
+num_epochs: 500
+num_timesteps: 500
 num_agents: 20
-num_runs: 5
+num_runs: 3
 nest_location: center
 # nest_location:
 #   - 0
 #   - 0
 height: 30
 width: 30
-eval: median_minvar
+eval: average
 
 population:
-  size: 100
-  mutation_rate: 0.2
-  mutation_strength: 0.5
-  keep_threshold: 0.3
+  size: 8
+  mutation_rate: 0.75 # this is now max mutation rate
+  mutation_strength: 0.5 # deprecated, now full resamples
+  keep_threshold: 0.25
 
 agent:
-  type: FetchAnt
+  type: DominAnt
   params:
-    input_size: 3
+    input_size: 13
     hidden_layer_size: 
-    - 8
-    - 12
-    - 24
-    - 12
-    - 8
-    output_size: 1
+    - 20
+    - 20
+    - 20
+    output_size: 3
