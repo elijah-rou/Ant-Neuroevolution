@@ -2,3 +2,5 @@ PySide2
 numpy
 torch
 black
+PyYaml
+dill
