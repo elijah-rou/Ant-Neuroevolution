@@ -56,7 +56,7 @@ class Population:
 
         # TODO: optimize these coefficients/make them not hard-coded
         randomnessCenter = 0  # center of initialization range
-        randomnessWidth = 1  # width of initialization range
+        randomnessWidth = .1  # width of initialization range
 
         for i in range(len(hiddenSizes) + 1):
             if i == 0:  # first layer
