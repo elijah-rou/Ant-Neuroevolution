@@ -31,8 +31,8 @@ class Population:
         layerSizes,
     ):
         self.popSize = popSize  # number of chromosomes
-        self.maxMutationRate = mutationRate  # probability of a given weight getting mutated (keep low) (i.e. 0.1)
-        self.mutationStrength = (
+        self.mutationRate = mutationRate  # probability of a given weight getting mutated (keep low) (i.e. 0.1)
+        self.maxMutationStrength = (
             mutationStrength  # variance of gaussian mutation function (needs testing)
         )
         self.clampRange = [-2, 2] # range of allowable scores
@@ -43,7 +43,7 @@ class Population:
         )  # list of weights
         self.scores = np.zeros(popSize)  # list of scores
         
-        self.mutationRate = 0 # temp
+        self.mutationStrength = 0 # temp
 
         self.maxScore = 50 #represents the target score - WARNING - if scores go above this training stops
 
@@ -110,7 +110,6 @@ class Population:
         )
         numKeeps = int(self.popSize * self.keepThresh)
         
-
         counter = 0
         # carry over the best individuals
         for i in range(self.popSize):
@@ -137,7 +136,7 @@ class Population:
     # takes in chromosome, randomly mutates it according to stored params
     def mutate(self, chromosome, score):
         # mutate more if score is low
-        self.mutationRate = self.maxMutationRate * (1 - (score/self.maxScore))
+        self.mutationStrength = self.maxMutationStrength * (1 - (score/self.maxScore))
         # loop over layers
         for i in range(len(chromosome)):
             # loop over weights
