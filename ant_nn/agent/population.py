@@ -31,16 +31,21 @@ class Population:
         layerSizes,
     ):
         self.popSize = popSize  # number of chromosomes
-        self.mutationRate = mutationRate  # probability of a given weight getting mutated (keep low) (i.e. 0.1)
+        self.maxMutationRate = mutationRate  # probability of a given weight getting mutated (keep low) (i.e. 0.1)
         self.mutationStrength = (
             mutationStrength  # variance of gaussian mutation function (needs testing)
         )
+        self.clampRange = [-2, 2] # range of allowable scores
         self.keepThresh = keepThresh  # what percentage of best chromosomes to keep unchanged each epoch (try 0.1)
         self.crossover = False  # enable crossover, not implemented yet
         self.chromosomes = self.initializePop(
             numInputs, numOutputs, layerSizes
         )  # list of weights
-        self.scores = np.zeros(popSize)  # list of
+        self.scores = np.zeros(popSize)  # list of scores
+        
+        self.mutationRate = 0 # temp
+
+        self.maxScore = 50 #represents the target score - WARNING - if scores go above this training stops
 
     # makes self.chromosomes
     def initializePop(self, numInputs, numOutputs, layerSizes):
@@ -86,15 +91,25 @@ class Population:
 
         return chromosome
 
+    # bound weights to range
+    def clampChromosome(self, chromosome):
+        for i in range(len(chromosome)): 
+            chromosome[i] = np.where(chromosome[i] > self.clampRange[0], chromosome[i], self.clampRange[0])
+            chromosome[i] = np.where(chromosome[i] < self.clampRange[1], chromosome[i], self.clampRange[1])
+        return chromosome
+
+
     # assumes scores have already been set by sim
     # resamples pop and generates new individuals by mutation
     # TODO: add crossover routine at the end to cross-pollinate new individuals
     def makeBabies(self):
         newGen = []
+        best_score = np.max(self.scores)
         keepCutoff = np.quantile(
             self.scores, (1.0 - self.keepThresh), interpolation="lower"
         )
         numKeeps = int(self.popSize * self.keepThresh)
+        
 
         counter = 0
         # carry over the best individuals
@@ -110,15 +125,19 @@ class Population:
 
         # mutate new individuals
         for i in range(self.popSize - numKeeps):
-            mutant = newGen[int(numKeeps * random.random())]
-            mutant = self.mutate(mutant)
+            mutant = newGen[int(numKeeps * random.random())].copy()
+            mutant = self.mutate(mutant, best_score)
             newGen += [mutant]
+
+        self.chromosomes = newGen
 
         # TODO: put crossover routine here
         # TODO: add more sexual innuendos to this method
 
     # takes in chromosome, randomly mutates it according to stored params
-    def mutate(self, chromosome):
+    def mutate(self, chromosome, score):
+        # mutate more if score is low
+        self.mutationRate = self.maxMutationRate * (1 - (score/self.maxScore))
         # loop over layers
         for i in range(len(chromosome)):
             # loop over weights
@@ -127,7 +146,10 @@ class Population:
                     if (
                         random.random() < self.mutationRate
                     ):  # only mutate a gene w some small prob
-                        chromosome[i][j][k] += random.gauss(0, self.mutationStrength)
+                        chromosome[i][j][k] += np.random.normal(0, self.mutationStrength)
+
+        chromosome = self.clampChromosome(chromosome)
+        return chromosome
 
     def setScore(self, index, score):
         self.scores[index] = score
@@ -143,9 +165,9 @@ class Population:
 
 
 # testing code - uncomment to see functionality
-# testPop = Population(100, .1, 1, .1, 5, 5, [6, 7])
-# for i in range(testPop.size()):
-#     testPop.setScore(i, 100*random.random())
+# testPop = Population(10, .8, 1, .1, 4, 2, [3])
 # for i in range(50):
+#     for j in range(testPop.size()):
+#         testPop.setScore(j, 100*random.random())
 #     testPop.makeBabies()
-# print(testPop.getChromosome(99))
+# print(testPop.getChromosome(1))
