@@ -13,18 +13,21 @@ def mish(x):
 class Brain(nn.Module):
     """ Neural Net for the ants. Uses 3 hidden layers. """
 
+    # TODO implement list of hidden layers from FetchAnt
     def __init__(self, input_size, output_size, hidden_sizes):
         super().__init__()
         self.fc1 = nn.Linear(input_size, hidden_sizes[0])
         self.fc2 = nn.Linear(hidden_sizes[0], hidden_sizes[1])
         self.fc3 = nn.Linear(hidden_sizes[1], output_size)
 
+    # TODO change to silu
     def forward(self, x):
         x = torch.tanh(self.fc1(x))
         x = torch.tanh(self.fc2(x))
         x = torch.tanh(self.fc3(x))
-        x = x
         return x
+
+    # TODO Add apply_weights from FetchAnt
 
 
 class DominAnt(Agent):  # IntelligAnt
@@ -62,6 +65,7 @@ class DominAnt(Agent):  # IntelligAnt
         super().__init__(nest_loc, position)
 
         # Define network input
+        # TODO Update network input, see FetchAnt for reference
         self.input = {
             "has_food": np.array([0]),
             "adjacent_food": np.zeros(5),
@@ -123,6 +127,7 @@ class DominAnt(Agent):  # IntelligAnt
 
     def update(self, grid):
         # Update inputs
+        # TODO Fix input updates
         self.sense(grid)
         self.input["relative_heading"] = self.position - self.nest_loc
         self.pickupFood()
@@ -131,6 +136,7 @@ class DominAnt(Agent):  # IntelligAnt
 
         # Determine actions
         actions = self.brain(self._tensor_input().float())
+        # TODO Remove silu from this, rework network output to assume 0-1 output
         self.put_pheromone = (
             F.silu(actions[0]).item() * self.PHEROMONE_MAX
         )  # Decide to place pheromone
