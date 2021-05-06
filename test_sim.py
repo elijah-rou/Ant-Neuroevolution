@@ -1,14 +1,14 @@
 from ant_nn.simulation import Simulation
 import dill
 
+
 def main():
     sim = Simulation()
-    best_chromosomes, best_scores = sim.run()
+    chromosomes, scores = sim.run()
 
     file = open("results.pkl", "wb")
-    dill.dump([best_chromosomes, best_chromosomes], file)
+    dill.dump([chromosomes, scores], file)
     file.close()
-    print(best_scores)
     print("done")
 
 

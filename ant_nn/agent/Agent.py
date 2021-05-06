@@ -22,6 +22,7 @@ class Agent(ABC):
             0, 2 * np.pi
         )  # angle of orientation in radians
         self.speed = 0
+        self.randomness = 0
         self.current_cell = None
         self.sensed_cells = [None for _ in range(5)]
 

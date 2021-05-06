@@ -2,7 +2,7 @@ import sys, random
 import pickle
 import numpy as np
 from PySide2 import QtCore, QtGui, QtWidgets
-
+from unpickle_results import get_best
 from ant_nn.environ.Environment import Environment
 
 # TODO
@@ -64,7 +64,7 @@ class AntGUI(QtWidgets.QMainWindow):
     def update(self):
         super.update()
         self.statusbar.showMessage(self.board.environ.nest.food)
-    
+
     def start(self):
         chrom_file = self.chrom_input.text()
         if len(chrom_file) > 0:
@@ -75,7 +75,8 @@ class AntGUI(QtWidgets.QMainWindow):
             chroms = np.array(temp[0][epoch_n])
             scores = np.array(temp[1][epoch_n]).argsort()
             chrom = chroms[scores[order_n]]
-            # chrom = np.array(temp[-1][1], dtype=object)
+
+            chrom = get_best(temp)
             self.board.start(chrom)
         else:
             self.board.start()
@@ -104,8 +105,8 @@ class Communicate(QtCore.QObject):
 
 class Board(QtWidgets.QFrame):
 
-    BoardWidth = 50
-    BoardHeight = 50
+    BoardWidth = 30
+    BoardHeight = 30
     Timer = 200
 
     def __init__(self, parent):
@@ -149,6 +150,7 @@ class Board(QtWidgets.QFrame):
                     cell,
                 )
         for agent in self.environ.agents:
+            has_food = agent.has_food
             row, col = agent.get_coord()
             self.drawSquare(
                 painter,
@@ -178,7 +180,8 @@ class Board(QtWidgets.QFrame):
             0xCC66CC,  # purple
             0x66CCCC,  # Cyan
             0xDAAA00,  # Yellow
-            0xFFC0CB   # Pink
+            0xFFC0CB,  # Pink
+            0xFFA500   # Orange
         ]
         if ant:  # Pass in None if it is an Ant
             if ant.has_food:
