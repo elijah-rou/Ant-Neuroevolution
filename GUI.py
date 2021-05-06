@@ -117,10 +117,6 @@ class Board(QtWidgets.QFrame):
 
     def start(self, chromosome=None):
         self.environ = Environment(chromosome)
-        # if not chromosome:
-        #     self.environ.default_setup()
-        # else:
-        #     self.environ.dominant_setup(chromosome)
         self.timer = QtCore.QBasicTimer()
         self.update()
         self.timer.start(Board.Timer, self)
