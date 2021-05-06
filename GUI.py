@@ -25,11 +25,19 @@ class AntGUI(QtWidgets.QMainWindow):
         self.setCentralWidget(self.board)
 
         self.chrom_input = QtWidgets.QLineEdit()
-        self.chrom_input.setText('C:/Users/evere/Documents/CornellTech/SwarmRobotics/Ant-Neuroevolution/results.pkl')
+        self.chrom_input.setText('C:/Users/evere/Documents/CornellTech/SwarmRobotics/Ant-Neuroevolution/fetchant_1.pkl')
         self.chrom_input.setPlaceholderText("Chromosome")
 
         self.file_button = QtWidgets.QPushButton('Select file')
         self.file_button.clicked.connect(self.select_file)
+
+        self.epoch_label = QtWidgets.QLabel('Epoch:')
+        self.epoch_input = QtWidgets.QLineEdit()
+        self.epoch_input.setText('-1')
+
+        self.score_label = QtWidgets.QLabel('nth best score:')
+        self.score_input = QtWidgets.QLineEdit()
+        self.score_input.setText('0')
 
         self.start_button = QtWidgets.QPushButton('Start')
         self.start_button.clicked.connect(self.start)
@@ -37,6 +45,10 @@ class AntGUI(QtWidgets.QMainWindow):
         self.control_layout = QtWidgets.QHBoxLayout()
         self.control_layout.addWidget(self.chrom_input)
         self.control_layout.addWidget(self.file_button)
+        self.control_layout.addWidget(self.epoch_label)
+        self.control_layout.addWidget(self.epoch_input)
+        self.control_layout.addWidget(self.score_label)
+        self.control_layout.addWidget(self.score_input)
         self.control_layout.addWidget(self.start_button)
 
         self.controls = QtWidgets.QWidget()
@@ -56,9 +68,14 @@ class AntGUI(QtWidgets.QMainWindow):
     def start(self):
         chrom_file = self.chrom_input.text()
         if len(chrom_file) > 0:
+            epoch_n = int(self.epoch_input.text())
+            order_n = int(self.score_input.text())
             pickle_off = open(chrom_file, "rb")
             temp = pickle.load(pickle_off)
-            chrom = np.array(temp[-1][1], dtype=object)
+            chroms = np.array(temp[0][epoch_n])
+            scores = np.array(temp[1][epoch_n]).argsort()
+            chrom = chroms[scores[order_n]]
+            # chrom = np.array(temp[-1][1], dtype=object)
             self.board.start(chrom)
         else:
             self.board.start()
@@ -137,6 +154,8 @@ class Board(QtWidgets.QFrame):
                 painter,
                 rect.left() + col * self.squareWidth(),
                 boardTop + (Board.BoardHeight - row - 1) * self.squareHeight(),
+                None,
+                agent
             )
         painter.end()
 
@@ -148,7 +167,7 @@ class Board(QtWidgets.QFrame):
             self.c.msgToSB.emit("Food Collected: " + str(score))
         QtWidgets.QFrame.timerEvent(self, event)
 
-    def drawSquare(self, painter, x, y, cell=None):
+    def drawSquare(self, painter, x, y, cell=None, ant=None):
 
         colorTable = [
             0x000000,
@@ -161,8 +180,11 @@ class Board(QtWidgets.QFrame):
             0xDAAA00,  # Yellow
             0xFFC0CB   # Pink
         ]
-        if not cell:  # Pass in None if it is an Ant
-            color = QtGui.QColor(0xCC0000)
+        if ant:  # Pass in None if it is an Ant
+            if ant.has_food:
+                color = QtGui.QColor(0xFFD700)
+            else:
+                color = QtGui.QColor(0xCC0000)
         elif cell.is_nest:
             color = QtGui.QColor(0xDAAA00)
         elif not cell.active:
