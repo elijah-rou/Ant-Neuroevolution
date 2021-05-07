@@ -1,4 +1,4 @@
-num_epochs: 150
+num_epochs: 250
 num_timesteps: 500
 num_agents: 10
 num_runs: 3
@@ -11,18 +11,16 @@ width: 30
 eval: median
 
 population:
-  size: 500
-  mutation_rate: 0.3 # this is now max mutation rate
-  mutation_strength: 0.5 
+  size: 800
+  mutation_rate: 0.3
+  mutation_strength: 0.5
   keep_threshold: 0.25
 
 agent:
   type: DominAnt
   params:
     input_size: 13
-    hidden_layer_size:
-    - 18 
-    - 26
-    - 16
+    hidden_layer_size: 
+    - 15
     - 8
     output_size: 3
