@@ -63,8 +63,8 @@ class Environment:
         # Spawn Food
         # max food here is 320 - TODO code a way to put this number into population automatically
         self.totalFood = 0
-        self.totalFood += self.spawn_food(5, 15)
-        self.totalFood += self.spawn_food(25, 5)
+        self.totalFood += self.spawn_food(5, 15, amount=5)
+        self.totalFood += self.spawn_food(25, 5, amount=5)
 
     def run(self, max_t=5000):
         """

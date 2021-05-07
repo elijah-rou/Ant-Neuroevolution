@@ -1,7 +1,7 @@
-num_epochs: 500
-num_timesteps: 250
+num_epochs: 150
+num_timesteps: 500
 num_agents: 10
-num_runs: 1
+num_runs: 3
 nest_location: center
 # nest_location:
 #   - 0
@@ -11,16 +11,18 @@ width: 30
 eval: median
 
 population:
-  size: 750
-  mutation_rate: 0.3
-  mutation_strength: 0.5
+  size: 500
+  mutation_rate: 0.3 # this is now max mutation rate
+  mutation_strength: 0.5 
   keep_threshold: 0.25
 
 agent:
-  type: FetchAnt
+  type: DominAnt
   params:
-    input_size: 3
-    hidden_layer_size: 
-    - 6
-    - 6
-    output_size: 1
+    input_size: 13
+    hidden_layer_size:
+    - 18 
+    - 26
+    - 16
+    - 8
+    output_size: 3
