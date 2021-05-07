@@ -11,8 +11,8 @@ width: 30
 eval: median
 
 population:
-  size: 50
-  mutation_rate: 0.3 # this is now max mutation rate
+  size: 800
+  mutation_rate: 0.1 # this is now max mutation rate
   mutation_strength: 0.5 
   keep_threshold: 0.25
 

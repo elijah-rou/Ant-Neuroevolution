@@ -151,7 +151,7 @@ class Environment:
             col = 10
             self.spawn_food(row, col)
 
-    def spawn_food(self, row, col, r=2, amount=10):
+    def spawn_food(self, row, col, r=2, amount=5):
         """
         INPUT:
           row: The row of the center of food pile
