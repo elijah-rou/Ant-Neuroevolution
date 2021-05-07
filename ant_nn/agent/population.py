@@ -45,7 +45,8 @@ class Population:
         
         self.mutationRate = 0 # temp
 
-        self.maxScore = 50 #represents the target score - WARNING - if scores go above this training stops
+        # TODO Move to config
+        self.maxScore = 155 #represents the target score - WARNING - if scores go above this training stops
 
     # makes self.chromosomes
     def initializePop(self, numInputs, numOutputs, layerSizes):
