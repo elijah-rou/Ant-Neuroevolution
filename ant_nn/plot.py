@@ -4,8 +4,8 @@ import pickle as pk
 
 def res_to_dict(result):
     res_dict = {
-    "chromosomes"   :   fetchant_1_temp[0],
-    "scores"        :   np.asarray(fetchant_1_temp[1])
+    "chromosomes"   :   result[0],
+    "scores"        :   np.asarray(result[1])
     }
     return res_dict
 
