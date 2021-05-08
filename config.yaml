@@ -1,4 +1,4 @@
-num_epochs: 200
+num_epochs: 500
 num_timesteps: 300
 num_agents: 10
 num_runs: 3
@@ -12,9 +12,11 @@ eval: median
 
 population:
   size: 800
-  mutation_rate: 0.1 # this is now max mutation rate
+  mutation_rate: 0.1
   mutation_strength: 0.5 
   keep_threshold: 0.25
+  init_from_file: True
+  filename: results_randFood1.pkl
 
 agent:
   type: DominAnt
