@@ -4,10 +4,10 @@ import dill
 
 def main():
     sim = Simulation()
-    chromosomes, scores = sim.run()
+    chromosomes, scores, final_pop = sim.run()
 
     file = open("results.pkl", "wb")
-    dill.dump([chromosomes, scores], file)
+    dill.dump([chromosomes, scores, final_pop], file)
     file.close()
     print("done")
 

@@ -47,6 +47,8 @@ class Simulation:
             agent_params["input_size"],
             agent_params["output_size"],
             agent_params["hidden_layer_size"],
+            ga_config["init_from_file"],
+            ga_config["filename"]
         )
 
         self.executor = ProcessPoolExecutor()
@@ -58,6 +60,7 @@ class Simulation:
         """
         e_scores = []
         e_chromosomes = []
+        final_pop = []
         pop_size = self.population.size()
         # pop_range = range(pop_size)
         eval_function = config["eval"]
@@ -108,10 +111,13 @@ class Simulation:
                 f"Best {eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}\n"
             )
             #print(f"Time in thread: {time.thread_time()}\n")
-            e_chromosomes += [self.population.chromosomes]
+            e_chromosomes += [self.population.chromosomes[best_index]]
+        
+        final_pop = self.population.chromosomes
             
         #print(f"END Total Time: {time.thread_time()}\n")
         return (
             e_chromosomes,
             e_scores,
+            final_pop
         )

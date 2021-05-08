@@ -6,6 +6,7 @@ import numpy as np
 import random
 
 
+
 class Population:
 
     """Class representing the GA chromosome population"""
@@ -29,6 +30,8 @@ class Population:
         numInputs,
         numOutputs,
         layerSizes,
+        initFromFile=False,
+        filename=None
     ):
         self.popSize = popSize  # number of chromosomes
         self.mutationRate = mutationRate  # probability of a given weight getting mutated (keep low) (i.e. 0.1)
@@ -38,9 +41,20 @@ class Population:
         self.clampRange = [-2, 2] # range of allowable scores
         self.keepThresh = keepThresh  # what percentage of best chromosomes to keep unchanged each epoch (try 0.1)
         self.crossover = False  # enable crossover, not implemented yet
-        self.chromosomes = self.initializePop(
-            numInputs, numOutputs, layerSizes
-        )  # list of weights
+        if initFromFile:
+            import pickle
+            pickle_off = open(filename,"rb")
+            temp = pickle.load(pickle_off)
+            level = temp[0][-1]
+            # print(level[0])
+            # for i in range(len(level)):
+            #     level[i] = np.asarray(level[i])
+            # print(level[0].shape)
+            self.chromosomes = level
+        else:
+            self.chromosomes = self.initializePop(
+                numInputs, numOutputs, layerSizes
+            )  # list of weights
         self.scores = np.zeros(popSize)  # list of scores
         
         self.mutationStrength = 0 # temp
