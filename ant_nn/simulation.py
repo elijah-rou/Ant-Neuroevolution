@@ -121,5 +121,6 @@ class Simulation:
         return (
             e_chromosomes,
             e_scores,
-            final_pop
+            final_pop,
+            self.food_res
         )
