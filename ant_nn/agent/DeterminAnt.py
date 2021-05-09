@@ -137,8 +137,8 @@ class DeterminAnt(Agent):  # IgnorAnt
         next_pos[0] = self.position[0] + self.speed * np.cos(self.orientation)
         next_pos[1] = self.position[1] + self.speed * np.sin(self.orientation)
 
-        if not self.coord_valid(grid, next_pos):  # if walking off grid, turn around
-            self.orientation = (self.orientation + np.pi) % (2 * np.pi)
+        while not self.coord_valid(grid, next_pos):  # if walking off grid, turn until you aren't
+            self.orientation = (self.orientation + np.pi/2) % (2 * np.pi)
             next_pos[0] = self.position[0] + self.speed * np.cos(self.orientation)
             next_pos[1] = self.position[1] + self.speed * np.sin(self.orientation)
 

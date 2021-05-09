@@ -11,11 +11,11 @@ from pprint import pprint
 class Environment:
     """ Class representing the environment"""
 
-    def __init__(self, chromosome=None):
+    def __init__(self, chromosome=None, config_path="config.yaml"):
         self.time = 0
 
         # Get config
-        file_stream = open("config.yaml", "r")
+        file_stream = open(config_path, "r")
         config = yaml.full_load(file_stream)
         agent_config = config["agent"]
 
@@ -62,9 +62,8 @@ class Environment:
 
         # Spawn Food
         # max food here is 320 - TODO code a way to put this number into population automatically
-        self.totalFood = 0
-        self.totalFood += self.spawn_food(5, 15)
-        self.totalFood += self.spawn_food(25, 5)
+        self.spawn_food(5, 15)
+        self.spawn_food(25, 5)
 
     def run(self, max_t=5000):
         """
@@ -120,7 +119,7 @@ class Environment:
             col = 10
             self.spawn_food(row, col)
 
-    def spawn_food(self, row, col, r=2, amount=10):
+    def spawn_food(self, row, col, r=2, amount=5):
         """
         INPUT:
           row: The row of the center of food pile
