@@ -11,4 +11,4 @@ print(len(level))
 
 def get_best(results):
     best_index = np.argmax(np.max(results[1], axis=1))
-    return results[0][best_index]#[np.argmax(results[1], axis=1)[best_index]]
+    return results[0][best_index][np.argmax(results[1], axis=1)[best_index]]
