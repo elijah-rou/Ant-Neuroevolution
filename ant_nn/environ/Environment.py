@@ -9,13 +9,13 @@ from pprint import pprint
 
 
 class Environment:
-    """ Class representing the environment"""
+    """Class representing the environment"""
 
-    def __init__(self, chromosome=None):
+    def __init__(self, chromosome=None, config_path="config.yaml"):
         self.time = 0
 
         # Get config
-        file_stream = open("config.yaml", "r")
+        file_stream = open(config_path, "r")
         config = yaml.full_load(file_stream)
         agent_config = config["agent"]
 
@@ -59,12 +59,36 @@ class Environment:
                 DeterminAnt(nest_loc=nest_loc, position=nest_loc)
                 for _ in range(config["num_agents"])
             ]
+        self.nest_loc = nest_loc
 
         # Spawn Food
-        # max food here is 320 - TODO code a way to put this number into population automatically
-        self.totalFood = 0
-        self.totalFood += self.spawn_food(5, 15, amount=5)
-        self.totalFood += self.spawn_food(25, 5, amount=5)
+        # pick 2 sets of random row/col
+        foodBoxSize = 20  # side length of square to spawn food randomly on
+
+        spot1 = self.pick_food_loc(foodBoxSize)
+        spot2 = self.pick_food_loc(foodBoxSize)
+
+        self.spawn_food(spot1[0], spot1[1])
+        self.spawn_food(spot2[0], spot2[1])
+
+    # picks a point on a square of side length squareSize around the nest
+    def pick_food_loc(self, squareSize):
+        loc = [0, 0]
+
+        sidePicker = np.random.uniform(0, 1)
+        lowerBoundX = int(self.nest_loc[0] - squareSize // 2)
+        upperBoundX = int(self.nest_loc[0] + squareSize // 2)
+        lowerBoundY = int(self.nest_loc[1] - squareSize // 2)
+        upperBoundY = int(self.nest_loc[1] + squareSize // 2)
+        if sidePicker < 0.25:  # left side
+            loc = [lowerBoundX, int(np.random.uniform(lowerBoundY, upperBoundY))]
+        elif sidePicker < 0.5:  # right side
+            loc = [upperBoundX, int(np.random.uniform(lowerBoundY, upperBoundY))]
+        elif sidePicker < 0.75:  # bottom side
+            loc = [int(np.random.uniform(lowerBoundX, upperBoundX)), lowerBoundY]
+        else:  # top side
+            loc = [int(np.random.uniform(lowerBoundX, upperBoundX)), upperBoundY]
+        return loc
 
     def run(self, max_t=5000):
         """
@@ -120,7 +144,7 @@ class Environment:
             col = 10
             self.spawn_food(row, col)
 
-    def spawn_food(self, row, col, r=2, amount=10):
+    def spawn_food(self, row, col, r=2, amount=5):
         """
         INPUT:
           row: The row of the center of food pile
@@ -134,8 +158,6 @@ class Environment:
             for j in range(col - r, col + r):
                 if 0 <= i < self.width and 0 <= j < self.height:
                     self.grid[i][j].food += amount
-
-        return (r+2)**2 * amount
 
     def __str__(self):
         string = ""

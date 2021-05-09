@@ -25,13 +25,15 @@ class AntGUI(QtWidgets.QMainWindow):
         self.setCentralWidget(self.board)
 
         self.chrom_input = QtWidgets.QLineEdit()
-        self.chrom_input.setText('C:/Users/evere/Documents/CornellTech/SwarmRobotics/Ant-Neuroevolution/results.pkl')
+        self.chrom_input.setText(
+            "C:/Users/evere/Documents/CornellTech/SwarmRobotics/Ant-Neuroevolution/results.pkl"
+        )
         self.chrom_input.setPlaceholderText("Chromosome")
 
-        self.file_button = QtWidgets.QPushButton('Select file')
+        self.file_button = QtWidgets.QPushButton("Select file")
         self.file_button.clicked.connect(self.select_file)
 
-        self.start_button = QtWidgets.QPushButton('Start')
+        self.start_button = QtWidgets.QPushButton("Start")
         self.start_button.clicked.connect(self.start)
 
         self.control_layout = QtWidgets.QHBoxLayout()
@@ -81,6 +83,7 @@ class AntGUI(QtWidgets.QMainWindow):
         #     print(dialog.selectedFiles())
         #     file_path = dialog.selectedFiles()[0]
         # self.chrom_input.setText(file_path)
+
 
 class Communicate(QtCore.QObject):
     msgToSB = QtCore.Signal(str)
@@ -139,7 +142,7 @@ class Board(QtWidgets.QFrame):
                 painter,
                 rect.left() + col * self.squareWidth(),
                 boardTop + (Board.BoardHeight - row - 1) * self.squareHeight(),
-                has_food=has_food
+                has_food=has_food,
             )
         painter.end()
 
@@ -163,7 +166,7 @@ class Board(QtWidgets.QFrame):
             0x66CCCC,  # Cyan
             0xDAAA00,  # Yellow
             0xFFC0CB,  # Pink
-            0xFFA500   # Orange
+            0xFFA500,  # Orange
         ]
         if not cell:  # Pass in None if it is an Ant
             if not has_food:
@@ -176,11 +179,11 @@ class Board(QtWidgets.QFrame):
             color = QtGui.QColor(0xDAAA00)  # Draw Wall
         elif cell.pheromone > 0:  # draw pheromone
             color = QtGui.QColor.fromHsv(233, 255 * min(cell.pheromone, 1), 255)
-        elif cell.food > 0:  
-            color = QtGui.QColor(0x66CC66)# Draw Food
-        elif cell.pheromone == 0: 
-            color = QtGui.QColor(0xFFFFFF) # Draw blank space
-        elif cell.pheromone <0:
+        elif cell.food > 0:
+            color = QtGui.QColor(0x66CC66)  # Draw Food
+        elif cell.pheromone == 0:
+            color = QtGui.QColor(0xFFFFFF)  # Draw blank space
+        elif cell.pheromone < 0:
             color = QtGui.QColor(0xFFC0CB)
 
         painter.fillRect(
