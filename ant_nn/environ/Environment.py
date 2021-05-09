@@ -86,7 +86,7 @@ class Environment:
             loc = [lowerBoundX, int(np.random.uniform(lowerBoundY, upperBoundY))]
         elif sidePicker < 0.5: # right side
             loc = [upperBoundX, int(np.random.uniform(lowerBoundY, upperBoundY))]
-        elif sidePicker < 0.5: # bottom side
+        elif sidePicker < 0.75: # bottom side
             loc = [int(np.random.uniform(lowerBoundX, upperBoundX)), lowerBoundY]
         else: # top side
             loc = [int(np.random.uniform(lowerBoundX, upperBoundX)), upperBoundY]
