@@ -31,26 +31,26 @@ class Agent(ABC):
 
     @abstractmethod
     def update(self, env):
-        """ Update the Agent's state """
+        """Update the Agent's state"""
         raise NotImplementedError
 
     @abstractmethod
     def sense(self, env):
-        """ Sense local environment (update current and sensed cells) """
+        """Sense local environment (update current and sensed cells)"""
         raise NotImplementedError
 
     @abstractmethod
     def depositPheromone(self):
-        """ Decide whether to drop pheromone, drop it if yes"""
+        """Decide whether to drop pheromone, drop it if yes"""
         raise NotImplementedError
 
     @abstractmethod
     def move(self, env):
-        """ Decide a direction to move, and move"""
+        """Decide a direction to move, and move"""
         raise NotImplementedError
 
     def pickupFood(self):
-        """ Pickup Food if the current cell has food """
+        """Pickup Food if the current cell has food"""
         if (
             (not self.has_food)
             and (self.current_cell.food > 0)
@@ -61,7 +61,7 @@ class Agent(ABC):
             self.last_food_location = self.current_cell.position
 
     def dropFood(self):
-        """ Drop Food if the current cell is a nest cell """
+        """Drop Food if the current cell is a nest cell"""
         if self.has_food and self.current_cell.is_nest:
             self.current_cell.food += 1
             self.has_food = False
@@ -70,7 +70,7 @@ class Agent(ABC):
         return self.position.astype(int)
 
     def coord_valid(self, grid, coord):
-        """ Check if coordinate is on grid """
+        """Check if coordinate is on grid"""
         x_valid = (coord[0] > 0) and (coord[0] < len(grid))
         y_valid = (coord[1] > 1) and (coord[1] < len(grid[0]))
         return x_valid and y_valid

@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 from ant_nn.plot import *
 
-result = pickle.load(open("./results.pkl","rb"))
+result = pickle.load(open("./results.pkl", "rb"))
 
 plot_food_over_time(result)
 

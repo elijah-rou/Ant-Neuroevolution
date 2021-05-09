@@ -2,6 +2,7 @@
 import numpy as np
 from ant_nn.environ.Environment import Environment
 
+
 def main():
     sm = 0
     env = Environment(config_path="determinant_config.yaml")
@@ -9,7 +10,7 @@ def main():
     # np.save("food_retrieved", food_retrived)
     print(food_retrived[-1])
     # plt.plot(food_retrived)
-    
+
 
 if __name__ == "__main__":
     main()

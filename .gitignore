@@ -2,4 +2,6 @@
 .vscode/
 evTest.py
 results.pkl
+*.zip
 *.pkl
+.DS_Store
