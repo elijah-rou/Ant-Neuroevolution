@@ -3,10 +3,9 @@ import numpy as np
 import pickle
 from ant_nn.plot import *
 
-res_temp = pickle.load(open("./results.pkl","rb"))
+result = pickle.load(open("./results.pkl","rb"))
 
-
-
+plot_food_over_time(result)
 
 # fetchant_1_temp = pickle.load(open("./fetchant_1.pkl", "rb"))
 # fetchant_2_temp = pickle.load(open("./fetchant_2.pkl", "rb"))
