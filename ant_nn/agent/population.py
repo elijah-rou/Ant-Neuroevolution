@@ -45,7 +45,7 @@ class Population:
             import pickle
             pickle_off = open(filename,"rb")
             temp = pickle.load(pickle_off)
-            level = temp[0][-1]
+            level = temp[2]
             # print(level[0])
             # for i in range(len(level)):
             #     level[i] = np.asarray(level[i])
