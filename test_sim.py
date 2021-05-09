@@ -3,7 +3,7 @@ import dill
 
 
 def main():
-    sim = Simulation(config_path="short_config.yml")
+    sim = Simulation(config_path="config.yaml")
     chromosomes, scores, food = sim.run()
 
     file = open("results.pkl", "wb")
