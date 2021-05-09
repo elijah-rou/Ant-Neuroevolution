@@ -41,6 +41,7 @@ class Brain(nn.Module):
 class DominAnt(Agent):  # IntelligAnt
     PHEROMONE_MAX = 5
     MAX_TURN = np.pi / 2
+    MAX_RANDOM = np.pi / 8
 
     sense_dict = {
         #                || LEFTER |  LEFT  | AHEAD |  RIGHT  | RIGHTER || RADIANS
@@ -166,7 +167,7 @@ class DominAnt(Agent):  # IntelligAnt
 
     def move(self, grid):
         # Move the approrpitae
-        self.orientation += self.orientation_delta + np.random.normal(0, self.randomness)
+        self.orientation += self.orientation_delta + np.random.normal(0, self.randomness*self.MAX_RANDOM)
         self.orientation %= 2 * np.pi
 
         next_pos = [0.0, 0.0]
