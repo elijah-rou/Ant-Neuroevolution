@@ -6,7 +6,7 @@ import numpy as np
 
 
 class Brain(nn.Module):
-    """ Neural Net for the ants. Uses 3 hidden layers. """
+    """Neural Net for the ants. Uses 3 hidden layers."""
 
     def __init__(self, input_size, output_size, hidden_sizes):
         super().__init__()
@@ -57,18 +57,18 @@ class FetchAnt(Agent):
         self.brain.apply_weights(weights)
 
     def _tensor_input(self):
-        """ Return a tensor from the input dict """
+        """Return a tensor from the input dict"""
         return torch.from_numpy(np.concatenate([x for x in self.input.values()]))
 
     def get_angle_to_nest(self):
-        """ returns angle from agent to nest """
+        """returns angle from agent to nest"""
         nest_diff = self.position - (self.nest_loc + 0.5)
         theta = np.arctan2(nest_diff[1], nest_diff[0])  # angle from nest to agent
         theta = (theta + np.pi) % (2 * np.pi)  # turn around and put in 0-2pi
         return theta
 
     def sense(self, grid):
-        """ Updates current cell """
+        """Updates current cell"""
         cell_pos = self.get_coord()  # integer coordinates of current cell
         self.current_cell = grid[cell_pos[0]][cell_pos[1]]
 

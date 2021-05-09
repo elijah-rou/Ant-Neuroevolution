@@ -8,7 +8,11 @@ from concurrent.futures import ProcessPoolExecutor, as_completed, wait
 from functools import partial
 
 
+<<<<<<< HEAD
 def sim_env(chromosome,TIMESTEPS):
+=======
+def sim_env(chromosome, TIMESTEPS):
+>>>>>>> 914c54ea8104d26f390bf563b2399a8165c3c93c
     sim = {"env": Environment(chromosome), "food": np.zeros(TIMESTEPS)}
     for t in range(TIMESTEPS):
         sim["env"].update()
@@ -16,20 +20,24 @@ def sim_env(chromosome,TIMESTEPS):
     score = sim["food"]
     return score
 
-    
+
 def plot_food(foods):
-        fig, ax = plt.subplots()
-        for food in foods:
-            ax.plot(food)
-        ax.set_title("Food v Time")
-        ax.set_xlabel("time")
-        ax.set_ylabel("Food Collected")
-        plt.show()
+    fig, ax = plt.subplots()
+    for food in foods:
+        ax.plot(food)
+    ax.set_title("Food v Time")
+    ax.set_xlabel("time")
+    ax.set_ylabel("Food Collected")
+    plt.show()
 
 
 class Simulation:
     def __init__(self, config_path="config.yaml"):
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> 914c54ea8104d26f390bf563b2399a8165c3c93c
         file_stream = open(config_path, "r")
         config = yaml.full_load(file_stream)
 
@@ -48,6 +56,8 @@ class Simulation:
             agent_params["input_size"],
             agent_params["output_size"],
             agent_params["hidden_layer_size"],
+            ga_config["init_from_file"],
+            ga_config["filename"],
         )
 
         self.executor = ProcessPoolExecutor()
@@ -59,6 +69,7 @@ class Simulation:
         Run the simulation
         """
         e_chromosomes = []
+        final_pop = []
         pop_size = self.population.size()
         e_scores = np.zeros((self.epochs, pop_size))
         # pop_range = range(pop_size)
@@ -69,7 +80,9 @@ class Simulation:
             print(f"Generation: {ep+1} - {t}")
 
             future_envs = {
-                self.executor.submit(sim_env, self.population.chromosomes[i], self.TIMESTEPS): (i, r)
+                self.executor.submit(
+                    sim_env, self.population.chromosomes[i], self.TIMESTEPS
+                ): (i, r)
                 for i in range(pop_size)
                 for r in range(self.runs)
             }
@@ -95,10 +108,21 @@ class Simulation:
             if self.eval_function == "median":
                 self.population.scores = np.median(self.scores, axis=1)
             elif self.eval_function == "median_minvar":
+<<<<<<< HEAD
                 self.population.scores = np.median(self.scores, axis=1) - np.std(self.scores, axis=1)
             elif self.eval_function == "median_minvar_ratio":
                 self.population.scores = np.median(self.scores, axis=1) / np.std(self.scores, axis=1)
             elif self.eval_function == "average":
+=======
+                self.population.scores = np.median(self.scores, axis=1) - np.std(
+                    self.scores, axis=1
+                )
+            elif eval_function == "median_minvar_ratio":
+                self.population.scores = np.median(self.scores, axis=1) / np.std(
+                    self.scores, axis=1
+                )
+            elif eval_function == "average":
+>>>>>>> 914c54ea8104d26f390bf563b2399a8165c3c93c
                 self.population.scores = np.mean(self.scores, axis=1)
             else:
                 self.population.scores = np.min(self.scores, axis=1)
@@ -110,12 +134,10 @@ class Simulation:
             print(
                 f"Best {self.eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}\n"
             )
-            #print(f"Time in thread: {time.thread_time()}\n")
-            e_chromosomes += [self.population.chromosomes]
-            
-        #print(f"END Total Time: {time.thread_time()}\n")
-        return (
-            e_chromosomes,
-            e_scores,
-            self.food_res
-        )
+            # print(f"Time in thread: {time.thread_time()}\n")
+            e_chromosomes += [self.population.chromosomes[best_index]]
+
+        final_pop = self.population.chromosomes
+
+        # print(f"END Total Time: {time.thread_time()}\n")
+        return (e_chromosomes, e_scores, final_pop, self.food_res)

@@ -43,7 +43,7 @@ class DeterminAnt(Agent):  # IgnorAnt
         self.move(grid)
 
     def sense(self, grid):
-        """ Updates current and sensed cells """
+        """Updates current and sensed cells"""
 
         cell_pos = self.get_coord()  # integer coordinates of current cell
         self.current_cell = grid[cell_pos[0]][cell_pos[1]]
@@ -66,7 +66,7 @@ class DeterminAnt(Agent):  # IgnorAnt
         self.adjacent_pheromone = self.sense_pheromone()
 
     def sense_food(self):
-        """ returns index of food in sensed cells """
+        """returns index of food in sensed cells"""
         for i in self.sense_idxs:
             if self.sensed_cells[i] is not None:
                 if self.sensed_cells[i].food > 0:
@@ -74,7 +74,7 @@ class DeterminAnt(Agent):  # IgnorAnt
         return -1
 
     def sense_pheromone(self):
-        """ returns index of pheromone in sensed cells """
+        """returns index of pheromone in sensed cells"""
         for i in self.sense_idxs:
             if self.sensed_cells[i] is not None:
                 if self.sensed_cells[i].pheromone > 0.1:
@@ -137,15 +137,17 @@ class DeterminAnt(Agent):  # IgnorAnt
         next_pos[0] = self.position[0] + self.speed * np.cos(self.orientation)
         next_pos[1] = self.position[1] + self.speed * np.sin(self.orientation)
 
-        while not self.coord_valid(grid, next_pos):  # if walking off grid, turn until you aren't
-            self.orientation = (self.orientation + np.pi/2) % (2 * np.pi)
+        while not self.coord_valid(
+            grid, next_pos
+        ):  # if walking off grid, turn until you aren't
+            self.orientation = (self.orientation + np.pi / 2) % (2 * np.pi)
             next_pos[0] = self.position[0] + self.speed * np.cos(self.orientation)
             next_pos[1] = self.position[1] + self.speed * np.sin(self.orientation)
 
         self.position[:] = next_pos[:]
 
     def get_angle_to_nest(self):
-        """ returns angle from agent to nest """
+        """returns angle from agent to nest"""
         nest_diff = self.position - (self.nest_loc + 0.5)
         theta = np.arctan2(nest_diff[1], nest_diff[0])  # angle from nest to agent
         theta = (theta + np.pi) % (2 * np.pi)  # turn around and put in 0-2pi

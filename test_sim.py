@@ -3,11 +3,11 @@ import dill
 
 
 def main():
-    sim = Simulation(config_path="config.yaml")
-    chromosomes, scores, food = sim.run()
+    sim = Simulation()
+    chromosomes, scores, final_pop, food = sim.run()
 
     file = open("results.pkl", "wb")
-    dill.dump([chromosomes, scores, food], file)
+    dill.dump([chromosomes, scores, final_pop, food], file)
     file.close()
     print("done")
 

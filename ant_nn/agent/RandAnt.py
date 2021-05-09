@@ -17,17 +17,17 @@ class RandAnt(Agent):
         self.distance_traveled = 0
 
     def update(self, env):
-        """ Update the Agent's state """
+        """Update the Agent's state"""
         self.depositPheromone(env)
         self.move(env)
 
     def depositPheromone(self, env):
-        """ Decide whether to drop pheromone, drop it if yes"""
+        """Decide whether to drop pheromone, drop it if yes"""
         i, j = self.get_coord()
         env.grid[i][j].pheromone = 1
 
     def move(self, env):
-        """ Decide a direction to move, and move"""
+        """Decide a direction to move, and move"""
         # Convert speed from radian to cartetian
         abs_v = self.MAX_SPEED * np.array(
             [np.sin(self.orientation), np.cos(self.orientation)]

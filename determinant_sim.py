@@ -9,7 +9,7 @@ def main():
     # np.save("food_retrieved", food_retrived)
     print(food_retrived[-1])
     # plt.plot(food_retrived)
-    
+
 
 if __name__ == "__main__":
     main()
