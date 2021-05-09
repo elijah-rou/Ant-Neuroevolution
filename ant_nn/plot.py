@@ -6,6 +6,7 @@ def res_to_dict(result):
     res_dict = {
     "chromosomes"   :   result[0],
     "scores"        :   np.asarray(result[1])
+    "food"          :   np.asarray(result[2])
     }
     return res_dict
 
@@ -21,7 +22,7 @@ def plot_score_evolution(result):
     plt.title('Score Evolution')
     plt.show()
 
-def plot_food_over_time(scores):
+def plot_food_over_time(result, num_epochs=4):
     """ plots best food_gathered vs time for each epoch """
     pass
 
