@@ -17,10 +17,10 @@ population:
   keep_threshold: 0.25
 
 agent:
-  type: FetchAnt
+  type: DominAnt
   params:
-    input_size: 3
+    input_size: 31
     hidden_layer_size: 
-    - 6
-    - 6
-    output_size: 1
+    - 15
+    - 8
+    output_size: 3
