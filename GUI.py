@@ -78,7 +78,7 @@ class AntGUI(QtWidgets.QMainWindow):
             temp = pickle.load(pickle_off)
             chroms = np.array(temp[0][epoch_n])
             scores = np.array(temp[1][epoch_n]).argsort()
-            chrom = chroms[scores[order_n]]
+            chrom = chroms[epoch_n]#[scores[order_n]]
 
             chrom = get_best(temp)
             self.board.start(chrom)
@@ -156,12 +156,8 @@ class Board(QtWidgets.QFrame):
                 painter,
                 rect.left() + col * self.squareWidth(),
                 boardTop + (Board.BoardHeight - row - 1) * self.squareHeight(),
-<<<<<<< HEAD
-                has_food=has_food,
-=======
                 None,
                 agent
->>>>>>> dev/ev
             )
         painter.end()
 
@@ -175,10 +171,11 @@ class Board(QtWidgets.QFrame):
 
     def drawSquare(self, painter, x, y, cell=None, ant=None):
         if ant:
-            if ant.has_food:
-                color = QtGui.QColor(0xFFD700)
-            else:
-                color = QtGui.QColor(0xCC0000)
+            color = QtGui.QColor(0xCC0000)
+            # if ant.has_food:
+            #     color = QtGui.QColor(0xFFD700)
+            # else:
+            #     color = QtGui.QColor(0xCC0000)
         elif cell.is_nest:
             color = QtGui.QColor(0xDAAA00)
         elif not cell.active:
@@ -194,7 +191,7 @@ class Board(QtWidgets.QFrame):
             x + 1, y + 1, self.squareWidth() - 1, self.squareHeight() - 1, color
         )
 
-        if cell and cell.food > 0 or ant and ant.has_food:  
+        if (cell and not cell.is_nest and cell.food > 0) or (ant and ant.has_food):  
             color = QtGui.QColor(0x66CC66)# Draw Food
             painter.fillRect(
             x + self.squareWidth()//4+1, y + self.squareHeight()//4+1, 
