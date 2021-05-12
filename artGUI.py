@@ -41,10 +41,10 @@ class AntGUI(QtWidgets.QMainWindow):
         self.score_input = QtWidgets.QLineEdit()
         self.score_input.setText('0')
 
-        self.start_button = QtWidgets.QPushButton('Start')
+        self.start_button = QtWidgets.QPushButton('Reset')
         self.start_button.clicked.connect(self.start)
 
-        self.pause_button = QtWidgets.QPushButton('|| , >|')
+        self.pause_button = QtWidgets.QPushButton('>||')
         self.pause_button.clicked.connect(self.board.pause)
 
         self.control_layout = QtWidgets.QHBoxLayout()
@@ -127,14 +127,14 @@ class Board(QtWidgets.QFrame):
         self.environ = None
         self.c = Communicate()
         self.isStarted = False
-        self.isPaused = False
+        self.isPaused = True
 
     def start(self, chromosome=None):
         self.isStarted = True
         self.environ = Environment(chromosome)
+        # self.draw_checkers()
         self.timer = QtCore.QBasicTimer()
         self.update()
-        self.timer.start(Board.Timer, self)
     
     def pause(self):
         if not self.isStarted:
@@ -145,6 +145,14 @@ class Board(QtWidgets.QFrame):
         else:
             self.timer.start(Board.Timer, self)
 
+    def draw_checkers(self):
+        for i in range(Board.BoardWidth * Board.BoardHeight):
+            if i % 2 == 0:
+                row = i//Board.BoardHeight
+                col = i%Board.BoardHeight
+                print(row, col)
+                self.environ.grid[row][col].food = 1
+
     def squareWidth(self):
         return self.contentsRect().width() // Board.BoardWidth
 
@@ -152,10 +160,8 @@ class Board(QtWidgets.QFrame):
         return self.contentsRect().height() // Board.BoardHeight
     
     def addFood(self, pos):
-        print(pos)
         col = pos.x()//self.squareWidth()
         row = pos.y()//self.squareHeight()
-        print(row, col)
         self.environ.grid[row][col].food += 1
         self.update()
 
@@ -198,8 +204,9 @@ class Board(QtWidgets.QFrame):
         QtWidgets.QFrame.timerEvent(self, event)
 
     def drawSquare(self, painter, x, y, cell=None, ant=None):
-        if ant:
-            color = QtGui.QColor.fromHsv(*Colors.ANT)
+        color = None
+        # if ant:
+        #     color = QtGui.QColor.fromHsv(*Colors.ANT)
         if cell:
             if cell.is_nest:
                 color = QtGui.QColor.fromHsv(*Colors.NEST)
@@ -210,6 +217,8 @@ class Board(QtWidgets.QFrame):
                 color = QtGui.QColor.fromHsv(*Colors.FREE)
             elif cell.pheromone <0:
                 color = QtGui.QColor(0xFFC0CB)
+        if not color:
+            color = QtGui.QColor.fromHsv(*Colors.FREE)
 
         painter.fillRect(
             x, y, self.squareWidth(), self.squareHeight(), color
@@ -224,8 +233,11 @@ class Board(QtWidgets.QFrame):
         )
 
 class Colors(object):
+    '''
+    c stores colors in hsv
+    '''
 
-    # # colors in hsv
+    # Bright mode
     # c = [
     #     (0, 0, 1), # White space
     #     (0, 255, 255), # Red Ant

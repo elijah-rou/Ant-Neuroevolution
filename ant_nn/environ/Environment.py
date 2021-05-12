@@ -59,8 +59,8 @@ class Environment:
         spot1 = self.pick_food_loc(foodBoxSize)
         spot2 = self.pick_food_loc(foodBoxSize)
 
-        self.spawn_food(spot1[0], spot1[1])
-        self.spawn_food(spot2[0], spot2[1])
+        # self.spawn_food(spot1[0], spot1[1])
+        # self.spawn_food(spot2[0], spot2[1])
 
     # picks a point on a square of side length squareSize around the nest
     def pick_food_loc(self, squareSize):
