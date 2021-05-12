@@ -44,6 +44,9 @@ class AntGUI(QtWidgets.QMainWindow):
         self.start_button = QtWidgets.QPushButton('Start')
         self.start_button.clicked.connect(self.start)
 
+        self.pause_button = QtWidgets.QPushButton('|| , >|')
+        self.pause_button.clicked.connect(self.board.pause)
+
         self.control_layout = QtWidgets.QHBoxLayout()
         self.control_layout.addWidget(self.chrom_input)
         self.control_layout.addWidget(self.file_button)
@@ -52,6 +55,7 @@ class AntGUI(QtWidgets.QMainWindow):
         self.control_layout.addWidget(self.score_label)
         self.control_layout.addWidget(self.score_input)
         self.control_layout.addWidget(self.start_button)
+        self.control_layout.addWidget(self.pause_button)
 
         self.controls = QtWidgets.QWidget()
         self.controls.setLayout(self.control_layout)
@@ -68,6 +72,7 @@ class AntGUI(QtWidgets.QMainWindow):
         self.statusbar.showMessage(self.board.environ.nest.food)
 
     def start(self):
+        self.isStarted = True
         chrom_file = self.chrom_input.text()
 
         # If there's a chromosome file, use it
@@ -121,12 +126,24 @@ class Board(QtWidgets.QFrame):
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.environ = None
         self.c = Communicate()
+        self.isStarted = False
+        self.isPaused = False
 
     def start(self, chromosome=None):
+        self.isStarted = True
         self.environ = Environment(chromosome)
         self.timer = QtCore.QBasicTimer()
         self.update()
         self.timer.start(Board.Timer, self)
+    
+    def pause(self):
+        if not self.isStarted:
+            return
+        self.isPaused = not self.isPaused
+        if self.isPaused:
+            self.timer.stop()
+        else:
+            self.timer.start(Board.Timer, self)
 
     def squareWidth(self):
         return self.contentsRect().width() // Board.BoardWidth
@@ -140,6 +157,7 @@ class Board(QtWidgets.QFrame):
         row = pos.y()//self.squareHeight()
         print(row, col)
         self.environ.grid[row][col].food += 1
+        self.update()
 
     def paintEvent(self, event):
         if not self.environ:
@@ -164,7 +182,6 @@ class Board(QtWidgets.QFrame):
             row, col = agent.get_coord()
             self.drawSquare(
                 painter,
-                
                 rect.left() + col * self.squareWidth(),
                 boardTop + row  * self.squareHeight(),
                 None,

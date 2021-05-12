@@ -44,6 +44,9 @@ class AntGUI(QtWidgets.QMainWindow):
         self.start_button = QtWidgets.QPushButton('Start')
         self.start_button.clicked.connect(self.start)
 
+        self.pause_button = QtWidgets.QPushBUtton('Pause/Continue')
+        self.pause_button.clicked.connect(self.pause)
+
         self.control_layout = QtWidgets.QHBoxLayout()
         self.control_layout.addWidget(self.chrom_input)
         self.control_layout.addWidget(self.file_button)
@@ -52,6 +55,7 @@ class AntGUI(QtWidgets.QMainWindow):
         self.control_layout.addWidget(self.score_label)
         self.control_layout.addWidget(self.score_input)
         self.control_layout.addWidget(self.start_button)
+        self.control_layout.addWidget(self.pause_button)
 
         self.controls = QtWidgets.QWidget()
         self.controls.setLayout(self.control_layout)
@@ -86,6 +90,15 @@ class AntGUI(QtWidgets.QMainWindow):
         # Otherwise, run determineant
         else:
             self.board.start()
+    
+    def pause(self):
+        if not self.isStarted:
+            return
+        self.isPaused = not self.isPaused
+        if self.isPaused:
+            self.timer.stop()
+        else:
+            self.timer.start()
 
     def center(self):
 
