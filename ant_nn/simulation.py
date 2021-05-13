@@ -8,8 +8,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed, wait
 from functools import partial
 
 
-def sim_env(chromosome, TIMESTEPS):
-    sim = {"env": Environment(chromosome), "food": np.zeros(TIMESTEPS)}
+def sim_env(chromosome, TIMESTEPS, config_path="config.yaml"):
+    sim = {"env": Environment(chromosome,config_path=config_path), "food": np.zeros(TIMESTEPS)}
     for t in range(TIMESTEPS):
         sim["env"].update()
         sim["food"][t] = sim["env"].nest.food
@@ -28,6 +28,7 @@ def plot_food(foods):
 
 class Simulation:
     def __init__(self, config_path="config.yaml"):
+        self.config_path = config_path
         file_stream = open(config_path, "r")
         config = yaml.full_load(file_stream)
 
@@ -71,7 +72,7 @@ class Simulation:
 
             future_envs = {
                 self.executor.submit(
-                    sim_env, self.population.chromosomes[i], self.TIMESTEPS
+                    sim_env, self.population.chromosomes[i], self.TIMESTEPS, self.config_path
                 ): (i, r)
                 for i in range(pop_size)
                 for r in range(self.runs)
