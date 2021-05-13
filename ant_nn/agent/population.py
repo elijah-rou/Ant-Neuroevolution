@@ -163,10 +163,10 @@ class Population:
                     if (
                         random.random() < self.mutationRate
                     ):  # only mutate a gene w some small prob
-                        # chromosome[i][j][k] += np.random.normal(0, self.mutationStrength)
-                        chromosome[i][j][k] = np.random.uniform(
-                            self.clampRange[0], self.clampRange[1]
-                        )
+                        chromosome[i][j][k] += np.random.normal(0, self.mutationStrength)
+                        # chromosome[i][j][k] = np.random.uniform(
+                        #     self.clampRange[0], self.clampRange[1]
+                        # )
 
         chromosome = self.clampChromosome(chromosome)
         return chromosome
