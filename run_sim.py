@@ -28,6 +28,7 @@ def main(cmdline_opts):
 
     print("config file:", config_path)
     print("result file:", result_path)
+    print()
 
     sim = Simulation(config_path=config_path)
     chromosomes, scores, final_pop, food = sim.run()
