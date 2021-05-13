@@ -3,9 +3,7 @@ from ant_nn.environ.GridCell import GridCell
 from ant_nn.agent.RandAnt import RandAnt
 from ant_nn.agent.DeterminAnt import DeterminAnt
 from ant_nn.agent.DominAnt import DominAnt
-from ant_nn.agent.FetchAnt import FetchAnt
 import yaml
-from pprint import pprint
 
 
 class Environment:
@@ -40,18 +38,11 @@ class Environment:
         self.nest.is_nest = True
 
         # Spawn Agents
-        if agent_config["type"] == "DominAnt":
+        if chromosome and agent_config["type"] == "DominAnt":
             params = agent_config["params"]
             layer_size = params["hidden_layer_size"]
             self.agents = [
                 DominAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
-                for _ in range(config["num_agents"])
-            ]
-        elif agent_config["type"] == "FetchAnt":
-            params = agent_config["params"]
-            layer_size = params["hidden_layer_size"]
-            self.agents = [
-                FetchAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
                 for _ in range(config["num_agents"])
             ]
         else:
@@ -105,7 +96,8 @@ class Environment:
 
     # def default_setup(self):
     #     nest_loc = [self.height // 2, self.width // 2]
-    #     self.agents = [DeterminAnt(nest_loc=nest_loc, position=nest_loc) for _ in range(10)]
+    #     self.agents = [DeterminAnt(nest_loc=ne
+    # st_loc, position=nest_loc) for _ in range(10)]
     #     # self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[10,20], has_food=True))
     #     # self.agents.append(RandAnt())
     #     # Set up nest location
