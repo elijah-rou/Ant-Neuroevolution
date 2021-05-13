@@ -88,7 +88,8 @@ class DominAnt(Agent):  # IntelligAnt
         }
         input_size = 15
         # input_size = 13
-        output_size = 3
+        # output_size = 3
+        output_size = 4
 
         # Init network and set weights
         self.brain = Brain(input_size, output_size, hidden_sizes)
@@ -168,13 +169,13 @@ class DominAnt(Agent):  # IntelligAnt
             torch.sigmoid(3 * actions[0]).item()
             * self.PHEROMONE_MAX  # should set range to 0-1
         )  # Decide to place pheromone
-        orientation_delta_sin = actions[1].item()
-        orientation_delta_cos = actions[2].item()
-        self.orientation_delta = np.arctan2(orientataion_delta_sin / orientation_delta_cos)
         # self.orientation_delta = actions[1].item() * self.MAX_TURN  # Orientation delta
         # self.randomness = torch.sigmoid(
         #     3 * actions[2]
         # ).item()  # should set range to 0-1
+        orientation_delta_sin = actions[1].item()
+        orientation_delta_cos = actions[2].item()
+        self.orientation_delta = np.arctan2(orientation_delta_sin,orientation_delta_cos) * self.MAX_TURN
         self.randomness = torch.sigmoid(
             3 * actions[3]
         ).item()  # should set range to 0-1
@@ -196,7 +197,7 @@ class DominAnt(Agent):  # IntelligAnt
         next_pos[0] = self.position[0] + self.MAX_SPEED * np.cos(self.orientation)
         next_pos[1] = self.position[1] + self.MAX_SPEED * np.sin(self.orientation)
 
-        correction_dir = (2 * np.round(np.random())) - 1  # random value either -1 or 1 to determine if turning left or right
+        correction_dir = (2 * np.round(np.random.rand())) - 1  # random value either -1 or 1 to determine if turning left or right
         while not self.coord_valid(grid, next_pos):  # if walking off grid, turn
             self.orientation = (self.orientation + correction_dir * np.pi / 2) % (2 * np.pi)
             next_pos[0] = self.position[0] + self.MAX_SPEED * np.cos(self.orientation)

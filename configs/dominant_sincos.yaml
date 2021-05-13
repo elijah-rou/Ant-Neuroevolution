@@ -1,0 +1,28 @@
+num_epochs: 100
+num_timesteps: 30
+num_agents: 10
+num_runs: 3
+nest_location: center
+# nest_location:
+#   - 0
+#   - 0
+height: 30
+width: 30
+eval: median
+
+population:
+  size: 80
+  mutation_rate: 0.1
+  mutation_strength: 0.5 
+  keep_threshold: 0.25
+  init_from_file: False
+  filename: results_500.pkl
+
+agent:
+  type: DominAnt
+  params:
+    input_size: 15
+    hidden_layer_size: 
+    - 15
+    - 8
+    output_size: 4
