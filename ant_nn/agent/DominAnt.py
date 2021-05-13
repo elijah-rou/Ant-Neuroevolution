@@ -189,7 +189,7 @@ class DominAnt(Agent):  # IntelligAnt
         next_pos[0] = self.position[0] + self.MAX_SPEED * np.cos(self.orientation)
         next_pos[1] = self.position[1] + self.MAX_SPEED * np.sin(self.orientation)
 
-        correction_dir = (2 * np.round(np.random())) - 1  # random value either -1 or 1 to determine if turning left or right
+        correction_dir = (2 * np.round(np.random.rand())) - 1  # random value either -1 or 1 to determine if turning left or right
         while not self.coord_valid(grid, next_pos):  # if walking off grid, turn
             self.orientation = (self.orientation + correction_dir * np.pi / 2) % (2 * np.pi)
             next_pos[0] = self.position[0] + self.MAX_SPEED * np.cos(self.orientation)
