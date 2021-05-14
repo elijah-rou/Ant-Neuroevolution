@@ -45,9 +45,9 @@ def main(cmdline_opts):
         if opt == '-d':
             degen_epoch = 50
         if opt == '--degen-epoch':
-            degen_epoch = arg
+            degen_epoch = int(arg)
         if opt == '--degen-score':
-            degen_score = arg
+            degen_score = int(arg)
 
     print("config file:", config_path)
     print("result file:", result_path)
