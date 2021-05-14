@@ -121,7 +121,7 @@ class Simulation:
                 best_score = e_scores[ep][best_index]
                 med_score = np.median(e_scores[ep])
                 print(
-                    f"Best {self.eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}\n"
+                    f"Best {self.eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}"
                 )
                 print(
                     f"Median {self.eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}\n"
