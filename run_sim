@@ -19,8 +19,8 @@ import dill
 
 def main(cmdline_opts):
     try:
-        short_opts = 'c:r:'
-        long_opts = ['config=', 'result=']
+        short_opts = 'c:r:d:'
+        long_opts = ['config=', 'result=', 'degen-epoch', 'degen-score']
         optlist, args = getopt.getopt(cmdline_opts, short_opts, long_opts)
     except getopt.GetoptError as err:
         # print help information and exit:
@@ -32,12 +32,18 @@ def main(cmdline_opts):
     config_path = "config.yaml"
     result_path = "result.yaml"
 
+    # default degen settings
+    degen_epoch = None
+    degen_score = 10
+
     # parse args
     for opt,arg in optlist:
         if opt in ("-c", "--config"):
             config_path = arg
         if opt in ("-r", "--result"):
             result_path = arg
+        if opt in ("-d", "--degen-epoch"):
+            print(arg)
 
     print("config file:", config_path)
     print("result file:", result_path)
