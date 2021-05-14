@@ -20,7 +20,7 @@ import dill
 def main(cmdline_opts):
     try:
         short_opts = 'c:r:d'
-        long_opts = ['config=', 'result=', 'degen-epoch', 'degen-score']
+        long_opts = ['config=', 'result=', 'degen-epoch=', 'degen-score=']
         optlist, args = getopt.getopt(cmdline_opts, short_opts, long_opts)
     except getopt.GetoptError as err:
         # print help information and exit:
@@ -44,9 +44,9 @@ def main(cmdline_opts):
             result_path = arg
         if opt == '-d':
             degen_epoch = 50
-        if opt == '--degen-epoch':
+        if opt == "--degen-epoch":
             degen_epoch = int(arg)
-        if opt == '--degen-score':
+        if opt == "--degen-score":
             degen_score = int(arg)
 
     print("config file:", config_path)
