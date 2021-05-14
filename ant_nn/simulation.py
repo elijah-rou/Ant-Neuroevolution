@@ -129,6 +129,7 @@ class Simulation:
                 if (degen_epoch is not None):  # if degen resim is enabled
                     if (ep+1 >= degen_epoch):  # if past degen_epoch
                         if (max_score < degen_score):  # if max score across all epochs < degen_score
+                            print('DEGENERATE: degen_epoch reached before degen_score. Restarting... ')
                             is_degen = True  # restart the sim
                             break
                 else:
