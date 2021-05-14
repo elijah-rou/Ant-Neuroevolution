@@ -4,12 +4,8 @@
 # run-sim [options]
 #=========================================================================
 #
-#  -c --config <path>     set path to config file (.yaml)
-#  -r --result <path>     set path where results will be written (.pkl)
-#
-#  -d                     enable degen restart mode with default degen_score of 10 and degen_epoch of 50
-#  --degen_score <score>  enable degen restart mode with degen_score of <score>
-#  --degen_epoch <epoch>  set epoch after which degen_score must be met to avoid restart if degen restart mode is enabled
+#  -c --config <path>  set path to config file (.yaml)
+#  -r --result <path>  set path where results will be written (.pkl)
 #
 # Author : Darren Midkiff
 # Date   : May 13, 2021
@@ -48,9 +44,9 @@ def main(cmdline_opts):
             result_path = arg
         if opt == '-d':
             degen_epoch = 50
-        if opt == "--degen-epoch":
+        if opt == '--degen-epoch':
             degen_epoch = int(arg)
-        if opt == "--degen-score":
+        if opt == '--degen-score':
             degen_score = int(arg)
 
     print("config file:", config_path)
