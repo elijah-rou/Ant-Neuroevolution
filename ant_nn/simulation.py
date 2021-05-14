@@ -124,7 +124,7 @@ class Simulation:
                     f"Best {self.eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}"
                 )
                 print(
-                    f"Median {self.eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}\n"
+                    f"Median {self.eval_function} score for epoch {ep+1}: {med_score}\n"
                 )
                 # print(f"Time in thread: {time.thread_time()}\n")
                 e_chromosomes += [self.population.chromosomes[best_index]]
