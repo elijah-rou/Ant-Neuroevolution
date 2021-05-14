@@ -4,8 +4,12 @@
 # run-sim [options]
 #=========================================================================
 #
-#  -c --config <path>  set path to config file (.yaml)
-#  -r --result <path>  set path where results will be written (.pkl)
+#  -c --config <path>     set path to config file (.yaml)
+#  -r --result <path>     set path where results will be written (.pkl)
+#
+#  -d                     enable degen restart mode with default degen_score of 10 and degen_epoch of 50
+#  --degen_score <score>  enable degen restart mode with degen_score of <score>
+#  --degen_epoch <epoch>  set epoch after which degen_score must be met to avoid restart if degen restart mode is enabled
 #
 # Author : Darren Midkiff
 # Date   : May 13, 2021
