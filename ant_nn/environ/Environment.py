@@ -11,11 +11,11 @@ from pprint import pprint
 class Environment:
     """ Class representing the environment"""
 
-    def __init__(self, chromosome=None):
+    def __init__(self, chromosome=None, config_path="config.yaml"):
         self.time = 0
 
         # Get config
-        file_stream = open("config.yaml", "r")
+        file_stream = open(config_path, "r")
         config = yaml.full_load(file_stream)
         agent_config = config["agent"]
 
@@ -81,7 +81,6 @@ class Environment:
         upperBoundX = int(self.nest_loc[0] + squareSize//2)
         lowerBoundY = int(self.nest_loc[1] - squareSize//2)
         upperBoundY = int(self.nest_loc[1] + squareSize//2)
-
         if sidePicker < 0.25: # left side
             loc = [lowerBoundX, int(np.random.uniform(lowerBoundY, upperBoundY))]
         elif sidePicker < 0.5: # right side
@@ -90,12 +89,7 @@ class Environment:
             loc = [int(np.random.uniform(lowerBoundX, upperBoundX)), lowerBoundY]
         else: # top side
             loc = [int(np.random.uniform(lowerBoundX, upperBoundX)), upperBoundY]
-
         return loc
-
-
-
-
 
     def run(self, max_t=5000):
         """
@@ -166,6 +160,7 @@ class Environment:
                 if 0 <= i < self.width and 0 <= j < self.height:
                     self.grid[i][j].food += amount
 
+        return (r+2)**2 * amount
 
     def __str__(self):
         string = ""
