@@ -34,19 +34,13 @@ class Population:
         filename=None
     ):
         self.popSize = popSize  # number of chromosomes
-<<<<<<< HEAD
-        self.mutationRate = mutationRate  # probability of a given weight getting mutated (keep low) (i.e. 0.1)
-        self.maxMutationStrength = (
-=======
         self.maxMutationRate = mutationRate  # probability of a given weight getting mutated (keep low) (i.e. 0.1)
         self.mutationStrength = (
->>>>>>> origin/dev/dcmid
             mutationStrength  # variance of gaussian mutation function (needs testing)
         )
-        self.clampRange = [-2, 2] # range of allowable scores
+        self.clampRange = [-1, 1] # range of allowable scores
         self.keepThresh = keepThresh  # what percentage of best chromosomes to keep unchanged each epoch (try 0.1)
         self.crossover = False  # enable crossover, not implemented yet
-<<<<<<< HEAD
         if initFromFile:
             import pickle
             pickle_off = open(filename,"rb")
@@ -66,16 +60,6 @@ class Population:
         self.mutationStrength = 0 # temp
 
         self.maxScore = 160 #represents the target score - WARNING - if scores go above this training stops
-=======
-        self.chromosomes = self.initializePop(
-            numInputs, numOutputs, layerSizes
-        )  # list of weights
-        self.scores = np.zeros(popSize)  # list of scores
-        
-        self.mutationRate = 0 # temp
-
-        self.maxScore = 50 #represents the target score - WARNING - if scores go above this training stops
->>>>>>> origin/dev/dcmid
 
     # makes self.chromosomes
     def initializePop(self, numInputs, numOutputs, layerSizes):
@@ -140,10 +124,6 @@ class Population:
         )
         numKeeps = int(self.popSize * self.keepThresh)
         
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/dev/dcmid
         counter = 0
         # carry over the best individuals
         for i in range(self.popSize):
@@ -170,11 +150,7 @@ class Population:
     # takes in chromosome, randomly mutates it according to stored params
     def mutate(self, chromosome, score):
         # mutate more if score is low
-<<<<<<< HEAD
         self.mutationStrength = self.maxMutationStrength * (1 - (score/self.maxScore))
-=======
-        self.mutationRate = self.maxMutationRate * (1 - (score/self.maxScore))
->>>>>>> origin/dev/dcmid
         # loop over layers
         for i in range(len(chromosome)):
             # loop over weights
@@ -183,12 +159,8 @@ class Population:
                     if (
                         random.random() < self.mutationRate
                     ):  # only mutate a gene w some small prob
-<<<<<<< HEAD
                         # chromosome[i][j][k] += np.random.normal(0, self.mutationStrength)
                         chromosome[i][j][k] = np.random.uniform(self.clampRange[0], self.clampRange[1])
-=======
-                        chromosome[i][j][k] += np.random.normal(0, self.mutationStrength)
->>>>>>> origin/dev/dcmid
 
         chromosome = self.clampChromosome(chromosome)
         return chromosome

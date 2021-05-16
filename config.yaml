@@ -1,5 +1,5 @@
-num_epochs: 500
-num_timesteps: 250
+num_epochs: 250
+num_timesteps: 300
 num_agents: 10
 num_runs: 1
 nest_location: center
