@@ -21,8 +21,8 @@ population:
 agent:
   type: DominAnt
   params:
-    input_size: 15
+    input_size: 13
     hidden_layer_size: 
-    - 25
     - 15
-    output_size: 4
+    - 8
+    output_size: 3

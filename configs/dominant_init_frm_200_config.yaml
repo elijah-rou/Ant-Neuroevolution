@@ -15,14 +15,14 @@ population:
   mutation_rate: 0.1
   mutation_strength: 0.5 
   keep_threshold: 0.25
-  init_from_file: False
-  filename: results_500.pkl
+  init_from_file: True
+  filename: results_fixedFood200.pkl
 
 agent:
   type: DominAnt
   params:
-    input_size: 15
+    input_size: 13
     hidden_layer_size: 
-    - 25
     - 15
-    output_size: 4
+    - 8
+    output_size: 3

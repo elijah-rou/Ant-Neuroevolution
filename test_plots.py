@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 from ant_nn.plot import *
 
-result = pickle.load(open("./results.pkl","rb"))
+result = pickle.load(open("./results.pkl", "rb"))
 
 plot_food_over_time(result)
 
@@ -51,4 +51,8 @@ plot_food_over_time(result)
 # plt.xlabel('time step')
 # plt.ylabel('food gathered')
 # plt.legend(['epoch 1', 'epoch 20', 'epoch 300', 'epoch 500'])
+<<<<<<< HEAD
 # plt.show()
+=======
+# plt.show()
+>>>>>>> 914c54ea8104d26f390bf563b2399a8165c3c93c

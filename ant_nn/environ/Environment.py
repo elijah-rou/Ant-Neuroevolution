@@ -3,13 +3,11 @@ from ant_nn.environ.GridCell import GridCell
 from ant_nn.agent.RandAnt import RandAnt
 from ant_nn.agent.DeterminAnt import DeterminAnt
 from ant_nn.agent.DominAnt import DominAnt
-from ant_nn.agent.FetchAnt import FetchAnt
 import yaml
-from pprint import pprint
 
 
 class Environment:
-    """ Class representing the environment"""
+    """Class representing the environment"""
 
     def __init__(self, chromosome=None, config_path="config.yaml"):
         self.time = 0
@@ -40,18 +38,11 @@ class Environment:
         self.nest.is_nest = True
 
         # Spawn Agents
-        if agent_config["type"] == "DominAnt":
+        if chromosome and agent_config["type"] == "DominAnt":
             params = agent_config["params"]
             layer_size = params["hidden_layer_size"]
             self.agents = [
                 DominAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
-                for _ in range(config["num_agents"])
-            ]
-        elif agent_config["type"] == "FetchAnt":
-            params = agent_config["params"]
-            layer_size = params["hidden_layer_size"]
-            self.agents = [
-                FetchAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
                 for _ in range(config["num_agents"])
             ]
         else:
@@ -62,8 +53,9 @@ class Environment:
         self.nest_loc = nest_loc
         # Spawn Food
 
+        # Spawn Food
         # pick 2 sets of random row/col
-        foodBoxSize = 20 # side length of square to spawn food randomly on
+        foodBoxSize = 20  # side length of square to spawn food randomly on
 
         spot1 = self.pick_food_loc(foodBoxSize)
         spot2 = self.pick_food_loc(foodBoxSize)
@@ -71,23 +63,22 @@ class Environment:
         self.spawn_food(spot1[0], spot1[1])
         self.spawn_food(spot2[0], spot2[1])
 
-
     # picks a point on a square of side length squareSize around the nest
     def pick_food_loc(self, squareSize):
         loc = [0, 0]
 
         sidePicker = np.random.uniform(0, 1)
-        lowerBoundX = int(self.nest_loc[0] - squareSize//2)
-        upperBoundX = int(self.nest_loc[0] + squareSize//2)
-        lowerBoundY = int(self.nest_loc[1] - squareSize//2)
-        upperBoundY = int(self.nest_loc[1] + squareSize//2)
-        if sidePicker < 0.25: # left side
+        lowerBoundX = int(self.nest_loc[0] - squareSize // 2)
+        upperBoundX = int(self.nest_loc[0] + squareSize // 2)
+        lowerBoundY = int(self.nest_loc[1] - squareSize // 2)
+        upperBoundY = int(self.nest_loc[1] + squareSize // 2)
+        if sidePicker < 0.25:  # left side
             loc = [lowerBoundX, int(np.random.uniform(lowerBoundY, upperBoundY))]
-        elif sidePicker < 0.5: # right side
+        elif sidePicker < 0.5:  # right side
             loc = [upperBoundX, int(np.random.uniform(lowerBoundY, upperBoundY))]
-        elif sidePicker < 0.75: # bottom side
+        elif sidePicker < 0.75:  # bottom side
             loc = [int(np.random.uniform(lowerBoundX, upperBoundX)), lowerBoundY]
-        else: # top side
+        else:  # top side
             loc = [int(np.random.uniform(lowerBoundX, upperBoundX)), upperBoundY]
         return loc
 
@@ -106,7 +97,8 @@ class Environment:
 
     # def default_setup(self):
     #     nest_loc = [self.height // 2, self.width // 2]
-    #     self.agents = [DeterminAnt(nest_loc=nest_loc, position=nest_loc) for _ in range(10)]
+    #     self.agents = [DeterminAnt(nest_loc=ne
+    # st_loc, position=nest_loc) for _ in range(10)]
     #     # self.agents.append(DeterminAnt(nest_loc=nest_loc, position=[10,20], has_food=True))
     #     # self.agents.append(RandAnt())
     #     # Set up nest location
