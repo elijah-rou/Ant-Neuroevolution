@@ -2,7 +2,6 @@
 import numpy as np
 from ant_nn.environ.Environment import Environment
 
-
 def main():
     sm = 0
     env = Environment(config_path="determinant_config.yaml")

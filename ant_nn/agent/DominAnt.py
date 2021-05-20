@@ -79,11 +79,17 @@ class DominAnt(Agent):  # IntelligAnt
             "has_food": np.array([0]),
             "adjacent_food": np.zeros(5),
             "adjacent_pheromone": np.zeros(5),
-            "global_angle": np.zeros(1),
-            "local_angle": np.zeros(1),
+            "global_sin" : np.zeros(1),
+            "global_cos" : np.zeros(1),
+            "local_sin" : np.zeros(1),
+            "local_cos" : np.zeros(1),
+            # "global_angle": np.zeros(1),
+            # "local_angle": np.zeros(1),
         }
-        input_size = 13
-        output_size = 3
+        input_size = 15
+        # input_size = 13
+        # output_size = 3
+        output_size = 4
 
         # Init network and set weights
         self.brain = Brain(input_size, output_size, hidden_sizes)
@@ -144,8 +150,14 @@ class DominAnt(Agent):  # IntelligAnt
         # Update inputs
         # TODO Fix input updates
         self.sense(grid)
-        self.input["local_angle"][0] = self.orientation
-        self.input["global_angle"][0] = self.get_angle_to_nest()
+        l_angle = self.orientation
+        self.input["local_sin"][0] = np.sin(l_angle)
+        self.input["local_cos"][0] = np.cos(l_angle)
+        # self.input["local_angle"][0] = self.orientation
+        g_angle = self.get_angle_to_nest()
+        self.input["global_sin"][0] = np.sin(g_angle)
+        self.input["global_cos"][0] = np.cos(g_angle)
+        # self.input["global_angle"][0] = self.get_angle_to_nest()
         self.pickupFood()
         self.dropFood()
         self.input["has_food"][0] = 1 if self.has_food else 0
@@ -157,9 +169,15 @@ class DominAnt(Agent):  # IntelligAnt
             torch.sigmoid(3 * actions[0]).item()
             * self.PHEROMONE_MAX  # should set range to 0-1
         )  # Decide to place pheromone
-        self.orientation_delta = actions[1].item() * self.MAX_TURN  # Orientation delta
+        # self.orientation_delta = actions[1].item() * self.MAX_TURN  # Orientation delta
+        # self.randomness = torch.sigmoid(
+        #     3 * actions[2]
+        # ).item()  # should set range to 0-1
+        orientation_delta_sin = actions[1].item()
+        orientation_delta_cos = actions[2].item()
+        self.orientation_delta = np.arctan2(orientation_delta_sin,orientation_delta_cos) * self.MAX_TURN
         self.randomness = torch.sigmoid(
-            3 * actions[2]
+            3 * actions[3]
         ).item()  # should set range to 0-1
 
         self.depositPheromone()
@@ -179,8 +197,9 @@ class DominAnt(Agent):  # IntelligAnt
         next_pos[0] = self.position[0] + self.MAX_SPEED * np.cos(self.orientation)
         next_pos[1] = self.position[1] + self.MAX_SPEED * np.sin(self.orientation)
 
-        while not self.coord_valid(grid, next_pos):  # if walking off grid, turn around
-            self.orientation = (self.orientation + np.pi / 2) % (2 * np.pi)
+        correction_dir = (2 * np.round(np.random.rand())) - 1  # random value either -1 or 1 to determine if turning left or right
+        while not self.coord_valid(grid, next_pos):  # if walking off grid, turn
+            self.orientation = (self.orientation + correction_dir * np.pi / 2) % (2 * np.pi)
             next_pos[0] = self.position[0] + self.MAX_SPEED * np.cos(self.orientation)
             next_pos[1] = self.position[1] + self.MAX_SPEED * np.sin(self.orientation)
 

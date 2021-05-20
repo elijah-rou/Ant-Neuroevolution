@@ -1,4 +1,4 @@
-num_epochs: 250
+num_epochs: 300
 num_timesteps: 300
 num_agents: 10
 num_runs: 3
@@ -21,8 +21,8 @@ population:
 agent:
   type: DominAnt
   params:
-    input_size: 13
+    input_size: 15
     hidden_layer_size: 
-    - 15
-    - 8
-    output_size: 3
+    - 17
+    - 10
+    output_size: 4
