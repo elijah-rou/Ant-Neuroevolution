@@ -2,7 +2,7 @@ import numpy as np
 
 
 class GridCell:
-    """ Class representing a cell in the environment"""
+    """Class representing a cell in the environment"""
 
     def __init__(self, row, col, kind=None, food=0, dissapate_coef=0.95):
         self.active = not kind == "wall"

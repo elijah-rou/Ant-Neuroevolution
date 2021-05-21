@@ -1,3 +1,5 @@
+from torch.nn.modules.container import Sequential
+from torch.nn.modules.linear import Linear
 from .Agent import Agent
 import torch
 import torch.nn as nn
@@ -5,40 +7,63 @@ import torch.nn.functional as F
 import numpy as np
 
 
-def mish(x):
+class Mish(nn.Module):
     """Mish Activation Function"""
-    return x * torch.tanh(F.softplus(x))
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, x):
+        return x * torch.tanh(F.softplus(x))
 
 
 class Brain(nn.Module):
-    """Neural Net for the ants. Uses 3 hidden layers."""
+    """Neural Net for the ants. Uses 3 hidden layers. Split branch for mean and std."""
 
     # TODO implement list of hidden layers from FetchAnt
     def __init__(self, input_size, output_size, hidden_sizes):
         super().__init__()
-        self.input_fc = nn.Linear(input_size, hidden_sizes[0])
+        self.input_fc = nn.Sequential(
+            nn.Linear(input_size, hidden_sizes[0]),
+            Mish()
+        )
         self.hidden = []
         for i in range(len(hidden_sizes) - 1):
-            self.hidden.append(nn.Linear(hidden_sizes[i], hidden_sizes[i + 1]))
-        self.output_fc = nn.Linear(hidden_sizes[-1], output_size)
+            self.hidden.append(
+                nn.Sequential(
+                    nn.Linear(hidden_sizes[i], hidden_sizes[i + 1]),
+                    Mish()
+                )
+            )
 
-    # TODO change to silu
+        self.output_mean = nn.Sequential(
+            nn.Linear(hidden_sizes[-1], output_size),
+            nn.Tanh()
+        )
+        self.output_dev = nn.Sequential(
+            nn.Linear(hidden_sizes[-1], output_size),
+            nn.ReLU()
+        )
+        
+
     def forward(self, x):
-        x = torch.tanh(self.input_fc(x))
+        x = self.input_fc(x)
         for h in self.hidden:
-            x = torch.tanh(h(x))
-        x = torch.tanh(self.output_fc(x))
+            x = h(x)
+        x_mean = self.output_mean(x)
+        x_dev = self.output_dev(x)
+        x = torch.cat([x_mean, x_dev], 1)
         return x
 
     # TODO Add apply_weights from FetchAnt
     def apply_weights(self, weights):
+        # TODO Fix for multiple branches
         self.input_fc.weight.data = torch.from_numpy(weights[0]).float()
         for i, w in enumerate(weights[1:-1]):
             self.hidden[i].weight.data = torch.from_numpy(w).float()
         self.output_fc.weight.data = torch.from_numpy(weights[-1]).float()
 
 
-class DominAnt(Agent):  # IntelligAnt
+class IntelligAnt(Agent):  # IntelligAnt
     PHEROMONE_MAX = 5
     MAX_TURN = np.pi / 2
     MAX_RANDOM = np.pi / 8
@@ -83,13 +108,9 @@ class DominAnt(Agent):  # IntelligAnt
             "global_cos" : np.zeros(1),
             "local_sin" : np.zeros(1),
             "local_cos" : np.zeros(1),
-            # "global_angle": np.zeros(1),
-            # "local_angle": np.zeros(1),
         }
         input_size = 15
-        # input_size = 13
-        # output_size = 3
-        output_size = 4
+        output_size = 6
 
         # Init network and set weights
         self.brain = Brain(input_size, output_size, hidden_sizes)
@@ -153,32 +174,23 @@ class DominAnt(Agent):  # IntelligAnt
         l_angle = self.orientation
         self.input["local_sin"][0] = np.sin(l_angle)
         self.input["local_cos"][0] = np.cos(l_angle)
-        # self.input["local_angle"][0] = self.orientation
+
         g_angle = self.get_angle_to_nest()
         self.input["global_sin"][0] = np.sin(g_angle)
         self.input["global_cos"][0] = np.cos(g_angle)
-        # self.input["global_angle"][0] = self.get_angle_to_nest()
+
         self.pickupFood()
         self.dropFood()
         self.input["has_food"][0] = 1 if self.has_food else 0
 
         # Determine actions
-        actions = self.brain(self._tensor_input().float())
-        # TODO Remove silu from this, rework network output to assume 0-1 output
-        self.put_pheromone = (
-            torch.sigmoid(3 * actions[0]).item()
-            * self.PHEROMONE_MAX  # should set range to 0-1
-        )  # Decide to place pheromone
-        # self.orientation_delta = actions[1].item() * self.MAX_TURN  # Orientation delta
-        # self.randomness = torch.sigmoid(
-        #     3 * actions[2]
-        # ).item()  # should set range to 0-1
-        orientation_delta_sin = actions[1].item()
-        orientation_delta_cos = actions[2].item()
-        self.orientation_delta = np.arctan2(orientation_delta_sin,orientation_delta_cos) * self.MAX_TURN
-        self.randomness = torch.sigmoid(
-            3 * actions[3]
-        ).item()  # should set range to 0-1
+        params = self.brain(self._tensor_input().float())
+        means = torch.stack(params[0]*self.PHEROMONE_MAX, params[2]*self.MAX_TURN, params[4]*self.MAX_RANDOM)
+        stds = torch.tensor(min(params[1], 1e-6), min(params[3], 1e-6), min(params[5], 1e-6))
+        actions = torch.normal(mean=means, std=stds)
+        self.put_pheromone = actions[0].item()
+        self.orientation_delta = actions[1].item()
+        self.randomness = actions[2].item()
 
         self.depositPheromone()
         self.move(grid)

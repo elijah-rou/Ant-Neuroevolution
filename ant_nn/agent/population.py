@@ -29,24 +29,37 @@ class Population:
         numInputs,
         numOutputs,
         layerSizes,
+        initFromFile=False,
+        filename=None,
     ):
         self.popSize = popSize  # number of chromosomes
-        self.maxMutationRate = mutationRate  # probability of a given weight getting mutated (keep low) (i.e. 0.1)
-        self.mutationStrength = (
+        self.mutationRate = mutationRate  # probability of a given weight getting mutated (keep low) (i.e. 0.1)
+        self.maxMutationStrength = (
             mutationStrength  # variance of gaussian mutation function (needs testing)
         )
-        self.clampRange = [-2, 2] # range of allowable scores
+        self.clampRange = [-2, 2]  # range of allowable scores
         self.keepThresh = keepThresh  # what percentage of best chromosomes to keep unchanged each epoch (try 0.1)
         self.crossover = False  # enable crossover, not implemented yet
-        self.chromosomes = self.initializePop(
-            numInputs, numOutputs, layerSizes
-        )  # list of weights
-        self.scores = np.zeros(popSize)  # list of scores
-        
-        self.mutationRate = 0 # temp
+        if initFromFile:
+            import pickle
 
-        # TODO Move to config
-        self.maxScore = 155 #represents the target score - WARNING - if scores go above this training stops
+            pickle_off = open(filename, "rb")
+            temp = pickle.load(pickle_off)
+            level = temp[2]
+            # print(level[0])
+            # for i in range(len(level)):
+            #     level[i] = np.asarray(level[i])
+            # print(level[0].shape)
+            self.chromosomes = level
+        else:
+            self.chromosomes = self.initializePop(
+                numInputs, numOutputs, layerSizes
+            )  # list of weights
+        self.scores = np.zeros(popSize)  # list of scores
+
+        self.mutationStrength = 0  # temp
+
+        self.maxScore = 160  # represents the target score - WARNING - if scores go above this training stops
 
     # makes self.chromosomes
     def initializePop(self, numInputs, numOutputs, layerSizes):
@@ -94,11 +107,14 @@ class Population:
 
     # bound weights to range
     def clampChromosome(self, chromosome):
-        for i in range(len(chromosome)): 
-            chromosome[i] = np.where(chromosome[i] > self.clampRange[0], chromosome[i], self.clampRange[0])
-            chromosome[i] = np.where(chromosome[i] < self.clampRange[1], chromosome[i], self.clampRange[1])
+        for i in range(len(chromosome)):
+            chromosome[i] = np.where(
+                chromosome[i] > self.clampRange[0], chromosome[i], self.clampRange[0]
+            )
+            chromosome[i] = np.where(
+                chromosome[i] < self.clampRange[1], chromosome[i], self.clampRange[1]
+            )
         return chromosome
-
 
     # assumes scores have already been set by sim
     # resamples pop and generates new individuals by mutation
@@ -138,7 +154,7 @@ class Population:
     # takes in chromosome, randomly mutates it according to stored params
     def mutate(self, chromosome, score):
         # mutate more if score is low
-        self.mutationRate = self.maxMutationRate * (1 - (score/self.maxScore))
+        self.mutationStrength = self.maxMutationStrength * (1 - (score / self.maxScore))
         # loop over layers
         for i in range(len(chromosome)):
             # loop over weights
@@ -148,6 +164,9 @@ class Population:
                         random.random() < self.mutationRate
                     ):  # only mutate a gene w some small prob
                         chromosome[i][j][k] += np.random.normal(0, self.mutationStrength)
+                        # chromosome[i][j][k] = np.random.uniform(
+                        #     self.clampRange[0], self.clampRange[1]
+                        # )
 
         chromosome = self.clampChromosome(chromosome)
         return chromosome

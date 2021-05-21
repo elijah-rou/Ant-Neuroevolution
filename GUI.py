@@ -25,11 +25,21 @@ class AntGUI(QtWidgets.QMainWindow):
         self.setCentralWidget(self.board)
 
         self.chrom_input = QtWidgets.QLineEdit()
-        self.chrom_input.setText('C:/Users/evere/Documents/CornellTech/SwarmRobotics/Ant-Neuroevolution/results.pkl')
+        self.chrom_input.setText(
+            "C:/Users/evere/Documents/CornellTech/SwarmRobotics/Ant-Neuroevolution/results.pkl"
+        )
         self.chrom_input.setPlaceholderText("Chromosome")
 
-        self.file_button = QtWidgets.QPushButton('Select file')
+        self.file_button = QtWidgets.QPushButton("Select file")
         self.file_button.clicked.connect(self.select_file)
+
+        self.epoch_label = QtWidgets.QLabel('Epoch:')
+        self.epoch_input = QtWidgets.QLineEdit()
+        self.epoch_input.setText('-1')
+
+        self.score_label = QtWidgets.QLabel('nth best score:')
+        self.score_input = QtWidgets.QLineEdit()
+        self.score_input.setText('0')
 
         self.start_button = QtWidgets.QPushButton('Start')
         self.start_button.clicked.connect(self.start)
@@ -37,6 +47,10 @@ class AntGUI(QtWidgets.QMainWindow):
         self.control_layout = QtWidgets.QHBoxLayout()
         self.control_layout.addWidget(self.chrom_input)
         self.control_layout.addWidget(self.file_button)
+        self.control_layout.addWidget(self.epoch_label)
+        self.control_layout.addWidget(self.epoch_input)
+        self.control_layout.addWidget(self.score_label)
+        self.control_layout.addWidget(self.score_input)
         self.control_layout.addWidget(self.start_button)
 
         self.controls = QtWidgets.QWidget()
@@ -55,12 +69,21 @@ class AntGUI(QtWidgets.QMainWindow):
 
     def start(self):
         chrom_file = self.chrom_input.text()
+
+        # If there's a chromosome file, use it
         if len(chrom_file) > 0:
+            epoch_n = int(self.epoch_input.text())
+            order_n = int(self.score_input.text())
             pickle_off = open(chrom_file, "rb")
             temp = pickle.load(pickle_off)
-            # chrom = np.array(temp[-1][1], dtype=object)
+            chroms = np.array(temp[0][epoch_n])
+            scores = np.array(temp[1][epoch_n]).argsort()
+            chrom = chroms[epoch_n]#[scores[order_n]]
+
             chrom = get_best(temp)
             self.board.start(chrom)
+
+        # Otherwise, run determineant
         else:
             self.board.start()
 
@@ -78,9 +101,7 @@ class AntGUI(QtWidgets.QMainWindow):
         dialog.setViewMode(QtWidgets.QFileDialog.Detail)
         if dialog.exec_():
             self.chrom_input.setText(dialog.selectedFiles()[0])
-        #     print(dialog.selectedFiles())
-        #     file_path = dialog.selectedFiles()[0]
-        # self.chrom_input.setText(file_path)
+
 
 class Communicate(QtCore.QObject):
     msgToSB = QtCore.Signal(str)
@@ -100,10 +121,6 @@ class Board(QtWidgets.QFrame):
 
     def start(self, chromosome=None):
         self.environ = Environment(chromosome)
-        # if not chromosome:
-        #     self.environ.default_setup()
-        # else:
-        #     self.environ.dominant_setup(chromosome)
         self.timer = QtCore.QBasicTimer()
         self.update()
         self.timer.start(Board.Timer, self)
@@ -139,7 +156,8 @@ class Board(QtWidgets.QFrame):
                 painter,
                 rect.left() + col * self.squareWidth(),
                 boardTop + (Board.BoardHeight - row - 1) * self.squareHeight(),
-                has_food=has_food
+                None,
+                agent
             )
         painter.end()
 
@@ -151,33 +169,19 @@ class Board(QtWidgets.QFrame):
             self.c.msgToSB.emit("Food Collected: " + str(score))
         QtWidgets.QFrame.timerEvent(self, event)
 
-    def drawSquare(self, painter, x, y, cell=None, has_food=None):
-
-        colorTable = [
-            0x000000,
-            0xCC6666,
-            0x66CC66,  # Green
-            0x6666CC,
-            0xCCCC66,  #
-            0xCC66CC,  # purple
-            0x66CCCC,  # Cyan
-            0xDAAA00,  # Yellow
-            0xFFC0CB,  # Pink
-            0xFFA500   # Orange
-        ]
-        if not cell:  # Pass in None if it is an Ant
-            if not has_food:
-                color = QtGui.QColor(0xCC0000)
-            else:
-                color = QtGui.QColor(0xFFA500)
+    def drawSquare(self, painter, x, y, cell=None, ant=None):
+        if ant:
+            color = QtGui.QColor(0xCC0000)
+            # if ant.has_food:
+            #     color = QtGui.QColor(0xFFD700)
+            # else:
+            #     color = QtGui.QColor(0xCC0000)
         elif cell.is_nest:
             color = QtGui.QColor(0xDAAA00)
         elif not cell.active:
             color = QtGui.QColor(0xDAAA00)  # Draw Wall
         elif cell.pheromone > 0:  # draw pheromone
             color = QtGui.QColor.fromHsv(233, 255 * min(cell.pheromone, 1), 255)
-        elif cell.food > 0:  
-            color = QtGui.QColor(0x66CC66)# Draw Food
         elif cell.pheromone == 0: 
             color = QtGui.QColor(0xFFFFFF) # Draw blank space
         elif cell.pheromone <0:
@@ -187,25 +191,27 @@ class Board(QtWidgets.QFrame):
             x + 1, y + 1, self.squareWidth() - 1, self.squareHeight() - 1, color
         )
 
+        if (cell and not cell.is_nest and cell.food > 0) or (ant and ant.has_food):  
+            color = QtGui.QColor(0x66CC66)# Draw Food
+            painter.fillRect(
+            x + self.squareWidth()//4+1, y + self.squareHeight()//4+1, 
+            self.squareWidth()//2, self.squareHeight()//2, color
+        )
 
-class Things(object):
+class Colors(object):
 
-    Empty = 0
-    Phero = 1
-    Wall = 2
-    Nest = 3
-    Food = 4
-    AgentNoFood = 5
-    AgentFood = 6
-    NoShape = 0
-    # ZShape = 1
-    # SShape = 2
-    # LineShape = 3
-    # TShape = 4
-    # SquareShape = 5
-    # LShape = 6
-    # MirroredLShape = 7
-
+    colorTable = {
+        0x000000,
+        0xCC6666,
+        0x66CC66,  # Green
+        0x6666CC,
+        0xCCCC66,  #
+        0xCC66CC,  # purple
+        0x66CCCC,  # Cyan
+        0xDAAA00,  # Yellow
+        0xFFC0CB,  # Pink
+        0xFFA500   # Orange
+    }
 
 def main():
 
