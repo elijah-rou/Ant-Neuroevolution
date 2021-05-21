@@ -9,14 +9,10 @@ import yaml
 class Environment:
     """Class representing the environment"""
 
-    def __init__(self, chromosome=None, config_path="config.yaml"):
+    def __init__(self, config, chromosome=None):
         self.time = 0
-
-        # Get config
-        file_stream = open(config_path, "r")
-        config = yaml.full_load(file_stream)
         agent_config = config["agent"]
-
+        
         # Setup Grid
         self.height = config.get("height", 50)
         self.width = config.get("width", 50)
