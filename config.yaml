@@ -13,7 +13,7 @@ eval: median
 population:
   size: 5000
   mutation_rate: 0.1
-  mutation_strength: 0.5 
+  mutation_strength: 0.5
   keep_threshold: 0.25
   init_from_file: False
   filename: results_500.pkl
