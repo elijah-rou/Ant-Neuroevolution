@@ -34,6 +34,7 @@ class Simulation:
 
         ga_config = config["population"]
         agent_params = config["agent"]["params"]
+        agent_type = config["agent"]["type"]
 
         self.eval_function = config["eval"]
         self.timesteps = config["num_timesteps"]
@@ -44,8 +45,7 @@ class Simulation:
             ga_config["mutation_rate"],
             ga_config["mutation_strength"],
             ga_config["keep_threshold"],
-            agent_params["input_size"],
-            agent_params["output_size"],
+            agent_type,
             agent_params["hidden_layer_size"],
             ga_config["init_from_file"],
             ga_config["filename"],

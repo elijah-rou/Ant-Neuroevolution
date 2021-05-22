@@ -1,25 +1,13 @@
-from torch.nn.modules.container import Sequential
-from torch.nn.modules.linear import Linear
-from .Agent import Agent
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import numpy as np
 
-
-class Mish(nn.Module):
-    """Mish Activation Function"""
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, x):
-        return x * torch.tanh(F.softplus(x))
-
+from .Agent import Agent
+from .brain_util import Mish
 
 class Brain(nn.Module):
     """Neural Net for the ants. Uses 3 hidden layers. Split branch for mean and std."""
 
-    # TODO implement list of hidden layers from FetchAnt
     def __init__(self, input_size, output_size, hidden_sizes):
         super().__init__()
         self.input_fc = nn.Sequential(
@@ -51,22 +39,24 @@ class Brain(nn.Module):
             x = h(x)
         x_mean = self.output_mean(x)
         x_dev = self.output_dev(x)
-        x = torch.cat([x_mean, x_dev], 1)
+        x = torch.cat([x_mean, x_dev], 0)
         return x
 
-    # TODO Add apply_weights from FetchAnt
     def apply_weights(self, weights):
-        # TODO Fix for multiple branches
-        self.input_fc.weight.data = torch.from_numpy(weights[0]).float()
-        for i, w in enumerate(weights[1:-1]):
-            self.hidden[i].weight.data = torch.from_numpy(w).float()
-        self.output_fc.weight.data = torch.from_numpy(weights[-1]).float()
+        # self.input_fc[0].weight.data = torch.from_numpy(weights[0]).float()
+        # for i, w in enumerate(weights[1:-2]):
+        #     self.hidden[i][0].weight.data = torch.from_numpy(w).float()
+        # self.output_mean[0].weight.data = torch.from_numpy(weights[-2]).float()
+        # self.output_dev[0].weight.data = torch.from_numpy(weights[-1]).float()
+        pass
 
 
 class IntelligAnt(Agent):  # IntelligAnt
     PHEROMONE_MAX = 5
     MAX_TURN = np.pi / 2
     MAX_RANDOM = np.pi / 8
+    INPUT_SIZE = 15
+    OUTPUT_SIZE = 4
 
     sense_dict = {
         #                || LEFTER |  LEFT  | AHEAD |  RIGHT  | RIGHTER || RADIANS
@@ -109,11 +99,9 @@ class IntelligAnt(Agent):  # IntelligAnt
             "local_sin" : np.zeros(1),
             "local_cos" : np.zeros(1),
         }
-        input_size = 15
-        output_size = 6
 
         # Init network and set weights
-        self.brain = Brain(input_size, output_size, hidden_sizes)
+        self.brain = Brain(self.INPUT_SIZE, self.OUTPUT_SIZE, hidden_sizes)
         self.brain.apply_weights(weights)
 
     def _tensor_input(self):
@@ -185,12 +173,13 @@ class IntelligAnt(Agent):  # IntelligAnt
 
         # Determine actions
         params = self.brain(self._tensor_input().float())
-        means = torch.stack(params[0]*self.PHEROMONE_MAX, params[2]*self.MAX_TURN, params[4]*self.MAX_RANDOM)
-        stds = torch.tensor(min(params[1], 1e-6), min(params[3], 1e-6), min(params[5], 1e-6))
+        # means = torch.stack(params[0]*self.PHEROMONE_MAX, params[2]*self.MAX_TURN, params[4]*self.MAX_RANDOM)
+        means = torch.stack([params[0]*self.PHEROMONE_MAX, params[2]*self.MAX_TURN])
+        # stds = torch.tensor(min(params[1], 1e-6), min(params[3], 1e-6), min(params[5], 1e-6))
+        stds = torch.tensor([min(params[1], 1e-6), min(params[3], 1e-6)])
         actions = torch.normal(mean=means, std=stds)
         self.put_pheromone = actions[0].item()
         self.orientation_delta = actions[1].item()
-        self.randomness = actions[2].item()
 
         self.depositPheromone()
         self.move(grid)
@@ -200,9 +189,9 @@ class IntelligAnt(Agent):  # IntelligAnt
 
     def move(self, grid):
         # Move the approrpitae
-        self.orientation += self.orientation_delta + np.random.normal(
-            0, self.randomness * self.MAX_RANDOM
-        )
+        # self.orientation += self.orientation_delta + np.random.normal(
+        #     0, self.randomness * self.MAX_RANDOM
+        # )
         self.orientation %= 2 * np.pi
 
         next_pos = [0.0, 0.0]

@@ -1,10 +1,11 @@
 # Ant Neuroevolution Project
 # Population class
-# Author: Russell Bingham
+# Author: Russell Bingham, Eli Roussos
 # Date: 3/31/21
 import numpy as np
 import random
-
+from .IntelligAnt import IntelligAnt
+from .DominAnt import DominAnt
 
 class Population:
 
@@ -26,8 +27,7 @@ class Population:
         mutationRate,
         mutationStrength,
         keepThresh,
-        numInputs,
-        numOutputs,
+        agentType,
         layerSizes,
         initFromFile=False,
         filename=None,
@@ -53,7 +53,7 @@ class Population:
             self.chromosomes = level
         else:
             self.chromosomes = self.initializePop(
-                numInputs, numOutputs, layerSizes
+                agentType, layerSizes
             )  # list of weights
         self.scores = np.zeros(popSize)  # list of scores
 
@@ -62,46 +62,28 @@ class Population:
         self.maxScore = 160  # represents the target score - WARNING - if scores go above this training stops
 
     # makes self.chromosomes
-    def initializePop(self, numInputs, numOutputs, layerSizes):
+    def initializePop(self, agentType, layerSizes):
+        if agentType == "DominAnt":
+            layerSizes = [DominAnt.INPUT_SIZE] + layerSizes + [DominAnt.OUTPUT_SIZE]
+        elif agentType == "IntelligAnt":
+            layerSizes = [DominAnt.INPUT_SIZE] + layerSizes + 2*[DominAnt.OUTPUT_SIZE]
         popArray = []
-        for i in range(self.popSize):
-            popArray += [self.makeChromosome(numInputs, numOutputs, layerSizes)]
+        for _ in range(self.popSize):
+            popArray += [self.makeChromosome(layerSizes)]
         return popArray
 
     # makes a single chromosome, returns it
     # dimensionality will be a list of numpy arrays, inner dims given by params
-    def makeChromosome(self, numInputs, numOutputs, hiddenSizes):
+    def makeChromosome(self, layerSizes, randomCenter=0, randomWidth=1):
         chromosome = []
-
-        # TODO: optimize these coefficients/make them not hard-coded
-        randomnessCenter = 0  # center of initialization range
-        randomnessWidth = 1  # width of initialization range
-
-        for i in range(len(hiddenSizes) + 1):
-            if i == 0:  # first layer
-                chromosome += [
-                    randomnessWidth
+        for i in range(len(layerSizes) -1):
+            chromosome += [
+                randomWidth
                     * (
-                        np.random.rand(hiddenSizes[0], numInputs)
-                        - (0.5 - randomnessCenter)
+                        np.random.rand(layerSizes[i+1], layerSizes[i])
+                        - (0.5 - randomCenter)
                     )
-                ]
-            elif i == len(hiddenSizes):  # last layer
-                chromosome += [
-                    randomnessWidth
-                    * (
-                        np.random.rand(numOutputs, hiddenSizes[-1])
-                        - (0.5 - randomnessCenter)
-                    )
-                ]
-            else:  # middle layers
-                chromosome += [
-                    randomnessWidth
-                    * (
-                        np.random.rand(hiddenSizes[i], hiddenSizes[i - 1])
-                        - (0.5 - randomnessCenter)
-                    )
-                ]
+            ]
 
         return chromosome
 
@@ -164,9 +146,6 @@ class Population:
                         random.random() < self.mutationRate
                     ):  # only mutate a gene w some small prob
                         chromosome[i][j][k] += np.random.normal(0, self.mutationStrength)
-                        # chromosome[i][j][k] = np.random.uniform(
-                        #     self.clampRange[0], self.clampRange[1]
-                        # )
 
         chromosome = self.clampChromosome(chromosome)
         return chromosome

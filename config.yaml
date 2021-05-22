@@ -1,7 +1,7 @@
 num_epochs: 250
 num_timesteps: 300
 num_agents: 10
-num_runs: 3
+num_runs: 1
 nest_location: center
 # nest_location:
 #   - 0
@@ -11,7 +11,7 @@ width: 30
 eval: median
 
 population:
-  size: 800
+  size: 5000
   mutation_rate: 0.1
   mutation_strength: 0.5 
   keep_threshold: 0.25
@@ -19,10 +19,9 @@ population:
   filename: results_500.pkl
 
 agent:
-  type: DominAnt
+  type: IntelligAnt
   params:
-    input_size: 13
     hidden_layer_size: 
-    - 15
+    - 32
+    - 16
     - 8
-    output_size: 3

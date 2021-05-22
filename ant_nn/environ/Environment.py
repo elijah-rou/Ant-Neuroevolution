@@ -2,6 +2,7 @@ import numpy as np
 from ant_nn.environ.GridCell import GridCell
 from ant_nn.agent.RandAnt import RandAnt
 from ant_nn.agent.DeterminAnt import DeterminAnt
+from ant_nn.agent.IntelligAnt import IntelligAnt
 from ant_nn.agent.DominAnt import DominAnt
 import yaml
 
@@ -34,11 +35,16 @@ class Environment:
         self.nest.is_nest = True
 
         # Spawn Agents
+        params = agent_config.get("params")
+        layer_size = params.get("hidden_layer_size")
         if chromosome and agent_config["type"] == "DominAnt":
-            params = agent_config["params"]
-            layer_size = params["hidden_layer_size"]
             self.agents = [
                 DominAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
+                for _ in range(config["num_agents"])
+            ]
+        if chromosome and agent_config["type"] == "IntelligAnt":  
+            self.agents = [
+                IntelligAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
                 for _ in range(config["num_agents"])
             ]
         else:
