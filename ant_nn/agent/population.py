@@ -2,6 +2,7 @@
 # Population class
 # Author: Russell Bingham, Eli Roussos
 # Date: 3/31/21
+from .DiscretAnt import DiscretAnt
 import numpy as np
 import random
 from .IntelligAnt import IntelligAnt
@@ -27,8 +28,7 @@ class Population:
         mutationRate,
         mutationStrength,
         keepThresh,
-        agentType,
-        layerSizes,
+        agentConfig,
         initFromFile=False,
         filename=None,
     ):
@@ -53,7 +53,7 @@ class Population:
             self.chromosomes = level
         else:
             self.chromosomes = self.initializePop(
-                agentType, layerSizes
+                agentConfig
             )  # list of weights
         self.scores = np.zeros(popSize)  # list of scores
 
@@ -62,7 +62,11 @@ class Population:
         self.maxScore = 160  # represents the target score - WARNING - if scores go above this training stops
 
     # makes self.chromosomes
-    def initializePop(self, agentType, layerSizes):
+    def initializePop(self, agentConfig):
+        agentType = agentConfig["type"]
+        params = agentConfig["params"]
+
+        layerSizes = params["hidden_layer_size"]
         layerShapes = [
             (layerSizes[i+1], layerSizes[i]) for i in range(len(layerSizes) -1)
         ]
@@ -70,8 +74,14 @@ class Population:
             layerShapes = [(layerSizes[0], DominAnt.INPUT_SIZE)] + layerShapes
             layerShapes += [(DominAnt.OUTPUT_SIZE, layerSizes[-1])]
         elif agentType == "IntelligAnt":
-            layerShapes = [(layerSizes[0], IntelligAnt.INPUT_SIZE)] + layerShapes
+            layerShapes = [(layerSizes[0], DiscretAnt.INPUT_SIZE)] + layerShapes
             layerShapes += 2*[(IntelligAnt.OUTPUT_SIZE, layerSizes[-1])]
+        elif agentType == "DiscretAnt":
+            d_bins = params["direction_bins"]
+            p_bins = params["pheromone_bins"]
+            layerShapes = [(layerSizes[0], DiscretAnt.INPUT_SIZE)] + layerShapes
+            layerShapes += [(d_bins, layerSizes[-1])]
+            layerShapes += [(p_bins, layerSizes[-1])]
         
         popArray = []
         for _ in range(self.popSize):

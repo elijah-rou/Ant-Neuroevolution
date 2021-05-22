@@ -3,6 +3,7 @@ from ant_nn.environ.GridCell import GridCell
 from ant_nn.agent.RandAnt import RandAnt
 from ant_nn.agent.DeterminAnt import DeterminAnt
 from ant_nn.agent.IntelligAnt import IntelligAnt
+from ant_nn.agent.DiscretAnt import DiscretAnt
 from ant_nn.agent.DominAnt import DominAnt
 import yaml
 
@@ -45,6 +46,13 @@ class Environment:
         elif chromosome and agent_config["type"] == "IntelligAnt":  
             self.agents = [
                 IntelligAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
+                for _ in range(config["num_agents"])
+            ]
+        elif chromosome and agent_config["type"] == "DiscretAnt":
+            d_bins = params.get("direction_bins", 7)
+            p_bins = params.get("pheromone_bins", 5)
+            self.agents = [
+                DiscretAnt(layer_size, chromosome, d_bins, p_bins, nest_loc=nest_loc, position=nest_loc)
                 for _ in range(config["num_agents"])
             ]
         else:

@@ -19,9 +19,10 @@ population:
   filename: results_500.pkl
 
 agent:
-  type: IntelligAnt
+  type: DiscretAnt
   params:
+    direction_bins: 7
+    pheromone_bins: 5
     hidden_layer_size: 
     - 32
-    - 16
-    - 8
+    - 32

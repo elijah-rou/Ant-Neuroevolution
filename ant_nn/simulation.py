@@ -33,8 +33,6 @@ class Simulation:
         config = yaml.full_load(file_stream)
 
         ga_config = config["population"]
-        agent_params = config["agent"]["params"]
-        agent_type = config["agent"]["type"]
 
         self.eval_function = config["eval"]
         self.timesteps = config["num_timesteps"]
@@ -45,8 +43,7 @@ class Simulation:
             ga_config["mutation_rate"],
             ga_config["mutation_strength"],
             ga_config["keep_threshold"],
-            agent_type,
-            agent_params["hidden_layer_size"],
+            config["agent"],
             ga_config["init_from_file"],
             ga_config["filename"],
         )
@@ -145,67 +142,3 @@ class Simulation:
         # print(f"END Total Time: {time.thread_time()}\n")
         return (e_chromosomes, e_scores, final_pop, self.food_res)
 
-
-class BackpropSimulation:
-    def __init__(self, config_path="config.yaml"):
-        self.config_path = config_path
-        file_stream = open(config_path, "r")
-        config = yaml.full_load(file_stream)
-
-        self.eval_function = config["eval"]
-        self.timesteps = config["num_timesteps"]
-        self.epochs = config["num_epochs"]
-        self.runs = config["num_runs"]
-
-        self.executor = ProcessPoolExecutor()
-        self.scores = np.zeros((self.population.size(), self.runs))
-        self.food_res = np.zeros((self.population.size(), self.runs, self.timesteps))
-        self.config = config
-
-    def run(self, degen_epoch=None, degen_score=10):
-        """
-        Run the simulation
-        """
-
-        for ep in range(self.epochs):
-            t = time.strftime("%X %x %Z")
-            print(f"Generation: {ep+1} - {t}")
-
-            score = sim_env(self.timesteps, self.config, model=model)
-
-            # Using executor.map, ignore
-            # sim_args = [c for c in self.population.chromosomes for _ in range(self.runs)]
-            # for chrom_index, score in zip(pop_range, self.executor.map(sim_env, sim_args, chunksize=16)):
-            #     self.scores[chrom_index%self.population.size()] += score
-            #     print(f"Chromosome {chrom_index%self.population.size()}: completed {score}")
-
-            if self.eval_function == "REINFORCE":
-                self.population.scores = np.median(self.scores, axis=1)
-
-            best_index = np.argmax(self.population.scores)
-            e_scores[ep] = self.population.scores
-            best_score = e_scores[ep][best_index]
-            med_score = np.median(e_scores[ep])
-            print(
-                f"Best {self.eval_function} score for epoch {ep+1}: {best_score} - chrom {best_index}"
-            )
-            print(
-                f"Median {self.eval_function} score for epoch {ep+1}: {med_score}\n"
-            )
-            # print(f"Time in thread: {time.thread_time()}\n")
-            e_chromosomes += [self.population.chromosomes[best_index]]
-
-            max_score = max(max_score,best_score)  # tracks max score over all epochs
-            if (degen_epoch is not None):  # if degen resim is enabled
-                if (ep+1 >= degen_epoch):  # if past degen_epoch
-                    if (max_score < degen_score):  # if max score across all epochs < degen_score
-                        print('DEGENERATE: degen_epoch reached before degen_score. Restarting... \n')
-                        is_degen = True  # restart the sim
-                        break
-            else:
-                is_degen = False
-
-        final_pop = self.population.chromosomes
-
-        # print(f"END Total Time: {time.thread_time()}\n")
-        return (e_chromosomes, e_scores, final_pop, self.food_res)
