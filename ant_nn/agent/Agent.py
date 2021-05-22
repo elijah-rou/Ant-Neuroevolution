@@ -28,6 +28,7 @@ class Agent(ABC):
 
         self.food_gathered = 0
         self.distance_traveled = 0
+        self.reward = 0
 
     @abstractmethod
     def update(self, env):
@@ -59,12 +60,17 @@ class Agent(ABC):
             self.has_food = True
             self.current_cell.food -= 1
             self.last_food_location = self.current_cell.position
+            self.reward += 10
+        else:
+            self.reward -= 1
 
     def dropFood(self):
         """Drop Food if the current cell is a nest cell"""
         if self.has_food and self.current_cell.is_nest:
-            self.current_cell.food += 1
+            #self.current_cell.food += 1
+            self.current_cell.food += self.reward + 20
             self.has_food = False
+            self.reward = 0
 
     def get_coord(self):
         return self.position.astype(int)
