@@ -1,7 +1,7 @@
 num_epochs: 250
 num_timesteps: 300
 num_agents: 10
-num_runs: 1
+num_runs: 3
 nest_location: center
 # nest_location:
 #   - 0
@@ -11,7 +11,7 @@ width: 30
 eval: median
 
 population:
-  size: 80
+  size: 800
   mutation_rate: 0.1
   crossover_rate: 0.05
   crossover_flag: True
