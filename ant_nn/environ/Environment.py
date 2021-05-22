@@ -42,7 +42,7 @@ class Environment:
                 DominAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
                 for _ in range(config["num_agents"])
             ]
-        if chromosome and agent_config["type"] == "IntelligAnt":  
+        elif chromosome and agent_config["type"] == "IntelligAnt":  
             self.agents = [
                 IntelligAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
                 for _ in range(config["num_agents"])

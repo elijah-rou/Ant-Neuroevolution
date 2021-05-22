@@ -43,11 +43,11 @@ class Brain(nn.Module):
         return x
 
     def apply_weights(self, weights):
-        # self.input_fc[0].weight.data = torch.from_numpy(weights[0]).float()
-        # for i, w in enumerate(weights[1:-2]):
-        #     self.hidden[i][0].weight.data = torch.from_numpy(w).float()
-        # self.output_mean[0].weight.data = torch.from_numpy(weights[-2]).float()
-        # self.output_dev[0].weight.data = torch.from_numpy(weights[-1]).float()
+        self.input_fc[0].weight.data = torch.from_numpy(weights[0]).float()
+        for i, w in enumerate(weights[1:-2]):
+            self.hidden[i][0].weight.data = torch.from_numpy(w).float()
+        self.output_mean[0].weight.data = torch.from_numpy(weights[-2]).float()
+        self.output_dev[0].weight.data = torch.from_numpy(weights[-1]).float()
         pass
 
 

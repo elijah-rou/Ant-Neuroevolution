@@ -63,24 +63,30 @@ class Population:
 
     # makes self.chromosomes
     def initializePop(self, agentType, layerSizes):
+        layerShapes = [
+            (layerSizes[i+1], layerSizes[i]) for i in range(len(layerSizes) -1)
+        ]
         if agentType == "DominAnt":
-            layerSizes = [DominAnt.INPUT_SIZE] + layerSizes + [DominAnt.OUTPUT_SIZE]
+            layerShapes = [(layerSizes[0], DominAnt.INPUT_SIZE)] + layerShapes
+            layerShapes += [(DominAnt.OUTPUT_SIZE, layerSizes[-1])]
         elif agentType == "IntelligAnt":
-            layerSizes = [DominAnt.INPUT_SIZE] + layerSizes + 2*[DominAnt.OUTPUT_SIZE]
+            layerShapes = [(layerSizes[0], IntelligAnt.INPUT_SIZE)] + layerShapes
+            layerShapes += 2*[(IntelligAnt.OUTPUT_SIZE, layerSizes[-1])]
+        
         popArray = []
         for _ in range(self.popSize):
-            popArray += [self.makeChromosome(layerSizes)]
+            popArray += [self.makeChromosome(layerShapes)]
         return popArray
 
     # makes a single chromosome, returns it
     # dimensionality will be a list of numpy arrays, inner dims given by params
-    def makeChromosome(self, layerSizes, randomCenter=0, randomWidth=1):
+    def makeChromosome(self, layerShapes, randomCenter=0, randomWidth=1):
         chromosome = []
-        for i in range(len(layerSizes) -1):
+        for shape in layerShapes:
             chromosome += [
                 randomWidth
                     * (
-                        np.random.rand(layerSizes[i+1], layerSizes[i])
+                        np.random.rand(shape[0], shape[1])
                         - (0.5 - randomCenter)
                     )
             ]
