@@ -24,7 +24,9 @@ class Population:
     def __init__(
         self,
         popSize,
-        mutationRate,
+        mutationRate, 
+        crossoverRate,
+        crossoverFlag,
         mutationStrength,
         keepThresh,
         numInputs,
@@ -35,12 +37,13 @@ class Population:
     ):
         self.popSize = popSize  # number of chromosomes
         self.mutationRate = mutationRate  # probability of a given weight getting mutated (keep low) (i.e. 0.1)
+        self.crossoverRate = crossoverRate
         self.maxMutationStrength = (
             mutationStrength  # variance of gaussian mutation function (needs testing)
         )
-        self.clampRange = [-1, 1] # range of allowable scores
+        self.clampRange = [-5, 5] # range of allowable scores
         self.keepThresh = keepThresh  # what percentage of best chromosomes to keep unchanged each epoch (try 0.1)
-        self.crossover = False  # enable crossover, not implemented yet
+        self.crossover_flag = crossoverFlag  # enable crossover, not implemented yet
         if initFromFile:
             import pickle
 
@@ -76,7 +79,7 @@ class Population:
 
         # TODO: optimize these coefficients/make them not hard-coded
         randomnessCenter = 0  # center of initialization range
-        randomnessWidth = 1  # width of initialization range
+        randomnessWidth = 4  # width of initialization range
 
         for i in range(len(hiddenSizes) + 1):
             if i == 0:  # first layer
@@ -119,7 +122,6 @@ class Population:
 
     # assumes scores have already been set by sim
     # resamples pop and generates new individuals by mutation
-    # TODO: add crossover routine at the end to cross-pollinate new individuals
     def makeBabies(self):
         newGen = []
         best_score = np.max(self.scores)
@@ -137,18 +139,19 @@ class Population:
                 if counter >= numKeeps:
                     break
 
-        if counter + 1 < numKeeps:
+        if counter + 1 < numKeeps: # breakcheck
             print("flag")
 
         # mutate new individuals
         for i in range(self.popSize - numKeeps):
             mutant = newGen[int(numKeeps * random.random())].copy()
             mutant = self.mutate(mutant, best_score)
+            if self.crossover_flag:
+                mutant = self.crossover(mutant, newGen, numKeeps)
             newGen += [mutant]
 
         self.chromosomes = newGen
 
-        # TODO: put crossover routine here
         # TODO: add more sexual innuendos to this method
 
     # takes in chromosome, randomly mutates it according to stored params
@@ -169,6 +172,20 @@ class Population:
                         # )
 
         chromosome = self.clampChromosome(chromosome)
+        return chromosome
+
+    def crossover(self, chromosome, newGen, numKeeps):
+        # loop over layers
+        for i in range(len(chromosome)):
+            # loop over input coeff banks
+            # crossover a whole set of weights for one node
+            # hopefully this should preserve an intact relationship btw inputs
+            for j in range(chromosome[i].shape[0]):
+                # crossover prob should be low
+                if (random.random() < self.crossoverRate):
+                    donor_chromosome = newGen[np.random.randint(numKeeps)]
+                    chromosome[i][j] = donor_chromosome[i][j].copy()
+
         return chromosome
 
     def setScore(self, index, score):

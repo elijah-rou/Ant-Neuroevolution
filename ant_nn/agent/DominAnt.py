@@ -21,13 +21,14 @@ class Brain(nn.Module):
         for i in range(len(hidden_sizes) - 1):
             self.hidden.append(nn.Linear(hidden_sizes[i], hidden_sizes[i + 1]))
         self.output_fc = nn.Linear(hidden_sizes[-1], output_size)
+        self.act = nn.Hardtanh(-5,5)
 
     # TODO change to silu
     def forward(self, x):
         x = torch.tanh(self.input_fc(x))
         for h in self.hidden:
             x = torch.tanh(h(x))
-        x = torch.tanh(self.output_fc(x))
+        x = self.act(self.output_fc(x))
         return x
 
     # TODO Add apply_weights from FetchAnt
@@ -39,9 +40,9 @@ class Brain(nn.Module):
 
 
 class DominAnt(Agent):  # IntelligAnt
-    PHEROMONE_MAX = 5
+    PHEROMONE_MAX = 1
     MAX_TURN = np.pi / 2
-    MAX_RANDOM = np.pi / 2
+    MAX_RANDOM = np.pi / 4
 
     sense_dict = {
         #                || LEFTER |  LEFT  | AHEAD |  RIGHT  | RIGHTER || RADIANS
@@ -89,7 +90,7 @@ class DominAnt(Agent):  # IntelligAnt
         input_size = 15
         # input_size = 13
         # output_size = 3
-        output_size = 4
+        output_size = 3
 
         # Init network and set weights
         self.brain = Brain(input_size, output_size, hidden_sizes)
@@ -160,24 +161,19 @@ class DominAnt(Agent):  # IntelligAnt
         # self.input["global_angle"][0] = self.get_angle_to_nest()
         self.pickupFood()
         self.dropFood()
-        self.input["has_food"][0] = 3 if self.has_food else 0
+        self.input["has_food"][0] = 1 if self.has_food else 0
 
         # Determine actions
         actions = self.brain(self._tensor_input().float())
-        # TODO Remove silu from this, rework network output to assume 0-1 output
         self.put_pheromone = (
             torch.sigmoid(3 * actions[0]).item()
             * self.PHEROMONE_MAX  # should set range to 0-1
         )  # Decide to place pheromone
-        # self.orientation_delta = actions[1].item() * self.MAX_TURN  # Orientation delta
-        # self.randomness = torch.sigmoid(
-        #     3 * actions[2]
-        # ).item()  # should set range to 0-1
-        orientation_delta_sin = actions[1].item()
-        orientation_delta_cos = actions[2].item()
-        self.orientation_delta = np.arctan2(orientation_delta_sin,orientation_delta_cos) * self.MAX_TURN
+
+        orientation_del = actions[1].item()
+        self.orientation_delta = orientation_del * self.MAX_TURN
         self.randomness = torch.sigmoid(
-            3 * actions[3]
+            3 * actions[2]
         ).item()  # should set range to 0-1
 
         self.depositPheromone()

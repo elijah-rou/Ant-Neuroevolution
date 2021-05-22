@@ -42,6 +42,8 @@ class Simulation:
         self.population = Population(
             ga_config["size"],
             ga_config["mutation_rate"],
+            ga_config["crossover_rate"],
+            ga_config["crossover_flag"],
             ga_config["mutation_strength"],
             ga_config["keep_threshold"],
             agent_params["input_size"],
