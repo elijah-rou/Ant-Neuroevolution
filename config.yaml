@@ -24,7 +24,7 @@ agent:
   type: DiscretAnt
   params:
     direction_bins: 7
-    pheromone_bins: 5
+    pheromone_bins: 2
     hidden_layer_size: 
     - 32
     - 32

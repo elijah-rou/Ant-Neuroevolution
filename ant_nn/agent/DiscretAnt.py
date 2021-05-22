@@ -192,6 +192,10 @@ class DiscretAnt(Agent):  # IntelligAnt
         self.depositPheromone()
         self.move(grid)
 
+        nest_cell = grid[self.nest_loc[0]][self.nest_loc[1]]
+        nest_cell.food += self.reward
+        self.reward = 0
+
     def depositPheromone(self):
         self.current_cell.pheromone += self.put_pheromone
         self.reward -= 2
@@ -217,8 +221,10 @@ class DiscretAnt(Agent):  # IntelligAnt
         coords = self.get_coord()
         next_cell = grid[coords[0]][coords[1]]
         if next_cell.pheromone > 0:
-            self.reward += 1
+            self.reward += 5
         elif next_cell.food > 0:
-            self.reward += 1
+            self.reward += 5
+        else:
+            self.reward -= 1
 
         
