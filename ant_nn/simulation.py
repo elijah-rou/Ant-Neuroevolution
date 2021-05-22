@@ -41,11 +41,13 @@ class Simulation:
         self.population = Population(
             ga_config["size"],
             ga_config["mutation_rate"],
+            ga_config["crossover_rate"],
+            ga_config["crossover_flag"],
             ga_config["mutation_strength"],
             ga_config["keep_threshold"],
             config["agent"],
             ga_config["init_from_file"],
-            ga_config["filename"],
+            ga_config["filename"]
         )
 
         self.executor = ProcessPoolExecutor()

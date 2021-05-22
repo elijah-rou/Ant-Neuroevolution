@@ -61,6 +61,7 @@ class Environment:
                 for _ in range(config["num_agents"])
             ]
         self.nest_loc = nest_loc
+        # Spawn Food
 
         # Spawn Food
         # pick 2 sets of random row/col

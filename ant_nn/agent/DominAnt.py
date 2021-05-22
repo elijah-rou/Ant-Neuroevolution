@@ -24,7 +24,7 @@ class Brain(nn.Module):
 
         self.output_fc = nn.Sequential(
             nn.Linear(hidden_sizes[-1], output_size),
-            nn.Tanh()
+            nn.Hardtanh(-5,5)
         )
 
     def forward(self, x):
@@ -42,9 +42,9 @@ class Brain(nn.Module):
 
 
 class DominAnt(Agent):  # IntelligAnt
-    PHEROMONE_MAX = 5
+    PHEROMONE_MAX = 1
     MAX_TURN = np.pi / 2
-    MAX_RANDOM = np.pi / 8
+    MAX_RANDOM = np.pi / 4
     INPUT_SIZE = 15
     OUTPUT_SIZE = 4
 
@@ -165,7 +165,6 @@ class DominAnt(Agent):  # IntelligAnt
 
         # Determine actions
         actions = self.brain(self._tensor_input().float())
-        # TODO Remove silu from this, rework network output to assume 0-1 output
         self.put_pheromone = (
             torch.sigmoid(3 * actions[0]).item()
             * self.PHEROMONE_MAX  # should set range to 0-1

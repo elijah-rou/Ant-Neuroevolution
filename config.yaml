@@ -11,9 +11,11 @@ width: 30
 eval: median
 
 population:
-  size: 5000
+  size: 80
   mutation_rate: 0.1
-  mutation_strength: 0.5
+  crossover_rate: 0.05
+  crossover_flag: True
+  mutation_strength: 1.0 
   keep_threshold: 0.25
   init_from_file: False
   filename: results_500.pkl
