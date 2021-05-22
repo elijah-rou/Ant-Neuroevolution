@@ -10,6 +10,10 @@ from ant_nn.environ.Environment import Environment
 # * Only paint cells that need to be updated?
 # * Separate drawing agent and drawing cell?
 
+# results: 4 element list: [best chromosome at each epoch,
+#                           full distribution of scores at each, 
+#                           all 800 chromosomes of final epoch, 
+#                           food]
 
 class AntGUI(QtWidgets.QMainWindow):
     def __init__(self):
@@ -25,9 +29,9 @@ class AntGUI(QtWidgets.QMainWindow):
         self.setCentralWidget(self.board)
 
         self.chrom_input = QtWidgets.QLineEdit()
-        self.chrom_input.setText(
-            "C:/Users/evere/Documents/CornellTech/SwarmRobotics/Ant-Neuroevolution/results.pkl"
-        )
+        # self.chrom_input.setText(
+        #     "C:/Users/evere/Documents/CornellTech/SwarmRobotics/Ant-Neuroevolution/results.pkl"
+        # )
         self.chrom_input.setPlaceholderText("Chromosome")
 
         self.file_button = QtWidgets.QPushButton("Select file")
@@ -41,9 +45,14 @@ class AntGUI(QtWidgets.QMainWindow):
         self.score_input = QtWidgets.QLineEdit()
         self.score_input.setText('0')
 
-        self.start_button = QtWidgets.QPushButton('Start')
+        self.hide_ants_button = QtWidgets.QPushButton('Hide Ants')
+        self.hide_ants_button.clicked.connect(self.board.toggle_ants)
+
+        self.start_button = QtWidgets.QPushButton('Reset')
         self.start_button.clicked.connect(self.start)
 
+        self.pause_button = QtWidgets.QPushButton('>||')
+        self.pause_button.clicked.connect(self.board.pause)
 
         self.control_layout = QtWidgets.QHBoxLayout()
         self.control_layout.addWidget(self.chrom_input)
@@ -52,6 +61,7 @@ class AntGUI(QtWidgets.QMainWindow):
         self.control_layout.addWidget(self.epoch_input)
         self.control_layout.addWidget(self.score_label)
         self.control_layout.addWidget(self.score_input)
+        self.control_layout.addWidget(self.hide_ants_button)
         self.control_layout.addWidget(self.start_button)
         self.control_layout.addWidget(self.pause_button)
 
@@ -59,7 +69,7 @@ class AntGUI(QtWidgets.QMainWindow):
         self.controls.setLayout(self.control_layout)
 
         self.dock = QtWidgets.QDockWidget("Controls", self)
-        self.dock.setFloating(False)
+        self.dock.setFloating(True)
         self.dock.setWidget(self.controls)
 
         # self.board.start()
@@ -70,6 +80,7 @@ class AntGUI(QtWidgets.QMainWindow):
         self.statusbar.showMessage(self.board.environ.nest.food)
 
     def start(self):
+        self.isStarted = True
         chrom_file = self.chrom_input.text()
 
         # If there's a chromosome file, use it
@@ -89,7 +100,6 @@ class AntGUI(QtWidgets.QMainWindow):
         else:
             self.board.start()
 
-
     def center(self):
 
         screen = QtWidgets.QDesktopWidget().screenGeometry()
@@ -104,6 +114,9 @@ class AntGUI(QtWidgets.QMainWindow):
         dialog.setViewMode(QtWidgets.QFileDialog.Detail)
         if dialog.exec_():
             self.chrom_input.setText(dialog.selectedFiles()[0])
+
+    def mousePressEvent(self, QMouseEvent):
+        self.board.addFood(QMouseEvent.pos())
 
 
 class Communicate(QtCore.QObject):
@@ -121,18 +134,47 @@ class Board(QtWidgets.QFrame):
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.environ = None
         self.c = Communicate()
+        self.isStarted = False
+        self.isPaused = True
+        self.show_ants = True
 
     def start(self, chromosome=None):
+        self.isStarted = True
         self.environ = Environment(chromosome)
+        # self.draw_checkers()
         self.timer = QtCore.QBasicTimer()
         self.update()
-        self.timer.start(Board.Timer, self)
+    
+    def pause(self):
+        if not self.isStarted:
+            return
+        self.isPaused = not self.isPaused
+        if self.isPaused:
+            self.timer.stop()
+        else:
+            self.timer.start(Board.Timer, self)
+    
+    def toggle_ants(self):
+        self.show_ants = not self.show_ants
+
+    def draw_checkers(self):
+        for i in range(Board.BoardWidth * Board.BoardHeight):
+            if i % 2 == 0:
+                row = i//Board.BoardHeight
+                col = i%Board.BoardHeight
+                self.environ.grid[row][col].food = 1
 
     def squareWidth(self):
-        return self.contentsRect().width() / Board.BoardWidth
+        return self.contentsRect().width() // Board.BoardWidth
 
     def squareHeight(self):
-        return self.contentsRect().height() / Board.BoardHeight
+        return self.contentsRect().height() // Board.BoardHeight
+    
+    def addFood(self, pos):
+        col = pos.x()//self.squareWidth()
+        row = pos.y()//self.squareHeight()
+        self.environ.grid[row][col].food += 1
+        self.update()
 
     def paintEvent(self, event):
         if not self.environ:
@@ -149,7 +191,7 @@ class Board(QtWidgets.QFrame):
                 self.drawSquare(
                     painter,
                     rect.left() + col * self.squareWidth(),
-                    boardTop + (Board.BoardHeight - row - 1) * self.squareHeight(),
+                    boardTop + row  * self.squareHeight(),
                     cell,
                 )
         for agent in self.environ.agents:
@@ -158,7 +200,7 @@ class Board(QtWidgets.QFrame):
             self.drawSquare(
                 painter,
                 rect.left() + col * self.squareWidth(),
-                boardTop + (Board.BoardHeight - row - 1) * self.squareHeight(),
+                boardTop + row  * self.squareHeight(),
                 None,
                 agent
             )
@@ -173,48 +215,71 @@ class Board(QtWidgets.QFrame):
         QtWidgets.QFrame.timerEvent(self, event)
 
     def drawSquare(self, painter, x, y, cell=None, ant=None):
-        if ant:
-            color = QtGui.QColor(0xCC0000)
-            # if ant.has_food:
-            #     color = QtGui.QColor(0xFFD700)
-            # else:
-            #     color = QtGui.QColor(0xCC0000)
-        elif cell.is_nest:
-            color = QtGui.QColor(0xDAAA00)
-        elif not cell.active:
-            color = QtGui.QColor(0xDAAA00)  # Draw Wall
-        elif cell.pheromone > 0:  # draw pheromone
-            color = QtGui.QColor.fromHsv(233, 255 * min(cell.pheromone, 1), 255)
-        elif cell.pheromone == 0: 
-            color = QtGui.QColor(0xFFFFFF) # Draw blank space
-        elif cell.pheromone <0:
-            color = QtGui.QColor(0xFFC0CB)
-
+        color = None
+        if self.show_ants and ant:
+            color = QtGui.QColor.fromHsv(*Colors.ANT)
+        if cell:
+            if cell.is_nest:
+                color = QtGui.QColor.fromHsv(*Colors.NEST)
+            elif cell.pheromone > 0:  # draw pheromone
+                h,s,v = Colors.PHER
+                if Colors.mode == 'dark':
+                    v = v*min(cell.pheromone,1)
+                else:
+                    s = s * min(cell.pheromone,1)
+                color = QtGui.QColor.fromHsv(h, s, v) 
+            elif cell.pheromone == 0: 
+                color = QtGui.QColor.fromHsv(*Colors.FREE)
+            elif cell.pheromone <0:
+                color = QtGui.QColor(0xFFC0CB)
+        if not color:
+            color = QtGui.QColor.fromHsv(*Colors.FREE)
+        padding = 1
+        if Colors.mode == 'dark':
+            padding = 0
         painter.fillRect(
-            x + 1, y + 1, self.squareWidth() - 1, self.squareHeight() - 1, color
+            x+padding, y+padding,
+            self.squareWidth() - padding, self.squareHeight() -padding,
+            color
         )
 
+        # Draw food
         if (cell and not cell.is_nest and cell.food > 0) or (ant and ant.has_food):  
-            color = QtGui.QColor(0x66CC66)# Draw Food
+            color = QtGui.QColor.fromHsv(*Colors.FOOD)
             painter.fillRect(
             x + self.squareWidth()//4+1, y + self.squareHeight()//4+1, 
             self.squareWidth()//2, self.squareHeight()//2, color
         )
 
 class Colors(object):
+    '''
+    c stores colors in hsv
+    '''
+    # Bright mode
+    mode = 'bright'
+    c = [
+        (0, 0, 255), # White space
+        (0, 255, 255), # Red Ant
+        (50, 100, 20), # brown nest
+        (233, 255, 255), # blue pheromone
+        (112, 255, 255) # Green food
+    ]
 
-    colorTable = {
-        0x000000,
-        0xCC6666,
-        0x66CC66,  # Green
-        0x6666CC,
-        0xCCCC66,  #
-        0xCC66CC,  # purple
-        0x66CCCC,  # Cyan
-        0xDAAA00,  # Yellow
-        0xFFC0CB,  # Pink
-        0xFFA500   # Orange
-    }
+    # dark mode
+    # mode = 'dark'
+    # c = [
+    #     (0, 0, 0), # black space
+    #     (0, 255, 255), # Red Ant
+    #     (26, 255, 200), # brown nest
+    #     (233, 255, 255), # blue pheromone
+    #     (112, 255, 255) # Green food
+    # ]
+
+    FREE = c[0]
+    ANT =  c[1]
+    NEST = c[2]
+    PHER = c[3]
+    FOOD = c[4]
 
 def main():
 
