@@ -80,7 +80,7 @@ class Population:
             d_bins = params["direction_bins"]
             p_bins = params["pheromone_bins"]
             layerShapes = [(layerSizes[0], DiscretAnt.INPUT_SIZE)] + layerShapes
-            layerShapes += [(d_bins, layerSizes[-1])]
+            layerShapes += [(d_bins+1, layerSizes[-1])]
             layerShapes += [(p_bins, layerSizes[-1])]
         
         popArray = []

@@ -24,7 +24,7 @@ class Brain(nn.Module):
             )
 
         self.output_direction = nn.Sequential(
-            nn.Linear(hidden_sizes[-1], direction_bins),
+            nn.Linear(hidden_sizes[-1], direction_bins+1),
             nn.Softmax(dim=0)
         )
         self.output_pheromone = nn.Sequential(
@@ -178,10 +178,15 @@ class DiscretAnt(Agent):  # IntelligAnt
 
         # Determine actions
         output = self.brain(self._tensor_input().float())
-        direction = torch.argmax(output[:self.direction_bins]) 
+        direction = torch.argmax(output[:self.direction_bins+1])
         pheromone = torch.argmax(output[-self.pheromone_bins:])
 
-        self.orientation_delta = self.directions[direction]
+        if direction < self.direction_bins:
+            self.orientation_delta = self.directions[direction]
+        else:
+            self.orientation_delta = np.random.uniform(
+            -np.pi/2, np.pi/2
+        )
         self.put_pheromone = self.pheromones[pheromone]
 
         self.depositPheromone()
