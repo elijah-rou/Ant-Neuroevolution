@@ -203,7 +203,7 @@ class DiscretAnt(Agent):  # IntelligAnt
         # )
         self.orientation %= 2 * np.pi
 
-        next_pos = [0.0, 0.0]
+        next_pos = np.array([0.0, 0.0])
         next_pos[0] = self.position[0] + self.MAX_SPEED * np.cos(self.orientation)
         next_pos[1] = self.position[1] + self.MAX_SPEED * np.sin(self.orientation)
 
@@ -213,10 +213,12 @@ class DiscretAnt(Agent):  # IntelligAnt
             next_pos[0] = self.position[0] + self.MAX_SPEED * np.cos(self.orientation)
             next_pos[1] = self.position[1] + self.MAX_SPEED * np.sin(self.orientation)
 
-        next_cell = grid[next_pos[0]][next_pos[1]]
+        self.position[:] = next_pos[:]
+        coords = self.get_coord()
+        next_cell = grid[coords[0]][coords[1]]
         if next_cell.pheromone > 0:
             self.reward += 1
         elif next_cell.food > 0:
             self.reward += 1
 
-        self.position[:] = next_pos[:]
+        
