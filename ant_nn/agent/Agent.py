@@ -1,5 +1,3 @@
-import random
-
 from abc import ABC, abstractmethod
 import numpy as np
 
@@ -29,6 +27,8 @@ class Agent(ABC):
         self.food_gathered = 0
         self.distance_traveled = 0
         self.reward = 0
+        self.episode_rewards = []
+        self.episode_log_prob = []
 
     @abstractmethod
     def update(self, env):

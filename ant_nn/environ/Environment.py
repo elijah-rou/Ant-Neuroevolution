@@ -4,8 +4,8 @@ from ant_nn.agent.RandAnt import RandAnt
 from ant_nn.agent.DeterminAnt import DeterminAnt
 from ant_nn.agent.IntelligAnt import IntelligAnt
 from ant_nn.agent.DiscretAnt import DiscretAnt
+from ant_nn.agent.DiscretAnt2 import DiscretAnt2
 from ant_nn.agent.DominAnt import DominAnt
-import yaml
 
 
 class Environment:
@@ -53,6 +53,12 @@ class Environment:
             p_bins = params.get("pheromone_bins", 5)
             self.agents = [
                 DiscretAnt(layer_size, chromosome, d_bins, p_bins, nest_loc=nest_loc, position=nest_loc)
+                for _ in range(config["num_agents"])
+            ]
+        elif chromosome and agent_config["type"] == "DiscretAnt2":
+            d_bins = params.get("direction_bins", 7)
+            self.agents = [
+                DiscretAnt2(layer_size, chromosome, d_bins, nest_loc=nest_loc, position=nest_loc)
                 for _ in range(config["num_agents"])
             ]
         else:

@@ -11,7 +11,7 @@ width: 30
 eval: median
 
 population:
-  size: 10
+  size: 500
   mutation_rate: 0.5
   crossover_rate: 0.2
   crossover_flag: True
@@ -21,10 +21,9 @@ population:
   filename: results_500.pkl
 
 agent:
-  type: DiscretAnt
+  type: DiscretAnt2
   params:
     direction_bins: 7
-    pheromone_bins: 2
     hidden_layer_size: 
     - 32
     - 32

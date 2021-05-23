@@ -3,6 +3,7 @@
 # Author: Russell Bingham, Eli Roussos
 # Date: 3/31/21
 from .DiscretAnt import DiscretAnt
+from .DiscretAnt2 import DiscretAnt2
 import numpy as np
 import random
 from .IntelligAnt import IntelligAnt
@@ -86,6 +87,10 @@ class Population:
             layerShapes = [(layerSizes[0], DiscretAnt.INPUT_SIZE)] + layerShapes
             layerShapes += [(d_bins+1, layerSizes[-1])]
             layerShapes += [(p_bins, layerSizes[-1])]
+        elif agentType == "DiscretAnt2":
+            d_bins = params["direction_bins"]
+            layerShapes = [(layerSizes[0], DiscretAnt.INPUT_SIZE)] + layerShapes
+            layerShapes += [(d_bins+1, layerSizes[-1])]
         
         popArray = []
         for _ in range(self.popSize):

@@ -8,7 +8,7 @@ from .brain_util import Mish
 class Brain(nn.Module):
     """Neural Net for the ants. Uses 3 hidden layers. Split branch for mean and std."""
 
-    def __init__(self, input_size, direction_bins, pheromone_bins, hidden_sizes):
+    def __init__(self, input_size, direction_bins, hidden_sizes):
         super().__init__()
         self.input_fc = nn.Sequential(
             nn.Linear(input_size, hidden_sizes[0]),
@@ -27,31 +27,24 @@ class Brain(nn.Module):
             nn.Linear(hidden_sizes[-1], direction_bins+1),
             nn.Softmax(dim=0)
         )
-        self.output_pheromone = nn.Sequential(
-            nn.Linear(hidden_sizes[-1], pheromone_bins),
-            nn.Softmax(dim=0)
-        )
         
 
     def forward(self, x):
         x = self.input_fc(x)
         for h in self.hidden:                        
             x = h(x)
-        x_dir = self.output_direction(x)
-        x_pheromone = self.output_pheromone(x)
-        x = torch.cat([x_dir, x_pheromone], 0)
+        x = self.output_direction(x)
         return x
 
     def apply_weights(self, weights):
         self.input_fc[0].weight.data = torch.from_numpy(weights[0]).float()
         for i, w in enumerate(weights[1:-2]):
             self.hidden[i][0].weight.data = torch.from_numpy(w).float()
-        self.output_direction[0].weight.data = torch.from_numpy(weights[-2]).float()
-        self.output_pheromone[0].weight.data = torch.from_numpy(weights[-1]).float()
+        self.output_direction[0].weight.data = torch.from_numpy(weights[-1]).float()
         pass
 
 
-class DiscretAnt(Agent):  # IntelligAnt
+class DiscretAnt2(Agent):  # IntelligAnt
     PHEROMONE_MAX = 5
     MAX_RANDOM = np.pi / 8
     INPUT_SIZE = 15
@@ -81,7 +74,6 @@ class DiscretAnt(Agent):  # IntelligAnt
         hidden_sizes,
         weights,
         direction_bins,
-        pheromone_bins,
         nest_loc=[0, 0],
         position=[0, 0],
     ):
@@ -101,18 +93,23 @@ class DiscretAnt(Agent):  # IntelligAnt
         }
 
         # Init network and set weights
-        self.brain = Brain(self.INPUT_SIZE, direction_bins, pheromone_bins, hidden_sizes)
+        self.brain = Brain(self.INPUT_SIZE, direction_bins, hidden_sizes)
         self.brain.apply_weights(weights)
         self.direction_bins = direction_bins
-        self.pheromone_bins = pheromone_bins
 
         directions = np.linspace(-np.pi/2, np.pi/2, self.direction_bins+1)
         self.directions = [(directions[i+1]+directions[i])/2 for i in range(self.direction_bins)]
-        self.pheromones = np.linspace(0, self.PHEROMONE_MAX, self.pheromone_bins)
+
+        # Get correct device
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda")
+        else:
+            self.device = torch.device("cpu")
+        self.brain = self.brain.to(self.device)
 
     def _tensor_input(self):
         """Return a tensor from the input dict"""
-        return torch.from_numpy(np.concatenate([x for x in self.input.values()]))
+        return torch.from_numpy(np.concatenate([x for x in self.input.values()])).to(self.device)
 
     def get_angle_to_nest(self):
         """returns angle from agent to nest"""
@@ -178,8 +175,7 @@ class DiscretAnt(Agent):  # IntelligAnt
 
         # Determine actions
         output = self.brain(self._tensor_input().float())
-        direction = torch.argmax(output[:self.direction_bins+1])
-        pheromone = torch.argmax(output[-self.pheromone_bins:])
+        direction = np.random.choice(np.arange(self.direction_bins+1), p=output.data.numpy())
 
         if direction < self.direction_bins:
             self.orientation_delta = self.directions[direction]
@@ -187,17 +183,17 @@ class DiscretAnt(Agent):  # IntelligAnt
             self.orientation_delta = np.random.uniform(
             -np.pi/2, np.pi/2
         )
-        self.put_pheromone = self.pheromones[pheromone]
 
         self.depositPheromone()
         self.move(grid)
 
         self.episode_rewards.append(self.reward)
+        self.episode_log_prob.append(torch.log(output[direction]))
         self.reward = 0
 
     def depositPheromone(self):
-        self.current_cell.pheromone += self.put_pheromone
-        self.reward -= 2
+        if self.has_food:
+            self.current_cell.pheromone += 1
 
     def move(self, grid):
         # Move the approrpitae
