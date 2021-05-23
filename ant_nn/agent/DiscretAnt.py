@@ -193,8 +193,6 @@ class DiscretAnt(Agent):  # IntelligAnt
         self.move(grid)
 
         nest_cell = grid[self.nest_loc[0]][self.nest_loc[1]]
-        nest_cell.food += self.reward
-        self.reward = 0
 
     def depositPheromone(self):
         self.current_cell.pheromone += self.put_pheromone
