@@ -41,7 +41,7 @@ class Population:
         self.maxMutationStrength = (
             mutationStrength  # variance of gaussian mutation function (needs testing)
         )
-        self.clampRange = [-5, 5] # range of allowable scores
+        self.clampRange = [-1, 1] # range of allowable scores
         self.keepThresh = keepThresh  # what percentage of best chromosomes to keep unchanged each epoch (try 0.1)
         self.crossover_flag = crossoverFlag  # enable crossover, not implemented yet
         if initFromFile:
