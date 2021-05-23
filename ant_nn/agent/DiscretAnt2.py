@@ -94,7 +94,7 @@ class DiscretAnt2(Agent):  # IntelligAnt
 
         # Init network and set weights
         self.brain = Brain(self.INPUT_SIZE, direction_bins, hidden_sizes)
-        self.brain.apply_weights(weights)
+        #self.brain.apply_weights(weights)
         self.direction_bins = direction_bins
 
         directions = np.linspace(-np.pi/2, np.pi/2, self.direction_bins+1)
@@ -216,9 +216,9 @@ class DiscretAnt2(Agent):  # IntelligAnt
         coords = self.get_coord()
         next_cell = grid[coords[0]][coords[1]]
         if next_cell.pheromone > 0:
-            self.reward += 5
+            self.reward += 50
         elif next_cell.food > 0:
-            self.reward += 5
+            self.reward += 50
         else:
             self.reward -= 1
 

@@ -1,7 +1,7 @@
 num_epochs: 250
 num_timesteps: 300
 num_agents: 10
-num_runs: 3
+num_runs: 1
 nest_location: center
 # nest_location:
 #   - 0
@@ -11,11 +11,11 @@ width: 30
 eval: median
 
 population:
-  size: 500
-  mutation_rate: 0.5
-  crossover_rate: 0.2
+  size: 2000
+  mutation_rate: 0.4
+  crossover_rate: 0.1
   crossover_flag: True
-  mutation_strength: 0.5
+  mutation_strength: 0.3
   keep_threshold: 0.25
   init_from_file: False
   filename: results_500.pkl
@@ -26,4 +26,4 @@ agent:
     direction_bins: 7
     hidden_layer_size: 
     - 32
-    - 32
+    - 16

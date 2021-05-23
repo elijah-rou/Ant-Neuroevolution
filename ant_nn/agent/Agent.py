@@ -60,13 +60,13 @@ class Agent(ABC):
             self.has_food = True
             self.current_cell.food -= 1
             self.last_food_location = self.current_cell.position
-            self.reward += 10
+            self.reward += 20
 
     def dropFood(self):
         """Drop Food if the current cell is a nest cell"""
         if self.has_food and self.current_cell.is_nest:
             self.current_cell.food += 1
-            self.reward += 20
+            self.reward += 200
             self.has_food = False
 
     def get_coord(self):

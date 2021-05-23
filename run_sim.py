@@ -29,7 +29,6 @@ def main(cmdline_opts):
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -a not recognized"
-        usage()
         sys.exit(2)
 
     # default paths
@@ -39,6 +38,7 @@ def main(cmdline_opts):
     # default degen settings
     degen_epoch = None
     degen_score = 10
+    backprop = True
 
     # parse args
     for opt,arg in optlist:
@@ -57,13 +57,20 @@ def main(cmdline_opts):
     print("result file:", result_path)
     print()
 
+    print("here")
     sim = Simulation(config_path=config_path)
-    chromosomes, scores, final_pop, food = sim.run(degen_epoch=degen_epoch, degen_score=degen_score)
+    print("here2")
+    if backprop:
+        print("here")
+        sim.run_backprop()
+    # else:
+    #     print("here")
+    #     chromosomes, scores, final_pop, food = sim.run(degen_epoch=degen_epoch, degen_score=degen_score)
 
-    file = open(result_path, "wb")
-    dill.dump([chromosomes, scores, final_pop, food], file)
-    file.close()
-    print("done")
+    # file = open(result_path, "wb")
+    # dill.dump([chromosomes, scores, final_pop, food], file)
+    # file.close()
+    # print("done")
 
 
 if __name__ == "__main__":

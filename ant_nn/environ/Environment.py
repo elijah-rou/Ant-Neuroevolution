@@ -6,12 +6,12 @@ from ant_nn.agent.IntelligAnt import IntelligAnt
 from ant_nn.agent.DiscretAnt import DiscretAnt
 from ant_nn.agent.DiscretAnt2 import DiscretAnt2
 from ant_nn.agent.DominAnt import DominAnt
-
+import copy
 
 class Environment:
     """Class representing the environment"""
 
-    def __init__(self, config, chromosome=None):
+    def __init__(self, config, chromosome=None, model=None):
         self.time = 0
         agent_config = config["agent"]
         
@@ -66,9 +66,13 @@ class Environment:
                 DeterminAnt(nest_loc=nest_loc, position=nest_loc)
                 for _ in range(config["num_agents"])
             ]
-        self.nest_loc = nest_loc
-        # Spawn Food
 
+        if model is not None:
+            for agent in self.agents:
+                agent.brain = copy.deepcopy(model)
+        
+        self.nest_loc = nest_loc
+        
         # Spawn Food
         # pick 2 sets of random row/col
         foodBoxSize = 20  # side length of square to spawn food randomly on
@@ -169,6 +173,9 @@ class Environment:
                     self.grid[i][j].food += amount
 
         return (r+2)**2 * amount
+    
+    def get_agent_scores(self):
+        return [(a.episode_rewards, a.episode_log_prob) for a in self.agents]
 
     def __str__(self):
         string = ""
