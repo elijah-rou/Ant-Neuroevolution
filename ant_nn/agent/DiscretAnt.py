@@ -178,8 +178,8 @@ class DiscretAnt(Agent):  # IntelligAnt
 
         # Determine actions
         output = self.brain(self._tensor_input().float())
-        direction = torch.argmax(output[:self.direction_bins+1])
-        pheromone = torch.argmax(output[-self.pheromone_bins:])
+        direction = np.random.choice(np.arange(self.direction_bins+1), p=output[:self.direction_bins+1].data.numpy())
+        pheromone = np.random.choice(np.arange(self.pheromone_bins), p=output[-self.pheromone_bins:].data.numpy())
 
         if direction < self.direction_bins:
             self.orientation_delta = self.directions[direction]
