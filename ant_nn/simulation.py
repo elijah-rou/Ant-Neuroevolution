@@ -60,8 +60,8 @@ class Simulation:
         Run the simulation
         """
         
-        pop_is_degen = True  # used to restart sim if population isn't evolving
-        while (pop_is_degen):
+        is_degen = True  # used to restart sim if population isn't evolving
+        while (is_degen):
             e_chromosomes = []
             final_pop = []
             pop_size = self.population.size()
