@@ -2,6 +2,8 @@ import numpy as np
 from ant_nn.environ.GridCell import GridCell
 from ant_nn.agent.RandAnt import RandAnt
 from ant_nn.agent.DeterminAnt import DeterminAnt
+from ant_nn.agent.IntelligAnt import IntelligAnt
+from ant_nn.agent.DiscretAnt import DiscretAnt
 from ant_nn.agent.DominAnt import DominAnt
 import yaml
 
@@ -9,14 +11,10 @@ import yaml
 class Environment:
     """Class representing the environment"""
 
-    def __init__(self, chromosome=None, config_path="config.yaml"):
+    def __init__(self, config, chromosome=None):
         self.time = 0
-
-        # Get config
-        file_stream = open(config_path, "r")
-        config = yaml.full_load(file_stream)
         agent_config = config["agent"]
-
+        
         # Setup Grid
         self.height = config.get("height", 50)
         self.width = config.get("width", 50)
@@ -38,11 +36,23 @@ class Environment:
         self.nest.is_nest = True
 
         # Spawn Agents
+        params = agent_config.get("params")
+        layer_size = params.get("hidden_layer_size")
         if chromosome and agent_config["type"] == "DominAnt":
-            params = agent_config["params"]
-            layer_size = params["hidden_layer_size"]
             self.agents = [
                 DominAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
+                for _ in range(config["num_agents"])
+            ]
+        elif chromosome and agent_config["type"] == "IntelligAnt":  
+            self.agents = [
+                IntelligAnt(layer_size, chromosome, nest_loc=nest_loc, position=nest_loc)
+                for _ in range(config["num_agents"])
+            ]
+        elif chromosome and agent_config["type"] == "DiscretAnt":
+            d_bins = params.get("direction_bins", 7)
+            p_bins = params.get("pheromone_bins", 5)
+            self.agents = [
+                DiscretAnt(layer_size, chromosome, d_bins, p_bins, nest_loc=nest_loc, position=nest_loc)
                 for _ in range(config["num_agents"])
             ]
         else:
@@ -51,6 +61,7 @@ class Environment:
                 for _ in range(config["num_agents"])
             ]
         self.nest_loc = nest_loc
+        # Spawn Food
 
         # Spawn Food
         # pick 2 sets of random row/col

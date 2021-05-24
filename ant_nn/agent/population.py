@@ -1,9 +1,12 @@
 # Ant Neuroevolution Project
 # Population class
-# Author: Russell Bingham
+# Author: Russell Bingham, Eli Roussos
 # Date: 3/31/21
+from .DiscretAnt import DiscretAnt
 import numpy as np
 import random
+from .IntelligAnt import IntelligAnt
+from .DominAnt import DominAnt
 
 
 class Population:
@@ -23,23 +26,24 @@ class Population:
     def __init__(
         self,
         popSize,
-        mutationRate,
+        mutationRate, 
+        crossoverRate,
+        crossoverFlag,
         mutationStrength,
         keepThresh,
-        numInputs,
-        numOutputs,
-        layerSizes,
+        agentConfig,
         initFromFile=False,
-        filename=None,
+        filename=None
     ):
         self.popSize = popSize  # number of chromosomes
         self.mutationRate = mutationRate  # probability of a given weight getting mutated (keep low) (i.e. 0.1)
+        self.crossoverRate = crossoverRate
         self.maxMutationStrength = (
             mutationStrength  # variance of gaussian mutation function (needs testing)
         )
-        self.clampRange = [-2, 2]  # range of allowable scores
+        self.clampRange = [-5, 5] # range of allowable scores
         self.keepThresh = keepThresh  # what percentage of best chromosomes to keep unchanged each epoch (try 0.1)
-        self.crossover = False  # enable crossover, not implemented yet
+        self.crossover_flag = crossoverFlag  # enable crossover, not implemented yet
         if initFromFile:
             import pickle
 
@@ -53,7 +57,7 @@ class Population:
             self.chromosomes = level
         else:
             self.chromosomes = self.initializePop(
-                numInputs, numOutputs, layerSizes
+                agentConfig
             )  # list of weights
         self.scores = np.zeros(popSize)  # list of scores
 
@@ -62,46 +66,44 @@ class Population:
         self.maxScore = 160  # represents the target score - WARNING - if scores go above this training stops
 
     # makes self.chromosomes
-    def initializePop(self, numInputs, numOutputs, layerSizes):
+    def initializePop(self, agentConfig):
+        agentType = agentConfig["type"]
+        params = agentConfig["params"]
+
+        layerSizes = params["hidden_layer_size"]
+        layerShapes = [
+            (layerSizes[i+1], layerSizes[i]) for i in range(len(layerSizes) -1)
+        ]
+        if agentType == "DominAnt":
+            layerShapes = [(layerSizes[0], DominAnt.INPUT_SIZE)] + layerShapes
+            layerShapes += [(DominAnt.OUTPUT_SIZE, layerSizes[-1])]
+        elif agentType == "IntelligAnt":
+            layerShapes = [(layerSizes[0], DiscretAnt.INPUT_SIZE)] + layerShapes
+            layerShapes += 2*[(IntelligAnt.OUTPUT_SIZE, layerSizes[-1])]
+        elif agentType == "DiscretAnt":
+            d_bins = params["direction_bins"]
+            p_bins = params["pheromone_bins"]
+            layerShapes = [(layerSizes[0], DiscretAnt.INPUT_SIZE)] + layerShapes
+            layerShapes += [(d_bins+1, layerSizes[-1])]
+            layerShapes += [(p_bins, layerSizes[-1])]
+        
         popArray = []
-        for i in range(self.popSize):
-            popArray += [self.makeChromosome(numInputs, numOutputs, layerSizes)]
+        for _ in range(self.popSize):
+            popArray += [self.makeChromosome(layerShapes)]
         return popArray
 
     # makes a single chromosome, returns it
     # dimensionality will be a list of numpy arrays, inner dims given by params
-    def makeChromosome(self, numInputs, numOutputs, hiddenSizes):
+    def makeChromosome(self, layerShapes, randomCenter=0, randomWidth=4):
         chromosome = []
-
-        # TODO: optimize these coefficients/make them not hard-coded
-        randomnessCenter = 0  # center of initialization range
-        randomnessWidth = 1  # width of initialization range
-
-        for i in range(len(hiddenSizes) + 1):
-            if i == 0:  # first layer
-                chromosome += [
-                    randomnessWidth
+        for shape in layerShapes:
+            chromosome += [
+                randomWidth
                     * (
-                        np.random.rand(hiddenSizes[0], numInputs)
-                        - (0.5 - randomnessCenter)
+                        np.random.rand(shape[0], shape[1])
+                        - (0.5 - randomCenter)
                     )
-                ]
-            elif i == len(hiddenSizes):  # last layer
-                chromosome += [
-                    randomnessWidth
-                    * (
-                        np.random.rand(numOutputs, hiddenSizes[-1])
-                        - (0.5 - randomnessCenter)
-                    )
-                ]
-            else:  # middle layers
-                chromosome += [
-                    randomnessWidth
-                    * (
-                        np.random.rand(hiddenSizes[i], hiddenSizes[i - 1])
-                        - (0.5 - randomnessCenter)
-                    )
-                ]
+            ]
 
         return chromosome
 
@@ -118,7 +120,6 @@ class Population:
 
     # assumes scores have already been set by sim
     # resamples pop and generates new individuals by mutation
-    # TODO: add crossover routine at the end to cross-pollinate new individuals
     def makeBabies(self):
         newGen = []
         best_score = np.max(self.scores)
@@ -127,7 +128,6 @@ class Population:
         )
         numKeeps = int(self.popSize * self.keepThresh)
         
-
         counter = 0
         # carry over the best individuals
         for i in range(self.popSize):
@@ -137,18 +137,19 @@ class Population:
                 if counter >= numKeeps:
                     break
 
-        if counter + 1 < numKeeps:
+        if counter + 1 < numKeeps: # breakcheck
             print("flag")
 
         # mutate new individuals
         for i in range(self.popSize - numKeeps):
             mutant = newGen[int(numKeeps * random.random())].copy()
             mutant = self.mutate(mutant, best_score)
+            if self.crossover_flag:
+                mutant = self.crossover(mutant, newGen, numKeeps)
             newGen += [mutant]
 
         self.chromosomes = newGen
 
-        # TODO: put crossover routine here
         # TODO: add more sexual innuendos to this method
 
     # takes in chromosome, randomly mutates it according to stored params
@@ -164,11 +165,22 @@ class Population:
                         random.random() < self.mutationRate
                     ):  # only mutate a gene w some small prob
                         chromosome[i][j][k] += np.random.normal(0, self.mutationStrength)
-                        # chromosome[i][j][k] = np.random.uniform(
-                        #     self.clampRange[0], self.clampRange[1]
-                        # )
 
         chromosome = self.clampChromosome(chromosome)
+        return chromosome
+
+    def crossover(self, chromosome, newGen, numKeeps):
+        # loop over layers
+        for i in range(len(chromosome)):
+            # loop over input coeff banks
+            # crossover a whole set of weights for one node
+            # hopefully this should preserve an intact relationship btw inputs
+            for j in range(chromosome[i].shape[0]):
+                # crossover prob should be low
+                if (random.random() < self.crossoverRate):
+                    donor_chromosome = newGen[np.random.randint(numKeeps)]
+                    chromosome[i][j] = donor_chromosome[i][j].copy()
+
         return chromosome
 
     def setScore(self, index, score):

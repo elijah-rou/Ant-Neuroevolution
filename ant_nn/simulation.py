@@ -4,13 +4,13 @@ from ant_nn.environ.Environment import Environment
 from ant_nn.agent.population import Population
 import yaml
 import time
-from concurrent.futures import ProcessPoolExecutor, as_completed, wait
-from functools import partial
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 
-def sim_env(chromosome, TIMESTEPS, config_path="config.yaml"):
-    sim = {"env": Environment(chromosome,config_path=config_path), "food": np.zeros(TIMESTEPS)}
-    for t in range(TIMESTEPS):
+def sim_env(timesteps, config, chromosome=None, model=None):
+    assert (chromosome is not None) or (model is not None)
+    sim = {"env": Environment(config, chromosome), "food": np.zeros(timesteps)}
+    for t in range(timesteps):
         sim["env"].update()
         sim["food"][t] = sim["env"].nest.food
     score = sim["food"]
@@ -33,27 +33,27 @@ class Simulation:
         config = yaml.full_load(file_stream)
 
         ga_config = config["population"]
-        agent_params = config["agent"]["params"]
 
         self.eval_function = config["eval"]
-        self.TIMESTEPS = config["num_timesteps"]
+        self.timesteps = config["num_timesteps"]
         self.epochs = config["num_epochs"]
         self.runs = config["num_runs"]
         self.population = Population(
             ga_config["size"],
             ga_config["mutation_rate"],
+            ga_config["crossover_rate"],
+            ga_config["crossover_flag"],
             ga_config["mutation_strength"],
             ga_config["keep_threshold"],
-            agent_params["input_size"],
-            agent_params["output_size"],
-            agent_params["hidden_layer_size"],
+            config["agent"],
             ga_config["init_from_file"],
-            ga_config["filename"],
+            ga_config["filename"]
         )
 
         self.executor = ProcessPoolExecutor()
         self.scores = np.zeros((self.population.size(), self.runs))
-        self.food_res = np.zeros((self.population.size(), self.runs, self.TIMESTEPS))
+        self.food_res = np.zeros((self.population.size(), self.runs, self.timesteps))
+        self.config = config
 
     def run(self, degen_epoch=None, degen_score=10):
         """
@@ -76,7 +76,7 @@ class Simulation:
 
                 future_envs = {
                     self.executor.submit(
-                        sim_env, self.population.chromosomes[i], self.TIMESTEPS, self.config_path
+                        sim_env, self.timesteps, self.config, self.population.chromosomes[i]
                     ): (i, r)
                     for i in range(pop_size)
                     for r in range(self.runs)
@@ -106,11 +106,11 @@ class Simulation:
                     self.population.scores = np.median(self.scores, axis=1) - np.std(
                         self.scores, axis=1
                     )
-                elif eval_function == "median_minvar_ratio":
+                elif self.eval_function == "median_minvar_ratio":
                     self.population.scores = np.median(self.scores, axis=1) / np.std(
                         self.scores, axis=1
                     )
-                elif eval_function == "average":
+                elif self.eval_function == "average":
                     self.population.scores = np.mean(self.scores, axis=1)
                 else:
                     self.population.scores = np.min(self.scores, axis=1)
@@ -143,3 +143,4 @@ class Simulation:
 
         # print(f"END Total Time: {time.thread_time()}\n")
         return (e_chromosomes, e_scores, final_pop, self.food_res)
+

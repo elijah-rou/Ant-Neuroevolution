@@ -3,6 +3,10 @@
 evTest.py
 results.pkl
 *.zip
+<<<<<<< HEAD
+*.pkl
+=======
 *.pkl
 .DS_Store
 *.zip
+>>>>>>> origin/dev/dcmid
