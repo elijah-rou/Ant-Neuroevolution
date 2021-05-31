@@ -179,31 +179,47 @@ class Simulation:
         lr = 0.01
         optimizer = Adam(model.parameters(), lr)
 
+        mean_losses = []
+        epoch_food = []
         for ep in range(self.epochs):
             t = time.strftime("%X %x %Z")
             print(f"Generation: {ep+1} - {t}")
             food, agent_scores = sim_env_backprop(self.timesteps, self.config, model)
-            agent_scores = agent_scores
+            historic_reward = np.zeros(self.timesteps)
+            historic_reward[-1] = food[-1]
             discounted = torch.zeros((self.config["num_agents"], self.timesteps))
             agent_losses = np.zeros(self.config["num_agents"])
-            for agent in range(discounted.shape[0]):
-                for t in range(discounted.shape[1]):
-                    Gt = 0
-                    power = 0
-                    for reward in agent_scores[agent][0][t:]:
-                        Gt += gamma**power * reward
-                        power += 1
-                    discounted[agent, t] = Gt
-                
-                discounted[agent] = (discounted[agent] - torch.mean(discounted[agent]))/torch.std(discounted[agent])
-                loss = -torch.stack(agent_scores[agent][1])*discounted[agent]
-                optimizer.zero_grad()
-                loss = loss.sum()
-                agent_losses[agent] = loss.item()
-                loss.backward()
-                optimizer.step()
-                print(f"Agent {agent} loss: {loss.item()}")
-            print(f"Mean Loss: {np.mean(agent_losses)}")
-            print(f"Food: {food[-1]}")
+            if food[-1] > 0:
+                for agent in range(discounted.shape[0]):
+                    for t in range(discounted.shape[1]):
+                        Gt = 0
+                        power = 0
+                        # for reward in agent_scores[agent][0][t:]:
+                        #     Gt += gamma**power * reward
+                        #     power += 1
+                        for reward in historic_reward[t:]:
+                            Gt += gamma**power * reward
+                            power += 1
+                        discounted[agent, t] = Gt
+                    
+                    discounted[agent] = (discounted[agent] - torch.mean(discounted[agent]))/torch.std(discounted[agent])
+                    loss = -torch.stack(agent_scores[agent][1])*discounted[agent]
+                    optimizer.zero_grad()
+                    loss = loss.sum()
+                    agent_losses[agent] = loss.item()
+                    loss.backward()
+                    optimizer.step()
+                    print(f"Agent {agent} loss: {loss.item()}")
+                print(f"Mean Loss: {np.mean(agent_losses)}")
+                print(f"Food: {food[-1]}\n")
+
+                mean_losses.append(np.mean(agent_losses))
+                epoch_food.append(food[-1])
+            else:
+                print("NO REWARD")
+            
+        with open("reinforce.npy", "wb") as f:
+            np.save(f, np.concatenate([mean_losses, epoch_food]))
+            
 
 
