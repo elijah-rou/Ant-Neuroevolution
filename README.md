@@ -1,4 +1,4 @@
-Ants
+# Ant Neuroevolution
+In nature, ants forage for food using a phenomenon called stigmergy, whereby the ants indirectly communicate by placing pheromone in the environment for other ants to find. To test whether this strategy is optimal, a functional evolutionary algorithm system for improving the behavior of pheromone-dropping ”ant” agents in simulation is presented. Traditional RL methods are tested as alternatives, but no neural network agent is able to approach the performance of a simple pre-programmed agent, suggesting that the foraging problem is fundamentally difficult to train a neural network decision agent for.
 
-# Poetry Use
-```poetry install```
+[Final Paper](https://www.linkedin.com/in/elijah-roussos/detail/treasury/education:698522969/?entityUrn=urn%3Ali%3Afsd_profileTreasuryMedia%3A(ACoAABfYhToBOUo85dc1PWv_zvOzb16Bj5JeuAE%2C1635472205378)&section=education%3A698522969&treasuryCount=4)
